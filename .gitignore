@@ -1,0 +1,46 @@
+# Environments and Virtual Envs
+.venv/
+venv/
+ENV/
+env/
+
+# Environment Variables & Secrets (CRITICAL: NEVER COMMIT)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Python Bytecode and Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# FieldSure AI Data & Runtime Outputs
+# Public health guidance documents and local data caches (managed locally)
+data/*
+!data/.gitkeep
+!data/README.md
+!data/sample_advisories/
+
+# Generated execution logs and artifacts (keep tracking sample outputs only)
+outputs/*.log
+outputs/*.jsonl
+outputs/*.json
+!outputs/.gitkeep
+!outputs/chat_completion_sample.log
+!outputs/prompt_comparison_sample.log
+!outputs/ingestion_validation_report.json
+
+# Operating System & IDE Artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
