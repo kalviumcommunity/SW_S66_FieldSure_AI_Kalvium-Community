@@ -20,7 +20,7 @@
 | **#10** | Document Loading & Multi-Format Intake | `Completed` | `src/ingestion/loader.py`, `tests/test_loader.py`, `outputs/document_loading_sample.log` |
 | **#11** | Text Extraction & Cleaning Pipeline | `Completed` | `src/ingestion/cleaner.py`, `tests/test_cleaner.py`, `outputs/text_cleaning_sample.log` |
 | **#12** | Document Chunking Strategies | `Completed` | `src/ingestion/chunker.py`, `tests/test_chunker.py`, `outputs/sample_chunks.json`, `outputs/chunking_strategy_comparison.log` |
-| **#13** | Chunk Metadata & Source Tracking | `Not Started` | `src/ingestion/metadata.py`, `tests/test_metadata.py` |
+| **#13** | Chunk Metadata & Source Tracking | `Completed` | `src/ingestion/metadata.py`, `tests/test_metadata.py`, `outputs/tagged_chunks_sample.json`, `outputs/source_tracing_sample.log` |
 | **#14** | Token-Aware Chunk Sizing & Overlap | `Not Started` | `src/ingestion/chunker.py` (token logic), tests |
 | **#15** | Corpus Preparation & Ingestion Validation | `Not Started` | `src/ingestion/pipeline.py`, `outputs/ingested_chunks.jsonl` |
 
@@ -262,22 +262,30 @@
 ---
 
 ### Module #13: Chunk Metadata & Source Tracking
-- **Status**: `Not Started`
+- **Status**: `Completed`
 - **Objective**: Attach immutable, traceable metadata to every chunk (`doc_id`, `chunk_id`, `source_file`, `title`, `version`, `date`, `section`, `chunk_index`, `token_count`).
 - **Dependencies**: Modules #10, #12.
 - **Expected Files**:
   - `src/ingestion/metadata.py`
   - `tests/test_metadata.py`
+  - `outputs/tagged_chunks_sample.json`
+  - `outputs/source_tracing_sample.log`
 - **Implementation Subtasks**:
-  1. [ ] Implement `DocumentChunk` and `ChunkMetadata` dataclasses.
-  2. [ ] Generate deterministic hashes for `doc_id` (SHA-256) and `chunk_id` (`{doc_id}_c{index:04d}`).
-  3. [ ] Extract or infer `document_title`, `version`, and `date` from filename or file headers.
-  4. [ ] Attach section context to individual chunk metadata.
+  1. [x] Implement `DocumentChunk` and `ChunkMetadata` dataclasses.
+  2. [x] Generate deterministic hashes for `doc_id` (SHA-256) and `chunk_id` (`{doc_id}_c{index:04d}`).
+  3. [x] Extract or infer `document_title`, `version`, and `date` from filename or file headers.
+  4. [x] Attach section context to individual chunk metadata.
+  5. [x] Implement source tracing engine (`trace_chunk_to_source`) linking retrieved chunks back to exact parent documents.
+  6. [x] Standardize uniform 14-field schema contract across the entire public health corpus.
 - **Acceptance Criteria**:
   - Every chunk contains 100% of required metadata attributes.
   - Chunk IDs are deterministic and reproducible across runs.
 - **Required Tests**:
   - `tests/test_metadata.py`: Verify metadata creation, field types, and deterministic ID generation.
+- **Verification Evidence**:
+  - Automated tests passing in `tests/test_metadata.py`.
+  - Structured 14-field schema chunks sample saved in `outputs/tagged_chunks_sample.json`.
+  - Lineage tracing audit log saved in `outputs/source_tracing_sample.log`.
 
 ---
 
