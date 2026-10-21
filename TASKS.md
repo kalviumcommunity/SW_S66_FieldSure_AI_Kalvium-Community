@@ -22,7 +22,7 @@
 | **#12** | Document Chunking Strategies | `Completed` | `src/ingestion/chunker.py`, `tests/test_chunker.py`, `outputs/sample_chunks.json`, `outputs/chunking_strategy_comparison.log` |
 | **#13** | Chunk Metadata & Source Tracking | `Completed` | `src/ingestion/metadata.py`, `tests/test_metadata.py`, `outputs/tagged_chunks_sample.json`, `outputs/source_tracing_sample.log` |
 | **#14** | Token-Aware Chunk Sizing & Overlap | `Completed` | `src/ingestion/chunker.py`, `tests/test_token_chunker.py`, `outputs/token_chunks_sample.json`, `outputs/token_chunking_sample.log` |
-| **#15** | Corpus Preparation & Ingestion Validation | `Not Started` | `src/ingestion/pipeline.py`, `outputs/ingested_chunks.jsonl` |
+| **#15** | Corpus Preparation & Ingestion Validation | `Completed` | `src/ingestion/pipeline.py`, `tests/test_ingestion_pipeline.py`, `outputs/ingested_chunks.jsonl`, `outputs/ingestion_validation_report.json`, `outputs/ingestion_summary.log` |
 
 ---
 
@@ -320,27 +320,34 @@
 ---
 
 ### Module #15: Corpus Preparation & Ingestion Validation
-- **Status**: `Not Started`
+- **Status**: `Completed`
 - **Objective**: Build the end-to-end ingestion pipeline runner, ingest a sample public health guidance corpus, perform comprehensive audit checks, and export validated chunks for Member 2.
 - **Dependencies**: Modules #10, #11, #12, #13, #14.
 - **Expected Files**:
   - `src/ingestion/pipeline.py`
   - `outputs/ingested_chunks.jsonl`
   - `outputs/ingestion_validation_report.json`
+  - `outputs/ingestion_summary.log`
   - `tests/test_ingestion_pipeline.py`
 - **Implementation Subtasks**:
-  1. [ ] Curate 3–5 realistic sample public health advisories in `data/sample_advisories/` (e.g., WHO Rabies PEP, COVID-19 Vaccine Storage, Cholera Outbreak Guidelines).
-  2. [ ] Implement `run_ingestion_pipeline(input_dir, output_file)` coordinating loader -> cleaner -> chunker -> metadata -> export.
-  3. [ ] Implement validation audit checks:
+  1. [x] Curate realistic sample public health advisories in `data/sample_advisories/` across Markdown, Plain Text, HTML, and unsupported formats.
+  2. [x] Implement `run_ingestion_pipeline(input_dir, output_file)` coordinating loader -> cleaner -> chunker -> metadata -> export.
+  3. [x] Implement validation audit checks:
      - Zero empty or whitespace-only chunks.
-     - Zero missing metadata fields.
+     - Zero missing metadata fields (100% 14-field contract compliance).
      - All chunks <= token budget.
      - Accurate total chunk counts per document.
-  4. [ ] Export clean JSONL dataset ready for Member 2's vector ingestion.
-  5. [ ] Write audit summary to `outputs/ingestion_validation_report.json`.
+     - Mathematical completeness reconciliation ($Discovered = Ingested + Failures$).
+  4. [x] Export clean JSONL dataset ready for Member 2's vector ingestion (`outputs/ingested_chunks.jsonl`).
+  5. [x] Write audit summary to `outputs/ingestion_validation_report.json` and `outputs/ingestion_summary.log`.
 - **Acceptance Criteria**:
   - Full pipeline runs end-to-end on sample corpus with exit code 0.
   - Outputs valid `ingested_chunks.jsonl` matching data contract.
   - Validation report confirms 0 errors, 0 empty chunks, 100% metadata completeness.
 - **Required Tests**:
-  - `tests/test_ingestion_pipeline.py`: End-to-end integration test validating pipeline output and audit metrics.
+  - `tests/test_ingestion_pipeline.py`: End-to-end integration test validating pipeline output, reconciliation math, and audit metrics.
+- **Verification Evidence**:
+  - Automated tests passing in `tests/test_ingestion_pipeline.py`.
+  - Exported JSONL chunk dataset saved in `outputs/ingested_chunks.jsonl`.
+  - Completeness validation report saved in `outputs/ingestion_validation_report.json`.
+  - Ingestion run dashboard log recorded in `outputs/ingestion_summary.log`.
