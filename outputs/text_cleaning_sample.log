@@ -1,0 +1,62 @@
+[2026-10-21 12:38:00] [INFO] Starting FieldSure AI Text Extraction & Cleaning Pipeline (Module #11)...
+[2026-10-21 12:38:00] [INFO] Loaded 3 documents from corpus: who_dengue_clinical_guidance.md, cdc_cholera_water_safety.txt, moh_malaria_rapid_triage.html
+[2026-10-21 12:38:00] [INFO] Cleaned who_dengue_clinical_guidance.md: 1532 -> 1518 chars (0.91% reduction)
+[2026-10-21 12:38:00] [INFO] Cleaned cdc_cholera_water_safety.txt: 1394 -> 1372 chars (1.58% reduction)
+[2026-10-21 12:38:00] [INFO] Cleaned moh_malaria_rapid_triage.html: 1285 -> 1064 chars (17.20% reduction)
+[2026-10-21 12:38:01] [INFO] Cleaning pipeline successfully completed and saved to outputs/text_cleaning_sample.log
+
+--- Structured Text Cleaning Audit ---
+{
+  "module": "Module #11 — Text Extraction & Cleaning Pipeline",
+  "timestamp": "2026-10-21T07:08:01.129481+00:00",
+  "total_documents_cleaned": 3,
+  "corpus_reports": [
+    {
+      "source_file": "who_dengue_clinical_guidance.md",
+      "doc_id": "who_dengue_clinical_guidance",
+      "original_char_count": 1532,
+      "cleaned_char_count": 1518,
+      "original_word_count": 204,
+      "cleaned_word_count": 204,
+      "reduction_chars": 14,
+      "reduction_percentage": 0.91,
+      "transformations_applied": [
+        "unicode_nfkc_normalized",
+        "whitespace_collapsed"
+      ],
+      "before_snippet": "# WHO Clinical Management of Dengue in Primary Health Centers  ## Document Information - **Source**: World Health Organi...",
+      "after_snippet": "# WHO Clinical Management of Dengue in Primary Health Centers  ## Document Information - **Source**: World Health Organi..."
+    },
+    {
+      "source_file": "cdc_cholera_water_safety.txt",
+      "doc_id": "cdc_cholera_water_safety",
+      "original_char_count": 1394,
+      "cleaned_char_count": 1372,
+      "original_word_count": 182,
+      "cleaned_word_count": 182,
+      "reduction_chars": 22,
+      "reduction_percentage": 1.58,
+      "transformations_applied": [
+        "whitespace_collapsed"
+      ],
+      "before_snippet": "CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL  DOCUMENT IDENTIFIER: CDC-WASH-CHOLERA-2024...",
+      "after_snippet": "CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL  DOCUMENT IDENTIFIER: CDC-WASH-CHOLERA-2024..."
+    },
+    {
+      "source_file": "moh_malaria_rapid_triage.html",
+      "doc_id": "moh_malaria_rapid_triage",
+      "original_char_count": 1285,
+      "cleaned_char_count": 1064,
+      "original_word_count": 156,
+      "cleaned_word_count": 148,
+      "reduction_chars": 221,
+      "reduction_percentage": 17.2,
+      "transformations_applied": [
+        "html_tags_stripped",
+        "whitespace_collapsed"
+      ],
+      "before_snippet": "<!DOCTYPE html> <html lang=\"en\"> <head>     <meta charset=\"UTF-8\">     <title>Ministry of Health - Community Malaria Rapi...",
+      "after_snippet": "National Vector-Borne Disease Control Programme  Standard Operating Procedure: Community Malaria Rapid Diagnostic Testin..."
+    }
+  ]
+}

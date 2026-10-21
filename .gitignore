@@ -38,6 +38,9 @@ outputs/*.json
 !outputs/token_cost_estimation_sample.log
 !outputs/context_window_management_sample.log
 !outputs/document_loading_sample.log
+!outputs/text_cleaning_sample.log
+!outputs/chunking_strategy_comparison.log
+!outputs/sample_chunks.json
 !outputs/ingestion_validation_report.json
 
 # Operating System & IDE Artifacts
