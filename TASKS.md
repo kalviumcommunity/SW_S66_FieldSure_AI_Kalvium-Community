@@ -14,7 +14,7 @@
 | **#1** | Development Environment & Project Workspace Setup | `Completed` | `pyproject.toml`, `.env.example`, `.gitignore`, workspace folders |
 | **#2** | GitHub Repository & Team Workflow Setup | `In Progress` | Directory tree scaffolding, workflow & style guide |
 | **#3** | LLM API Access & First Completion Call | `Completed` | `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log` |
-| **#4** | Prompt Construction & System/User Roles | `Not Started` | `prompts/`, `src/prompt_comparison.py`, `outputs/` |
+| **#4** | Prompt Construction & System/User Roles | `Completed` | `prompts/`, `src/prompt_comparison.py`, `outputs/prompt_comparison_sample.log` |
 | **#10** | Document Loading & Multi-Format Intake | `Not Started` | `src/ingestion/loader.py`, `tests/test_loader.py` |
 | **#11** | Text Extraction & Cleaning Pipeline | `Not Started` | `src/ingestion/cleaner.py`, `tests/test_cleaner.py` |
 | **#12** | Document Chunking Strategies | `Not Started` | `src/ingestion/chunker.py`, `tests/test_chunker.py` |
@@ -104,25 +104,30 @@
 ---
 
 ### Module #4: Prompt Construction & System/User Roles
-- **Status**: `Not Started`
+- **Status**: `Completed`
 - **Objective**: Design role-based prompt templates enforcing strict grounding, inline citations, and deterministic safe refusals for public health questions; build comparative test runner.
 - **Dependencies**: Module #3.
 - **Expected Files**:
   - `prompts/system_prompt_baseline.txt`
   - `prompts/system_prompt_constrained.txt`
+  - `prompts/README.md`
   - `src/prompt_comparison.py`
   - `outputs/prompt_comparison_sample.log`
   - `tests/test_prompts.py`
 - **Implementation Subtasks**:
-  1. [ ] Author `system_prompt_baseline.txt` (standard, unconstrained assistant prompt).
-  2. [ ] Author `system_prompt_constrained.txt` (mandating strict grounding, inline citations `[Doc, Section]`, safe refusal on ungrounded questions, non-diagnostic disclaimer).
-  3. [ ] Implement `src/prompt_comparison.py` sending test questions across both prompts.
-  4. [ ] Capture payloads, responses, token counts, and refusal triggers cleanly in `outputs/prompt_comparison_sample.log`.
+  1. [x] Author `system_prompt_baseline.txt` (standard, unconstrained assistant prompt).
+  2. [x] Author `system_prompt_constrained.txt` (mandating strict grounding, inline citations `[Doc, Section]`, safe refusal on ungrounded questions, non-diagnostic disclaimer).
+  3. [x] Implement `src/prompt_comparison.py` sending test questions across both prompts.
+  4. [x] Capture payloads, responses, token counts, and refusal triggers cleanly in `outputs/prompt_comparison_sample.log`.
 - **Acceptance Criteria**:
   - Comparative execution clearly demonstrates baseline hallucination/extrapolation vs. constrained grounded refusal on out-of-domain queries.
   - Log records tokens and latency without exposing secret keys.
 - **Required Tests**:
   - `tests/test_prompts.py`: Validate prompt template loading, variable formatting, and message structure.
+- **Verification Evidence**:
+  - `prompts/README.md` documents side-by-side prompt analysis and architectural rationale for the chosen constrained prompt.
+  - Automated tests in `tests/test_prompts.py` validate template presence, mandatory safety sections, and mocked comparative runner execution.
+  - Sample comparative execution audit logged in `outputs/prompt_comparison_sample.log`.
 
 ---
 
