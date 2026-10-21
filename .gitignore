@@ -43,6 +43,8 @@ outputs/*.json
 !outputs/sample_chunks.json
 !outputs/tagged_chunks_sample.json
 !outputs/source_tracing_sample.log
+!outputs/token_chunking_sample.log
+!outputs/token_chunks_sample.json
 !outputs/ingestion_validation_report.json
 
 # Operating System & IDE Artifacts

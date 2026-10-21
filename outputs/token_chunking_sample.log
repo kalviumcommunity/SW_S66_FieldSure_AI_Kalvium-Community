@@ -1,0 +1,40 @@
+[2026-10-21 11:05:00] [INFO] Starting FieldSure AI Token-Aware Chunk Sizing & Overlap Audit (Module #14)...
+[2026-10-21 11:05:00] [INFO] Tokenizer encoding: cl100k_base (tiktoken)
+[2026-10-21 11:05:00] [INFO] Target chunk budget: 500 tokens | Controlled overlap: 50 tokens (10.0%)
+[2026-10-21 11:05:00] [INFO] Document evaluated: who_dengue_clinical_guidance.md (321 total tokens, 1518 chars)
+
+--- Task 1 & 2: Token Sizing & Overlap Benchmark ---
+Strategy: token_structural (500/50) | Chunks:  4 | Avg Tokens:  80.2 | Min Tokens:  48 | Max Tokens:  96 | Compliant: 100% (<= 500)
+Strategy: token_sliding    (120/35) | Chunks:  4 | Avg Tokens: 105.5 | Min Tokens:  78 | Max Tokens: 120 | Compliant: 100% (<= 120)
+
+--- Task 3: Boundary Context Preservation Demonstration ---
+Target assertion: Dengue Critical Phase (days 3–7) plasma leakage and mucosal bleeding.
+
+1. WITHOUT OVERLAP (overlap = 0 tokens):
+   - Chunk 0 ends at token 120:
+     "...1. Febrile Phase: Abrupt onset of high fever (>38.5°C), severe retro-orbital headache, arthralgia, myalgia, and transient maculopapular rash. 2. Critical Phase: Occurs around day 3–7 of illness at defervescence."
+   - Chunk 1 starts at token 121:
+     "Characterized by plasma leakage, pleural effusion, ascites, hemoconcentration, and mucosal bleeding. 3. Recovery Phase: Gradual reabsorption of extravasated fluid..."
+   - DEFECT IDENTIFIED:
+     Chunk 1 begins with orphaned predicate 'Characterized by plasma leakage...'. Without prior sentence context, vector search matching Chunk 1 cannot determine whether plasma leakage relates to Dengue, Cholera, or Malaria.
+
+2. WITH CONTROLLED OVERLAP (overlap = 35 tokens):
+   - Chunk 0 ends at token 120:
+     "...1. Febrile Phase: Abrupt onset of high fever (>38.5°C)... 2. Critical Phase: Occurs around day 3–7 of illness at defervescence."
+   - Chunk 1 starts repeating 35 tokens:
+     "2. Critical Phase: Occurs around day 3–7 of illness at defervescence. Characterized by plasma leakage, pleural effusion, ascites, hemoconcentration, and mucosal bleeding. 3. Recovery Phase..."
+   - BENEFIT VERIFIED:
+     The full causal assertion ('Critical phase day 3-7 causes plasma leakage') is preserved intact at the head of Chunk 1. Downstream field workers searching for 'plasma leakage defervescence' receive a self-contained, medically complete answer.
+
+--- Task 4: Architectural & Cost Justification ---
+1. Why 500 tokens?
+   - Fits standard dense embedding models (text-embedding-3-small, BGE) within their 512-token optimal dense window.
+   - 4 retrieved chunks consume ~2,000 prompt tokens, utilizing only ~1.5% of GPT-4o-mini's 128k context window.
+   - Sized perfectly to keep entire clinical protocols or diagnostic checklists unified without arbitrary truncation.
+2. Why 50 tokens (10%) overlap?
+   - 50 tokens accommodate 1 to 2 complete clinical sentences or 3 to 4 bullet points.
+   - Incurs only ~10% storage/embedding overhead while completely eliminating boundary context loss.
+
+Artifacts generated:
+- outputs/token_chunks_sample.json
+- outputs/token_chunking_sample.log

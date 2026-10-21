@@ -21,7 +21,7 @@
 | **#11** | Text Extraction & Cleaning Pipeline | `Completed` | `src/ingestion/cleaner.py`, `tests/test_cleaner.py`, `outputs/text_cleaning_sample.log` |
 | **#12** | Document Chunking Strategies | `Completed` | `src/ingestion/chunker.py`, `tests/test_chunker.py`, `outputs/sample_chunks.json`, `outputs/chunking_strategy_comparison.log` |
 | **#13** | Chunk Metadata & Source Tracking | `Completed` | `src/ingestion/metadata.py`, `tests/test_metadata.py`, `outputs/tagged_chunks_sample.json`, `outputs/source_tracing_sample.log` |
-| **#14** | Token-Aware Chunk Sizing & Overlap | `Not Started` | `src/ingestion/chunker.py` (token logic), tests |
+| **#14** | Token-Aware Chunk Sizing & Overlap | `Completed` | `src/ingestion/chunker.py`, `tests/test_token_chunker.py`, `outputs/token_chunks_sample.json`, `outputs/token_chunking_sample.log` |
 | **#15** | Corpus Preparation & Ingestion Validation | `Not Started` | `src/ingestion/pipeline.py`, `outputs/ingested_chunks.jsonl` |
 
 ---
@@ -292,22 +292,30 @@
 ---
 
 ### Module #14: Token-Aware Chunk Sizing & Overlap
-- **Status**: `Not Started`
+- **Status**: `Completed`
 - **Objective**: Enforce strict token budgets (e.g., target 500 tokens) using subword tokenization with configurable sliding overlap (e.g., 50 tokens) to prevent context boundary loss.
 - **Dependencies**: Modules #12, #13.
 - **Expected Files**:
-  - Integrated into `src/ingestion/chunker.py`
+  - `src/ingestion/chunker.py`
   - `tests/test_token_chunker.py`
+  - `outputs/token_chunks_sample.json`
+  - `outputs/token_chunking_sample.log`
 - **Implementation Subtasks**:
-  1. [ ] Integrate `tiktoken` encoder (`cl100k_base`).
-  2. [ ] Implement token counting utility `count_tokens(text: str) -> int`.
-  3. [ ] Implement sliding window algorithm creating token-accurate chunks with defined overlap.
-  4. [ ] Add safety fallback for monolithic single tokens/words exceeding budget.
+  1. [x] Integrate `tiktoken` encoder (`cl100k_base`).
+  2. [x] Implement token counting utility `count_tokens(text: str) -> int`.
+  3. [x] Implement sliding window algorithm creating token-accurate chunks with defined overlap (`split_by_tokens`).
+  4. [x] Add safety fallback for monolithic single tokens/words exceeding budget.
+  5. [x] Implement boundary context preservation comparison (`compare_boundary_overlap`) showing zero-overlap vs controlled-overlap.
+  6. [x] Implement mathematical overlap verification (`verify_chunk_overlap`).
 - **Acceptance Criteria**:
   - 100% of produced chunks strictly fall within the token limit (e.g. <= 500 tokens).
   - Overlap tokens accurately bridge adjacent chunks without duplicating section headers.
 - **Required Tests**:
   - `tests/test_token_chunker.py`: Assert all output chunks are under token ceiling; verify overlap content matches between chunk $N$ tail and chunk $N+1$ head.
+- **Verification Evidence**:
+  - Automated tests passing in `tests/test_token_chunker.py`.
+  - Boundary context preservation demonstration saved in `outputs/token_chunks_sample.json`.
+  - Token execution audit report logged in `outputs/token_chunking_sample.log`.
 
 ---
 
