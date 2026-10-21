@@ -1,0 +1,36 @@
+[2026-10-21 11:40:01] [INFO] Initializing FieldSure AI LLM client...
+[2026-10-21 11:40:01] [INFO] Configuration loaded: Base URL=https://api.openai.com/v1 | Model=gpt-4o-mini | Key=sk-...1234
+[2026-10-21 11:40:01] [INFO] Sending chat completion request with 2 messages...
+[2026-10-21 11:40:01] [INFO]   [Message 1 - SYSTEM]: You are FieldSure AI, an expert assistant for community health workers. Provide accurate, practical, and grounded public health guidance. Always state that guidance is for triage and reference, not diagnostic decisions.
+[2026-10-21 11:40:01] [INFO]   [Message 2 - USER]: What are the early warning signs of dehydration in pediatric diarrhea cases, and what immediate field actions are recommended before referral to a health center?
+[2026-10-21 11:40:02] [INFO] Token metrics: Prompt Tokens: 67 | Completion Tokens: 184 | Total Tokens: 251
+[2026-10-21 11:40:02] [INFO] Chat completion transaction successfully logged to outputs/chat_completion_sample.log
+
+--- Structured Transaction Audit ---
+{
+  "timestamp": "2026-10-21T06:10:02.128456+00:00",
+  "endpoint": "https://api.openai.com/v1",
+  "model": "gpt-4o-mini",
+  "api_key_masked": "sk-...1234",
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are FieldSure AI, an expert assistant for community health workers. Provide accurate, practical, and grounded public health guidance. Always state that guidance is for triage and reference, not diagnostic decisions."
+      },
+      {
+        "role": "user",
+        "content": "What are the early warning signs of dehydration in pediatric diarrhea cases, and what immediate field actions are recommended before referral to a health center?"
+      }
+    ]
+  },
+  "response": {
+    "role": "assistant",
+    "content": "### Early Warning Signs of Dehydration in Pediatric Cases\n\n1. **Mild to Moderate Signs**:\n   - Increased thirst and restlessness or irritability.\n   - Sunken eyes.\n   - Dry mouth and tongue.\n   - Decreased skin turgor (skin pinch on the abdomen goes back slowly, < 2 seconds).\n   - Reduced urine output (no wet diapers for several hours).\n\n2. **Danger / Severe Dehydration Signs (Immediate Emergency)**:\n   - Lethargy, drowsiness, or unconsciousness.\n   - Inability to drink or drinking poorly.\n   - Skin pinch goes back very slowly (> 2 seconds).\n   - Weak or rapid pulse, cold extremities.\n\n### Immediate Field Actions Before Referral\n\n- **Plan A / Plan B Oral Rehydration Therapy (ORT)**:\n  - If the child can drink, immediately administer low-osmolarity Oral Rehydration Salts (ORS) in frequent, small sips (5 ml every 1–2 minutes using a clean cup and spoon).\n  - Continue breastfeeding frequently for nursing infants.\n  - Administer Zinc supplementation (10 mg/day for infants < 6 months; 20 mg/day for children 6 months–5 years) as per local health worker standing protocols.\n- **Prevent Danger**:\n  - Do not administer anti-diarrheal or anti-emetic medications to children in the field.\n  - Keep the child warm during transport.\n  - Refer urgently to the nearest primary health center (PHC) if danger signs appear or the child is unable to drink.\n\n*Disclaimer: This guidance is provided for community triage, educational reference, and protocol compliance only. It does not replace clinical evaluation or diagnostic decision-making by a qualified medical officer.*"
+  },
+  "token_usage": {
+    "prompt_tokens": 67,
+    "completion_tokens": 184,
+    "total_tokens": 251
+  }
+}
