@@ -37,6 +37,19 @@ from src.ingestion.chunker import (
     split_paragraph_structural,
     split_sentence_chunks,
 )
+from src.ingestion.metadata import (
+    ChunkMetadata,
+    DocumentChunk,
+    DocumentMetadata,
+    SourceTraceReport,
+    build_document_metadata,
+    process_and_tag_document,
+    run_metadata_tagging_and_tracing,
+    tag_document_chunks,
+    trace_chunk_to_source,
+    filter_chunks_by_metadata,
+    validate_chunk_metadata_completeness,
+)
 
 __all__ = [
     "CorruptDocumentError",
@@ -66,4 +79,15 @@ __all__ = [
     "split_into_sentences",
     "split_paragraph_structural",
     "split_sentence_chunks",
+    "ChunkMetadata",
+    "DocumentChunk",
+    "DocumentMetadata",
+    "SourceTraceReport",
+    "build_document_metadata",
+    "process_and_tag_document",
+    "run_metadata_tagging_and_tracing",
+    "tag_document_chunks",
+    "trace_chunk_to_source",
+    "filter_chunks_by_metadata",
+    "validate_chunk_metadata_completeness",
 ]

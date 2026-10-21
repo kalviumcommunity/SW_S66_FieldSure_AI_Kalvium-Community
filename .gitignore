@@ -41,6 +41,8 @@ outputs/*.json
 !outputs/text_cleaning_sample.log
 !outputs/chunking_strategy_comparison.log
 !outputs/sample_chunks.json
+!outputs/tagged_chunks_sample.json
+!outputs/source_tracing_sample.log
 !outputs/ingestion_validation_report.json
 
 # Operating System & IDE Artifacts
