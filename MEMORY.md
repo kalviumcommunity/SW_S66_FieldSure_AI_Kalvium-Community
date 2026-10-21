@@ -8,12 +8,13 @@
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #3 (LLM API Access & First Completion Call) Completed; Ready for Module #4 (Prompt Construction & System/User Roles).
+- **Current Active Task**: Module #4 (Prompt Construction & System/User Roles) Completed; Ready for Module #10 (Document Loading & Multi-Format Intake).
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
+  - Module #4 (Prompt Construction & System/User Roles: `prompts/system_prompt_baseline.txt`, `prompts/system_prompt_constrained.txt`, `prompts/README.md`, `src/prompt_comparison.py`, `outputs/prompt_comparison_sample.log`, `tests/test_prompts.py`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
-- **Next Planned Module**: Module #4 (Prompt Construction & System/User Roles) or Module #10 (Document Loading).
+- **Next Planned Module**: Module #10 (Document Loading & Multi-Format Intake).
 
 ---
 
@@ -33,7 +34,11 @@
 5. **LLM Client & Safety**:
    - Centralized `src/config.py` loading secrets dynamically from `.env`. Zero secrets logged or committed.
    - Standardized `OpenAICompatibleClient` using `httpx` with timeout configuration and explicit error translation (401 auth, 429 rate limit).
-   - Structured audit logging to `outputs/chat_completion_sample.log` with masked credentials.
+   - Structured audit logging to `outputs/chat_completion_sample.log` and `outputs/prompt_comparison_sample.log` with masked credentials.
+6. **Prompt Governance & Refusal Guardrails**:
+   - Explicit prompt constraints requiring citation of document and section for every claim (`[Document Title, Section Name]`).
+   - Deterministic safe refusal sentence for diagnostic or out-of-scope inquiries.
+   - Mandatory non-diagnostic legal disclaimer on all guidance outputs.
 
 ---
 
@@ -44,6 +49,8 @@
 - `src.llm_client.OpenAICompatibleClient`: Reusable client connecting to any OpenAI-compatible chat API with standard payload formatting and error handling.
 - `src.llm_client.UsageInfo` & `ChatCompletionResult`: Standardized data classes for completion results and token usage.
 - `src.chat_completion.run_chat_completion()`: Baseline execution runner with exit code contracts (0=success, 1=config error, 2=API error).
+- `prompts/system_prompt_constrained.txt`: Production-ready prompt enforcing grounding, citations, and safe refusals.
+- `src.prompt_comparison.run_prompt_comparison()`: Comparative evaluation harness testing prompt variations across triage and refusal scenarios.
 
 ---
 
