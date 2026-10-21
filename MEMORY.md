@@ -8,31 +8,33 @@
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #6 (Context Windows & Message History Management) Completed; Ready for Module #10 (Document Loading & Multi-Format Intake).
+- **Current Active Task**: Module #10 (Document Loading & Multi-Format Intake) Completed; Ready for Module #11 (Text Extraction & Cleaning Pipeline).
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
   - Module #4 (Prompt Construction & System/User Roles: `prompts/system_prompt_baseline.txt`, `prompts/system_prompt_constrained.txt`, `prompts/README.md`, `src/prompt_comparison.py`, `outputs/prompt_comparison_sample.log`, `tests/test_prompts.py`).
   - Module #5 (Tokens, Tokenization & Cost Estimation: `src/token_cost_estimator.py`, `outputs/token_cost_estimation_sample.log`, `tests/test_token_cost.py`).
   - Module #6 (Context Windows & Message History Management: `src/context_manager.py`, `outputs/context_window_management_sample.log`, `tests/test_context_manager.py`).
+  - Module #10 (Document Loading & Multi-Format Intake: `src/ingestion/loader.py`, `data/sample_advisories/`, `outputs/document_loading_sample.log`, `tests/test_loader.py`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
-- **Next Planned Module**: Module #10 (Document Loading & Multi-Format Intake).
+- **Next Planned Module**: Module #11 (Text Extraction & Cleaning Pipeline).
 
 ---
 
 ## 2. Key Technical Decisions
 
 1. **Tooling & Environment**: Astral `uv` selected for fast, reproducible dependency resolution and virtual environment isolation (`pyproject.toml` + `uv.lock`).
-2. **Text Extraction**:
-   - `pypdf` proposed for pure-Python PDF extraction without system binary dependencies.
-   - `python-docx` for `.docx` outline extraction.
-   - Standard library UTF-8 reader for Markdown (`.md`) and plain text (`.txt`).
+2. **Text Extraction & Intake**:
+   - `pypdf` for pure-Python PDF page-wise extraction without external binaries.
+   - `python-docx` for structured Word document extraction.
+   - Standard library UTF-8 reader with fallback encodings (`utf-8-sig`, `latin-1`) for Markdown (`.md`), plain text (`.txt`), and HTML (`.html`).
+   - Batch intake gracefully skips corrupt, missing, or unsupported formats, cataloging failures into an audit error ledger without terminating pipeline runs.
 3. **Chunking & Token Budgeting**:
    - Recursive structural chunking splitting along semantic boundaries (headings, paragraphs, sentences).
    - Default budget: **500 tokens** chunk size with **50 tokens (10%) sliding overlap**.
    - Subword token accounting via `tiktoken` (`cl100k_base`).
 4. **Metadata Traceability**:
-   - Every chunk tagged with immutable provenance (`doc_id`, `chunk_id`, `source_file`, `document_title`, `document_version`, `section_heading`, `chunk_index`, `token_count`).
+   - Every document maintains immutable provenance (`doc_id`, `source_file`, `file_path`, `file_type`, `file_size_bytes`).
 5. **LLM Client & Safety**:
    - Centralized `src/config.py` loading secrets dynamically from `.env`. Zero secrets logged or committed.
    - Standardized `OpenAICompatibleClient` using `httpx` with timeout configuration and explicit error translation (401 auth, 429 rate limit).
@@ -64,6 +66,8 @@
 - `src.token_cost_estimator.ModelPricing`: Dataclass calculating differential input/output costs for any model.
 - `src.token_cost_estimator.profile_text(...)`: Computes characters-per-token and tokens-per-word metrics for length-token relationship analysis.
 - `src.context_manager.ContextWindowManager`: Multi-turn dialogue manager with pre-request token measurement, system prompt preservation, and sliding-window trimming.
+- `src.ingestion.loader.load_document(path)`: Robust multi-format document reader (`.pdf`, `.docx`, `.md`, `.txt`, `.html`) with source metadata preservation.
+- `src.ingestion.loader.load_corpus(dir)`: Batch intake runner surviving bad files with detailed error ledger reporting.
 
 ---
 

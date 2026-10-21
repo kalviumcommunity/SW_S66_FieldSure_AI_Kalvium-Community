@@ -1,0 +1,24 @@
+CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL
+
+DOCUMENT IDENTIFIER: CDC-WASH-CHOLERA-2024
+TARGET AUDIENCE: Community Health Workers, Disaster Relief Teams, Camp Coordinators
+
+1. GENERAL OUTBREAK CONTEXT
+Vibrio cholerae transmission is predominantly waterborne through ingestion of water or food contaminated with feces from an infected person. In flood emergencies or displaced person camps, rapid establishment of safe water points is the single most critical intervention.
+
+2. WATER TREATMENT STANDARDS
+- All drinking water distributed in settlement camps must be disinfected with sodium dichloroisocyanurate (NaDCC) or calcium hypochlorite.
+- Target Free Residual Chlorine (FRC) levels:
+  * At point of distribution: 0.5 to 1.0 mg/L (ppm).
+  * At household storage containers after 24 hours: Minimum 0.2 mg/L (ppm).
+  * Turbid water (NTU > 5) must undergo flocculation or filtration prior to chlorination.
+
+3. ORAL REHYDRATION POINTS (ORPs)
+- Set up an ORP within 500 meters of any cluster of suspected cases.
+- Provide low-osmolarity Oral Rehydration Salts (ORS) solution prepared with potable treated water only.
+- Never store reconstituted ORS solution for more than 24 hours.
+
+4. INFECTION CONTROL IN THE FIELD
+- Chlorinated handwashing stations (0.05% chlorine solution) must be erected at all latrine exits and treatment areas.
+- Disinfection of vomitus and stool spills requires 0.5% high-strength chlorine solution.
+- Dead bodies of suspected cholera victims must be handled only by designated decontamination teams.

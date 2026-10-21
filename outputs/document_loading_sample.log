@@ -1,0 +1,50 @@
+[2026-10-21 12:28:00] [INFO] Initializing FieldSure AI Document Ingestion Loader...
+[2026-10-21 12:28:00] [INFO] Scanning corpus directory: data/sample_advisories
+[2026-10-21 12:28:00] [INFO] Successfully loaded: who_dengue_clinical_guidance.md (1,532 chars, 204 words)
+[2026-10-21 12:28:00] [INFO] Successfully loaded: cdc_cholera_water_safety.txt (1,394 chars, 182 words)
+[2026-10-21 12:28:00] [INFO] Successfully loaded: moh_malaria_rapid_triage.html (1,285 chars, 156 words)
+[2026-10-21 12:28:00] [WARNING] Skipped unreadable/unsupported file 'unsupported_format.xyz': Unsupported file format '.xyz'
+[2026-10-21 12:28:01] [INFO] Corpus intake completed: 3 files successfully ingested, 1 unreadable file skipped.
+[2026-10-21 12:28:01] [INFO] Audit confirmation log successfully recorded to outputs/document_loading_sample.log
+
+--- Structured Document Intake Audit ---
+{
+  "module": "Module #10 — Document Loading & Multi-Format Intake",
+  "timestamp": "2026-10-21T06:58:01.328914+00:00",
+  "total_loaded": 3,
+  "total_skipped": 1,
+  "documents": [
+    {
+      "source_file": "who_dengue_clinical_guidance.md",
+      "file_type": "md",
+      "char_count": 1532,
+      "word_count": 204,
+      "page_count": null,
+      "sample_preview": "# WHO Clinical Management of Dengue in Primary Health Centers  ## Document Information - **Source**: World Health Organization / Regional D..."
+    },
+    {
+      "source_file": "cdc_cholera_water_safety.txt",
+      "file_type": "txt",
+      "char_count": 1394,
+      "word_count": 182,
+      "page_count": null,
+      "sample_preview": "CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL  DOCUMENT IDENTIFIER: CDC-WASH-CHOLERA-2024 TARGET AUDIENCE: Co..."
+    },
+    {
+      "source_file": "moh_malaria_rapid_triage.html",
+      "file_type": "html",
+      "char_count": 1285,
+      "word_count": 156,
+      "page_count": null,
+      "sample_preview": "<!DOCTYPE html> <html lang=\"en\"> <head>     <meta charset=\"UTF-8\">     <title>Ministry of Health - Community Malaria Rapid Triage Protocol</ti..."
+    }
+  ],
+  "error_ledger": [
+    {
+      "file": "unsupported_format.xyz",
+      "path": "data/sample_advisories/unsupported_format.xyz",
+      "error_type": "UnsupportedFileError",
+      "error_message": "Unsupported file format '.xyz' for file 'unsupported_format.xyz'. Supported extensions: ['.docx', '.htm', '.html', '.md', '.pdf', '.txt']"
+    }
+  ]
+}
