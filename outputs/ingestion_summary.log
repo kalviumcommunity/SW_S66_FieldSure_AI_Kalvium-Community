@@ -1,0 +1,54 @@
+[2026-10-21 11:20:00] [INFO] Starting FieldSure AI End-to-End Ingestion Validation (Module #15)...
+[2026-10-21 11:20:00] [INFO] Input Directory: data/sample_advisories
+[2026-10-21 11:20:00] [INFO] Output JSONL:    outputs/ingested_chunks.jsonl
+
+--- Ingestion Summary Dashboard (Task 2) ---
+Total Source Documents Discovered:  4
+Successfully Ingested Documents:    3
+Failed or Skipped Documents:        1
+Total Chunks Created:               11
+
+--- Mathematical Completeness Reconciliation (Task 3) ---
+Equation: Discovered (4) = Ingested (3) + Recorded Failures (1)
+Reconciliation Status:              [PASSED] — No document was silently dropped.
+Zero Empty Chunks Verified:         [PASSED]
+Token Budget Ceiling Compliant:     [PASSED]
+Metadata Schema Contract Compliant: [PASSED]
+
+--- Document Ingestion Breakdown ---
+• [WHO] who_dengue_clinical_guidance.md    | Chunks:  4 | Tokens:  321 | Avg Tokens:  80.2 | Version: 2024.1 Update
+• [CDC] cdc_cholera_water_safety.txt       | Chunks:  4 | Tokens:  319 | Avg Tokens:  79.8 | Version: CDC-WASH-CHOLERA-2024
+• [MOH] moh_malaria_rapid_triage.html      | Chunks:  3 | Tokens:  218 | Avg Tokens:  72.7 | Version: NVBDCP-SOP-2024
+
+--- Recorded Skipped / Failed Files Ledger ---
+• [SKIPPED] unsupported_format.xyz         | Error: UnsupportedFileError (Unsupported file format '.xyz'. Supported extensions: .pdf, .docx, .md, .txt, .html, .htm)
+
+--- Sample Chunks Inspection (Task 4) ---
+Chunk ID:     doc_who_dengue_guidance_2024_c0000
+Source File:  data/sample_advisories/who_dengue_clinical_guidance.md
+Section:      Document Information
+Position:     Chunk #1 of 4
+Token Count:  48 tokens (258 chars)
+Citation:     [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: 'Document Information' [Chunk #1/4 | ID: doc_who_dengue_guidance_2024_c0000]
+Snippet:      [Section: Document Information] # WHO Clinical Management of Dengue in Primary Health Centers  ## Document Information - **Source**: World Health Organization / Regional Disease Su...
+--------------------------------------------------------------------------------
+Chunk ID:     doc_who_dengue_guidance_2024_c0001
+Source File:  data/sample_advisories/who_dengue_clinical_guidance.md
+Section:      1. Case Definition & Diagnostic Phases
+Position:     Chunk #2 of 4
+Token Count:  96 tokens (472 chars)
+Citation:     [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: '1. Case Definition & Diagnostic Phases' [Chunk #2/4 | ID: doc_who_dengue_guidance_2024_c0001]
+Snippet:      [Section: 1. Case Definition & Diagnostic Phases] Dengue is a severe arboviral infection transmitted by *Aedes aegypti* mosquitoes. The clinical course consists of three distinct ph...
+--------------------------------------------------------------------------------
+Chunk ID:     doc_who_dengue_guidance_2024_c0002
+Source File:  data/sample_advisories/who_dengue_clinical_guidance.md
+Section:      2. Red Flag Danger Signs Requiring Urgent Referral
+Position:     Chunk #3 of 4
+Token Count:  95 tokens (487 chars)
+Citation:     [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: '2. Red Flag Danger Signs Requiring Urgent Referral' [Chunk #3/4 | ID: doc_who_dengue_guidance_2024_c0002]
+Snippet:      [Section: 2. Red Flag Danger Signs Requiring Urgent Referral] Community health workers must evaluate patients daily during the critical phase for warning signs: - Persistent vomiting...
+--------------------------------------------------------------------------------
+
+[INFO] Ingestion run completed successfully.
+[INFO] Serialized dataset exported to outputs/ingested_chunks.jsonl
+[INFO] Validation report saved to outputs/ingestion_validation_report.json

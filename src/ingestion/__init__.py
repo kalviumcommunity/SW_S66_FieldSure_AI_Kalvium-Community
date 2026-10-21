@@ -56,6 +56,14 @@ from src.ingestion.metadata import (
     filter_chunks_by_metadata,
     validate_chunk_metadata_completeness,
 )
+from src.ingestion.pipeline import (
+    CompletenessAudit,
+    DocumentIngestionResult,
+    IngestionFailure,
+    IngestionPipelineReport,
+    discover_corpus_files,
+    run_ingestion_pipeline,
+)
 
 __all__ = [
     "CorruptDocumentError",
@@ -102,4 +110,10 @@ __all__ = [
     "trace_chunk_to_source",
     "filter_chunks_by_metadata",
     "validate_chunk_metadata_completeness",
+    "CompletenessAudit",
+    "DocumentIngestionResult",
+    "IngestionFailure",
+    "IngestionPipelineReport",
+    "discover_corpus_files",
+    "run_ingestion_pipeline",
 ]
