@@ -15,6 +15,7 @@
 | **#2** | GitHub Repository & Team Workflow Setup | `In Progress` | Directory tree scaffolding, workflow & style guide |
 | **#3** | LLM API Access & First Completion Call | `Completed` | `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log` |
 | **#4** | Prompt Construction & System/User Roles | `Completed` | `prompts/`, `src/prompt_comparison.py`, `outputs/prompt_comparison_sample.log` |
+| **#5** | Tokens, Tokenization & Cost Estimation | `Completed` | `src/token_cost_estimator.py`, `outputs/token_cost_estimation_sample.log` |
 | **#10** | Document Loading & Multi-Format Intake | `Not Started` | `src/ingestion/loader.py`, `tests/test_loader.py` |
 | **#11** | Text Extraction & Cleaning Pipeline | `Not Started` | `src/ingestion/cleaner.py`, `tests/test_cleaner.py` |
 | **#12** | Document Chunking Strategies | `Not Started` | `src/ingestion/chunker.py`, `tests/test_chunker.py` |
@@ -128,6 +129,31 @@
   - `prompts/README.md` documents side-by-side prompt analysis and architectural rationale for the chosen constrained prompt.
   - Automated tests in `tests/test_prompts.py` validate template presence, mandatory safety sections, and mocked comparative runner execution.
   - Sample comparative execution audit logged in `outputs/prompt_comparison_sample.log`.
+
+---
+
+### Module #5: Tokens, Tokenization & Cost Estimation
+- **Status**: `Completed`
+- **Objective**: Measure token consumption with subword tokenizer (tiktoken), establish differential input/output cost models, and demonstrate length-token relationships across diverse content types.
+- **Dependencies**: Module #1.
+- **Expected Files**:
+  - `src/token_cost_estimator.py`
+  - `outputs/token_cost_estimation_sample.log`
+  - `tests/test_token_cost.py`
+- **Implementation Subtasks**:
+  1. [x] Implement subword token counting using `tiktoken` (`cl100k_base`).
+  2. [x] Report token metrics across 3 project corpus samples (short question, clinical paragraph, full protocol document).
+  3. [x] Calculate cost estimates across benchmark models (gpt-4o-mini, gpt-4o, claude-3-5-sonnet) with differential input/output rates and 10k monthly query scaling.
+  4. [x] Profile text length vs token relationship across English prose, medical terminology, structured JSON, and multilingual Hindi text.
+  5. [x] Capture structured analysis in `outputs/token_cost_estimation_sample.log`.
+- **Acceptance Criteria**:
+  - `python src/token_cost_estimator.py` runs and outputs clean terminal reports for all 5 tasks.
+  - Audit record saved to `outputs/token_cost_estimation_sample.log`.
+- **Required Tests**:
+  - `tests/test_token_cost.py`: Unit tests validating counting, monotonic sample scaling, pricing arithmetic, and domain disproportionality.
+- **Verification Evidence**:
+  - Automated tests passing in `tests/test_token_cost.py`.
+  - Sample analysis audit captured in `outputs/token_cost_estimation_sample.log`.
 
 ---
 

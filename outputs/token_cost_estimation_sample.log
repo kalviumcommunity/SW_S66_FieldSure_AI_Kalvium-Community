@@ -1,0 +1,109 @@
+[2026-10-21 12:05:00] [INFO] Starting FieldSure AI Token & Cost Estimation Analysis (Module #5)...
+[2026-10-21 12:05:00] [INFO] Evaluated 3 corpus samples: Short Question, Clinical Paragraph, Full Protocol Document.
+[2026-10-21 12:05:00] [INFO] Computed differential cost estimates for gpt-4o-mini, gpt-4o, and claude-3-5-sonnet.
+[2026-10-21 12:05:00] [INFO] Profiled length-token disproportionality across English prose, medical jargon, JSON, and Hindi script.
+[2026-10-21 12:05:01] [INFO] Token and cost estimation analysis successfully saved to outputs/token_cost_estimation_sample.log
+
+--- Structured Token & Cost Estimation Audit ---
+{
+  "module": "Module #5 — Tokens, Tokenization & Cost Estimation",
+  "sample_counts": [
+    {
+      "category": "Short Question (Query)",
+      "description": "User input triage query",
+      "characters": 89,
+      "words": 12,
+      "tokens": 16,
+      "chars_per_token": 5.56,
+      "tokens_per_word": 1.33
+    },
+    {
+      "category": "Clinical Paragraph (Chunk)",
+      "description": "Medium size text chunk from field guide",
+      "characters": 481,
+      "words": 64,
+      "tokens": 92,
+      "chars_per_token": 5.23,
+      "tokens_per_word": 1.44
+    },
+    {
+      "category": "Full Protocol Document",
+      "description": "Comprehensive advisory document",
+      "characters": 1632,
+      "words": 218,
+      "tokens": 348,
+      "chars_per_token": 4.69,
+      "tokens_per_word": 1.60
+    }
+  ],
+  "pricing_evaluations": [
+    {
+      "model": "gpt-4o-mini",
+      "input_tokens": 1880,
+      "output_tokens": 250,
+      "total_tokens": 2130,
+      "input_cost_usd": 0.000282,
+      "output_cost_usd": 0.000150,
+      "total_cost_usd": 0.000432,
+      "monthly_scale_10k_queries_usd": 4.32
+    },
+    {
+      "model": "gpt-4o",
+      "input_tokens": 1880,
+      "output_tokens": 250,
+      "total_tokens": 2130,
+      "input_cost_usd": 0.004700,
+      "output_cost_usd": 0.002500,
+      "total_cost_usd": 0.007200,
+      "monthly_scale_10k_queries_usd": 72.00
+    },
+    {
+      "model": "claude-3-5-sonnet",
+      "input_tokens": 1880,
+      "output_tokens": 250,
+      "total_tokens": 2130,
+      "input_cost_usd": 0.005640,
+      "output_cost_usd": 0.003750,
+      "total_cost_usd": 0.009390,
+      "monthly_scale_10k_queries_usd": 93.90
+    }
+  ],
+  "length_token_relationships": [
+    {
+      "category": "Standard English Prose",
+      "description": "Simple conversational English field advice",
+      "characters": 82,
+      "words": 12,
+      "tokens": 18,
+      "chars_per_token": 4.56,
+      "tokens_per_word": 1.50
+    },
+    {
+      "category": "Medical Jargon & Multisyllabic Terms",
+      "description": "Complex clinical terms that fragment into multiple BPE subwords",
+      "characters": 76,
+      "words": 4,
+      "tokens": 28,
+      "chars_per_token": 2.71,
+      "tokens_per_word": 7.00
+    },
+    {
+      "category": "Structured Data / JSON",
+      "description": "Code and data schemas containing punctuation, keys, and formatting syntax",
+      "characters": 87,
+      "words": 6,
+      "tokens": 25,
+      "chars_per_token": 3.48,
+      "tokens_per_word": 4.17
+    },
+    {
+      "category": "Multilingual Text (Hindi Health Advisory)",
+      "description": "Non-Latin Devanagari script showing higher token density per character",
+      "characters": 88,
+      "words": 15,
+      "tokens": 62,
+      "chars_per_token": 1.42,
+      "tokens_per_word": 4.13
+    }
+  ]
+}
