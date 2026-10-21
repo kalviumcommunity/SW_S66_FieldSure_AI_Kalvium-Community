@@ -97,6 +97,9 @@
   - Missing API key produces actionable error message without raw traceback dump.
 - **Required Tests**:
   - `tests/test_llm_client.py`: Unit test with mocked API response verifying token parsing and error handling.
+- **Verification Evidence**:
+  - Automated test suite `tests/test_llm_client.py` covers 200 OK completions, 401 auth errors, 429 rate limits, and network timeouts.
+  - Sanitized baseline execution audit captured in `outputs/chat_completion_sample.log`.
 
 ---
 

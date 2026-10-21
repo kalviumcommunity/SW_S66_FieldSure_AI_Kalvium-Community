@@ -1,7 +1,8 @@
-"""Chat completion entry point for FieldSure AI (Module #3).
+"""Chat completion entry point for FieldSure AI (Module #3: LLM API Access & First Completion Call).
 
 Executes a baseline public health query against an OpenAI-compatible endpoint,
 safely logs request/response payloads without credential leakage, and handles failures cleanly.
+Tasks: Config from .env, chat request/response, sanitized logging, and error handling.
 """
 
 from datetime import datetime, timezone
