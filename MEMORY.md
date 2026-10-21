@@ -8,10 +8,12 @@
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #1 Completed; Ready for Module #2 (Repository & Team Workflow) or Module #3 (LLM API Access).
-- **Completed Modules**: Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
+- **Current Active Task**: Module #3 (LLM API Access & First Completion Call) Completed; Ready for Module #4 (Prompt Construction & System/User Roles).
+- **Completed Modules**:
+  - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
+  - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
-- **Next Planned Module**: Module #2 or Module #3 (LLM API Access & First Completion Call).
+- **Next Planned Module**: Module #4 (Prompt Construction & System/User Roles) or Module #10 (Document Loading).
 
 ---
 
@@ -29,15 +31,19 @@
 4. **Metadata Traceability**:
    - Every chunk tagged with immutable provenance (`doc_id`, `chunk_id`, `source_file`, `document_title`, `document_version`, `section_heading`, `chunk_index`, `token_count`).
 5. **LLM Client & Safety**:
-   - Centralized `src/config.py` loading secrets from `.env`. Zero secrets logged or committed.
-   - Explicit prompt constraints requiring citation of document and section for every claim, with deterministic refusal on unsupported queries.
+   - Centralized `src/config.py` loading secrets dynamically from `.env`. Zero secrets logged or committed.
+   - Standardized `OpenAICompatibleClient` using `httpx` with timeout configuration and explicit error translation (401 auth, 429 rate limit).
+   - Structured audit logging to `outputs/chat_completion_sample.log` with masked credentials.
 
 ---
 
 ## 3. Existing Reusable Functions & Components
 
-*(To be populated as code modules are implemented)*
-- *None implemented yet (pre-implementation phase).*
+- `src.config.load_llm_config()`: Safely parses and validates `API_BASE_URL`, `API_KEY`, and `CHAT_MODEL` from environment or `.env`.
+- `src.config.mask_api_key(key)`: Obfuscates API keys (e.g. `sk-...1234`) for zero-leakage logging.
+- `src.llm_client.OpenAICompatibleClient`: Reusable client connecting to any OpenAI-compatible chat API with standard payload formatting and error handling.
+- `src.llm_client.UsageInfo` & `ChatCompletionResult`: Standardized data classes for completion results and token usage.
+- `src.chat_completion.run_chat_completion()`: Baseline execution runner with exit code contracts (0=success, 1=config error, 2=API error).
 
 ---
 

@@ -13,7 +13,7 @@
 | :---: | :--- | :---: | :--- |
 | **#1** | Development Environment & Project Workspace Setup | `Completed` | `pyproject.toml`, `.env.example`, `.gitignore`, workspace folders |
 | **#2** | GitHub Repository & Team Workflow Setup | `In Progress` | Directory tree scaffolding, workflow & style guide |
-| **#3** | LLM API Access & First Completion Call | `Not Started` | `src/config.py`, `src/llm_client.py`, `src/chat_completion.py` |
+| **#3** | LLM API Access & First Completion Call | `Completed` | `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log` |
 | **#4** | Prompt Construction & System/User Roles | `Not Started` | `prompts/`, `src/prompt_comparison.py`, `outputs/` |
 | **#10** | Document Loading & Multi-Format Intake | `Not Started` | `src/ingestion/loader.py`, `tests/test_loader.py` |
 | **#11** | Text Extraction & Cleaning Pipeline | `Not Started` | `src/ingestion/cleaner.py`, `tests/test_cleaner.py` |
@@ -76,7 +76,7 @@
 ---
 
 ### Module #3: LLM API Access & First Completion Call
-- **Status**: `Not Started`
+- **Status**: `Completed`
 - **Objective**: Implement secure LLM client initialization via environment variables and execute a verified baseline chat completion without credential leakage.
 - **Dependencies**: Modules #1, #2.
 - **Expected Files**:
@@ -86,17 +86,20 @@
   - `outputs/chat_completion_sample.log`
   - `tests/test_llm_client.py`
 - **Implementation Subtasks**:
-  1. [ ] Implement `src/config.py` to validate and load `API_BASE_URL`, `API_KEY`, `CHAT_MODEL`.
-  2. [ ] Implement `src/llm_client.py` wrapper wrapping HTTP completion requests with timeout and error handling.
-  3. [ ] Implement `src/chat_completion.py` executing a baseline public health query.
-  4. [ ] Sanitize logging to ensure API keys are never written to `outputs/chat_completion_sample.log` or stdout.
-  5. [ ] Handle API errors gracefully (exit code 1 for config error, exit code 2 for API error).
+  1. [x] Implement `src/config.py` to validate and load `API_BASE_URL`, `API_KEY`, `CHAT_MODEL`.
+  2. [x] Implement `src/llm_client.py` wrapper wrapping HTTP completion requests with timeout and error handling.
+  3. [x] Implement `src/chat_completion.py` executing a baseline public health query.
+  4. [x] Sanitize logging to ensure API keys are never written to `outputs/chat_completion_sample.log` or stdout.
+  5. [x] Handle API errors gracefully (exit code 1 for config error, exit code 2 for API error).
 - **Acceptance Criteria**:
   - `uv run python src/chat_completion.py` runs and returns a valid completion.
   - Log file `outputs/chat_completion_sample.log` is generated without leaking credentials.
   - Missing API key produces actionable error message without raw traceback dump.
 - **Required Tests**:
   - `tests/test_llm_client.py`: Unit test with mocked API response verifying token parsing and error handling.
+- **Verification Evidence**:
+  - Automated test suite `tests/test_llm_client.py` covers 200 OK completions, 401 auth errors, 429 rate limits, and network timeouts.
+  - Sanitized baseline execution audit captured in `outputs/chat_completion_sample.log`.
 
 ---
 
