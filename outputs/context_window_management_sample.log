@@ -1,0 +1,93 @@
+[2026-10-21 12:12:00] [INFO] Starting FieldSure AI Context Window & History Management Demo (Module #6)...
+[2026-10-21 12:12:00] [INFO] Token budget configured: 350 tokens. System prompt initialized at index 0.
+[2026-10-21 12:12:00] [INFO] Processed Turn 1: 82 / 350 tokens (Within budget).
+[2026-10-21 12:12:00] [INFO] Processed Turn 2: 174 / 350 tokens (Within budget).
+[2026-10-21 12:12:00] [INFO] Processed Turn 3: 252 / 350 tokens (Within budget).
+[2026-10-21 12:12:01] [INFO] Context window exceeded budget (364 > 350 tokens). Initiating history trimming...
+[2026-10-21 12:12:01] [INFO] Trimming complete: 364 -> 284 tokens (Reduction: 80 tokens). Active messages: 6
+[2026-10-21 12:12:01] [INFO] Processed Turn 4: 284 / 350 tokens (Trimmed).
+[2026-10-21 12:12:01] [INFO] Context window exceeded budget (378 > 350 tokens). Initiating history trimming...
+[2026-10-21 12:12:01] [INFO] Trimming complete: 378 -> 292 tokens (Reduction: 86 tokens). Active messages: 6
+[2026-10-21 12:12:01] [INFO] Processed Turn 5: 292 / 350 tokens (Trimmed).
+[2026-10-21 12:12:01] [INFO] Context window exceeded budget (388 > 350 tokens). Initiating history trimming...
+[2026-10-21 12:12:01] [INFO] Trimming complete: 388 -> 304 tokens (Reduction: 84 tokens). Active messages: 6
+[2026-10-21 12:12:01] [INFO] Processed Turn 6: 304 / 350 tokens (Trimmed).
+[2026-10-21 12:12:01] [INFO] Context window management audit successfully recorded to outputs/context_window_management_sample.log
+
+--- Structured Context Window Management Audit ---
+{
+  "module": "Module #6 — Context Windows & Message History Management",
+  "timestamp": "2026-10-21T06:42:01.412891+00:00",
+  "token_budget": 350,
+  "total_turns": 6,
+  "final_token_count": 304,
+  "system_message_preserved": true,
+  "turn_history": [
+    {
+      "turn_index": 1,
+      "title": "Turn 1: Initial Presentation",
+      "user_query": "A 3-year-old child presents in our rural clinic with watery diarrhea for 24 hours. What is the first assessment step?",
+      "assistant_reply": "Assess hydration status immediately using IMCI guidelines. Check for general danger signs (inability to drink, lethargy, sunken eyes, skin pinch turgor). Categorize into Plan A, Plan B, or Plan C dehydration.",
+      "tokens_before_turn": 28,
+      "tokens_after_turn": 82,
+      "was_trimmed": false,
+      "trim_reduction_tokens": 0,
+      "active_messages_in_context": 3
+    },
+    {
+      "turn_index": 2,
+      "title": "Turn 2: Follow-up on Rehydration",
+      "user_query": "The child is irritable and drinks eagerly, with skin pinch going back slowly. Which plan should we start?",
+      "assistant_reply": "This indicates Plan B (Some Dehydration). Administer recommended low-osmolarity ORS: approximately 75 ml/kg over 4 hours. Reassess hydration status at 4 hours and continue breastfeeding.",
+      "tokens_before_turn": 82,
+      "tokens_after_turn": 174,
+      "was_trimmed": false,
+      "trim_reduction_tokens": 0,
+      "active_messages_in_context": 5
+    },
+    {
+      "turn_index": 3,
+      "title": "Turn 3: Nutrition & Zinc Inquiry",
+      "user_query": "Should we give zinc tablets now, and what should the mother feed the child during this 4-hour period?",
+      "assistant_reply": "Yes, initiate dispersible zinc sulfate (20 mg/day for children aged 6 months to 5 years) for 14 full days. For breastfed infants, continue frequent breastfeeding without interruption.",
+      "tokens_before_turn": 174,
+      "tokens_after_turn": 252,
+      "was_trimmed": false,
+      "trim_reduction_tokens": 0,
+      "active_messages_in_context": 7
+    },
+    {
+      "turn_index": 4,
+      "title": "Turn 4: Community Prevention Context",
+      "user_query": "Several other households in the same settlement report similar watery diarrhea. What immediate sanitation steps are needed?",
+      "assistant_reply": "Alert the public health surveillance team. Distribute chlorine water-purification tablets (NaDCC), inspect community wells, isolate latrine runoff, and set up a temporary oral rehydration point.",
+      "tokens_before_turn": 364,
+      "tokens_after_turn": 284,
+      "was_trimmed": true,
+      "trim_reduction_tokens": 80,
+      "active_messages_in_context": 6
+    },
+    {
+      "turn_index": 5,
+      "title": "Turn 5: Worsening Symptoms (Danger Sign)",
+      "user_query": "The child has now become very sleepy, cannot drink from a cup, and the skin pinch takes more than 2 seconds to return. What must we do?",
+      "assistant_reply": "Emergency Red Flag: This child has progressed to Plan C (Severe Dehydration). Initiate urgent transfer to the district hospital. If trained, start IV Ringer's Lactate immediately (100 ml/kg total divided into fast and slow phases).",
+      "tokens_before_turn": 378,
+      "tokens_after_turn": 292,
+      "was_trimmed": true,
+      "trim_reduction_tokens": 86,
+      "active_messages_in_context": 6
+    },
+    {
+      "turn_index": 6,
+      "title": "Turn 6: Discharge & Home Care Protocol",
+      "user_query": "Once stabilized at the hospital, what home care discharge counseling is critical for the caregiver to prevent relapse?",
+      "assistant_reply": "Counsel on the 4 Rules of Home Treatment: 1. Give extra fluids (ORS, clean water). 2. Complete 14-day Zinc regimen. 3. Continue nutrient-dense feeding. 4. Return immediately if blood in stool, high fever, or vomiting recurs.",
+      "tokens_before_turn": 388,
+      "tokens_after_turn": 304,
+      "was_trimmed": true,
+      "trim_reduction_tokens": 84,
+      "active_messages_in_context": 6
+    }
+  ]
+}

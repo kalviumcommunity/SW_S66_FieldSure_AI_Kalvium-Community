@@ -16,6 +16,7 @@
 | **#3** | LLM API Access & First Completion Call | `Completed` | `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log` |
 | **#4** | Prompt Construction & System/User Roles | `Completed` | `prompts/`, `src/prompt_comparison.py`, `outputs/prompt_comparison_sample.log` |
 | **#5** | Tokens, Tokenization & Cost Estimation | `Completed` | `src/token_cost_estimator.py`, `outputs/token_cost_estimation_sample.log` |
+| **#6** | Context Windows & Message History Management | `Completed` | `src/context_manager.py`, `outputs/context_window_management_sample.log` |
 | **#10** | Document Loading & Multi-Format Intake | `Not Started` | `src/ingestion/loader.py`, `tests/test_loader.py` |
 | **#11** | Text Extraction & Cleaning Pipeline | `Not Started` | `src/ingestion/cleaner.py`, `tests/test_cleaner.py` |
 | **#12** | Document Chunking Strategies | `Not Started` | `src/ingestion/chunker.py`, `tests/test_chunker.py` |
@@ -154,6 +155,32 @@
 - **Verification Evidence**:
   - Automated tests passing in `tests/test_token_cost.py`.
   - Sample analysis audit captured in `outputs/token_cost_estimation_sample.log`.
+
+---
+
+### Module #6: Context Windows & Message History Management
+- **Status**: `Completed`
+- **Objective**: Manage multi-turn conversation history, compute pre-request token budgets, and apply sliding-window trimming and turn summarization to enforce token budgets while perpetually preserving the system message.
+- **Dependencies**: Modules #1, #3, #5.
+- **Expected Files**:
+  - `src/context_manager.py`
+  - `outputs/context_window_management_sample.log`
+  - `tests/test_context_manager.py`
+- **Implementation Subtasks**:
+  1. [x] Maintain multi-turn history structure tracking system prompt and alternating user/assistant messages.
+  2. [x] Compute total message history tokens prior to each LLM request including chat framing overhead.
+  3. [x] Implement token budget enforcement that trims older conversation turns while perpetually preserving the system prompt and most recent turn.
+  4. [x] Demonstrate token budget management over an overflowing multi-turn clinical consultation (6 turns).
+  5. [x] Record structured execution audit to `outputs/context_window_management_sample.log`.
+- **Acceptance Criteria**:
+  - `python src/context_manager.py` executes successfully and prints step-by-step token and trimming audit.
+  - System prompt at index 0 is never pruned under any overflow scenario.
+  - Final token count is strictly constrained within the configured token ceiling.
+- **Required Tests**:
+  - `tests/test_context_manager.py`: Unit tests validating multi-turn history, pre-request budgeting, system message preservation, recent turn retention, and overflowing trimming.
+- **Verification Evidence**:
+  - Automated tests passing in `tests/test_context_manager.py`.
+  - Step-by-step trimming audit logged in `outputs/context_window_management_sample.log`.
 
 ---
 

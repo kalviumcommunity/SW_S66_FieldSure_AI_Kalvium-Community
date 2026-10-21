@@ -8,12 +8,13 @@
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #5 (Tokens, Tokenization & Cost Estimation) Completed; Ready for Module #10 (Document Loading & Multi-Format Intake).
+- **Current Active Task**: Module #6 (Context Windows & Message History Management) Completed; Ready for Module #10 (Document Loading & Multi-Format Intake).
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
   - Module #4 (Prompt Construction & System/User Roles: `prompts/system_prompt_baseline.txt`, `prompts/system_prompt_constrained.txt`, `prompts/README.md`, `src/prompt_comparison.py`, `outputs/prompt_comparison_sample.log`, `tests/test_prompts.py`).
   - Module #5 (Tokens, Tokenization & Cost Estimation: `src/token_cost_estimator.py`, `outputs/token_cost_estimation_sample.log`, `tests/test_token_cost.py`).
+  - Module #6 (Context Windows & Message History Management: `src/context_manager.py`, `outputs/context_window_management_sample.log`, `tests/test_context_manager.py`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
 - **Next Planned Module**: Module #10 (Document Loading & Multi-Format Intake).
 
@@ -43,6 +44,10 @@
 7. **Token Economics & Pricing Models**:
    - Separate pricing calculation for input vs. output tokens (e.g. gpt-4o-mini at $0.15/1M input and $0.60/1M output).
    - Character-to-token ratio profiling demonstrates that medical terminology and non-Latin scripts (e.g. Devanagari) consume substantially more tokens per character than standard English.
+8. **Context Window & History Management**:
+   - System prompt at index 0 is strictly immutable and preserved across all trimming actions.
+   - Pre-request token measurement accounts for subword content and message framing overhead (~3 tokens/message).
+   - Sliding-window eviction prunes oldest turns while appending a concise summary tag to retain continuity and keep history within context ceilings.
 
 ---
 
@@ -58,6 +63,7 @@
 - `src.token_cost_estimator.count_tokens(text)`: Accurately counts subword tokens using `tiktoken` with fallback heuristic.
 - `src.token_cost_estimator.ModelPricing`: Dataclass calculating differential input/output costs for any model.
 - `src.token_cost_estimator.profile_text(...)`: Computes characters-per-token and tokens-per-word metrics for length-token relationship analysis.
+- `src.context_manager.ContextWindowManager`: Multi-turn dialogue manager with pre-request token measurement, system prompt preservation, and sliding-window trimming.
 
 ---
 
