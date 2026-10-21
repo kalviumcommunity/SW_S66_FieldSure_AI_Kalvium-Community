@@ -12,6 +12,31 @@ from src.ingestion.loader import (
     load_corpus,
     load_document,
 )
+from src.ingestion.cleaner import (
+    CleaningReport,
+    clean_corpus,
+    clean_document,
+    clean_text,
+    fix_line_wrap_hyphenation,
+    normalize_unicode,
+    remove_boilerplate_patterns,
+    strip_html_tags,
+)
+
+from src.ingestion.chunker import (
+    Chunk,
+    ChunkingStats,
+    ChunkingStrategy,
+    chunk_document,
+    chunk_text_by_strategy,
+    compare_strategies_on_document,
+    compute_chunking_stats,
+    run_chunking_comparison,
+    split_fixed_size,
+    split_into_sentences,
+    split_paragraph_structural,
+    split_sentence_chunks,
+)
 
 __all__ = [
     "CorruptDocumentError",
@@ -21,4 +46,24 @@ __all__ = [
     "UnsupportedFileError",
     "load_corpus",
     "load_document",
+    "CleaningReport",
+    "clean_corpus",
+    "clean_document",
+    "clean_text",
+    "fix_line_wrap_hyphenation",
+    "normalize_unicode",
+    "remove_boilerplate_patterns",
+    "strip_html_tags",
+    "Chunk",
+    "ChunkingStats",
+    "ChunkingStrategy",
+    "chunk_document",
+    "chunk_text_by_strategy",
+    "compare_strategies_on_document",
+    "compute_chunking_stats",
+    "run_chunking_comparison",
+    "split_fixed_size",
+    "split_into_sentences",
+    "split_paragraph_structural",
+    "split_sentence_chunks",
 ]

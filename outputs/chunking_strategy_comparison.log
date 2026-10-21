@@ -1,0 +1,26 @@
+[2026-10-21 10:35:00] [INFO] Starting Document Chunking Strategy Evaluation (Module #12)...
+[2026-10-21 10:35:00] [INFO] Document under evaluation: who_dengue_clinical_guidance.md (1518 chars, 204 words)
+[2026-10-21 10:35:00] [INFO] Executing 3 strategies: fixed_size, sentence, paragraph_structural
+
+--- Chunking Strategy Benchmark Summary ---
+Strategy: fixed_size             | Chunks:  4 | Avg Chars:  417.0 | Avg Tokens:  77.2 | Min/Max Chars: 168/500 | Min/Max Tokens:  36/ 94
+Strategy: sentence               | Chunks:  5 | Avg Chars:  418.2 | Avg Tokens:  79.6 | Min/Max Chars: 358/489 | Min/Max Tokens:  66/ 94
+Strategy: paragraph_structural   | Chunks:  4 | Avg Chars:  407.2 | Avg Tokens:  80.2 | Min/Max Chars: 258/487 | Min/Max Tokens:  48/ 96
+
+--- Boundary Inspection Notes ---
+1. Fixed-Size Strategy:
+   - Slices characters at index 450/500 regardless of word or sentence continuity.
+   - Boundary failure: Severed words and mid-sentence breaks observed at transition boundaries (e.g. 'et consists...', '## 2. Red Flag Danger Signs Requ', 'Progressive hematocrit elevation with').
+   - Clinical risk: High danger of missing dosage units or truncating emergency warnings.
+
+2. Sentence-Based Strategy:
+   - Aggregates complete grammatical sentences up to 500 chars with 1-sentence overlap.
+   - Boundary success: Zero mid-sentence splits, preserves clinical abbreviations and units ('38.5°C', 'e.g.', 'mg/kg').
+   - Boundary limitation: Disconnects list items from their parent section headings and aggregates disparate topics across sections.
+
+3. Paragraph / Structural Recursive Strategy (Chosen Architecture):
+   - Splits hierarchically along Markdown headings (##) and paragraph breaks (\n\n).
+   - Boundary excellence: Attaches [Section: ...] header to all chunks; maintains complete clinical lists intact.
+   - Retrieval grounding: Crucial clinical warnings (e.g., contraindicated NSAIDs) remain bound to their clinical context.
+
+Artifact successfully saved to outputs/sample_chunks.json

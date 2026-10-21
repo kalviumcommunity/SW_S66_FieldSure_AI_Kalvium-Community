@@ -18,8 +18,8 @@
 | **#5** | Tokens, Tokenization & Cost Estimation | `Completed` | `src/token_cost_estimator.py`, `outputs/token_cost_estimation_sample.log` |
 | **#6** | Context Windows & Message History Management | `Completed` | `src/context_manager.py`, `outputs/context_window_management_sample.log` |
 | **#10** | Document Loading & Multi-Format Intake | `Completed` | `src/ingestion/loader.py`, `tests/test_loader.py`, `outputs/document_loading_sample.log` |
-| **#11** | Text Extraction & Cleaning Pipeline | `Not Started` | `src/ingestion/cleaner.py`, `tests/test_cleaner.py` |
-| **#12** | Document Chunking Strategies | `Not Started` | `src/ingestion/chunker.py`, `tests/test_chunker.py` |
+| **#11** | Text Extraction & Cleaning Pipeline | `Completed` | `src/ingestion/cleaner.py`, `tests/test_cleaner.py`, `outputs/text_cleaning_sample.log` |
+| **#12** | Document Chunking Strategies | `Completed` | `src/ingestion/chunker.py`, `tests/test_chunker.py`, `outputs/sample_chunks.json`, `outputs/chunking_strategy_comparison.log` |
 | **#13** | Chunk Metadata & Source Tracking | `Not Started` | `src/ingestion/metadata.py`, `tests/test_metadata.py` |
 | **#14** | Token-Aware Chunk Sizing & Overlap | `Not Started` | `src/ingestion/chunker.py` (token logic), tests |
 | **#15** | Corpus Preparation & Ingestion Validation | `Not Started` | `src/ingestion/pipeline.py`, `outputs/ingested_chunks.jsonl` |
@@ -234,21 +234,30 @@
 ---
 
 ### Module #12: Document Chunking Strategies
-- **Status**: `Not Started`
+- **Status**: `Completed`
 - **Objective**: Implement structural and recursive document chunking that splits text at natural semantic boundaries (headings, paragraphs, sentences) rather than arbitrary character cuts.
 - **Dependencies**: Module #11.
 - **Expected Files**:
   - `src/ingestion/chunker.py`
   - `tests/test_chunker.py`
+  - `outputs/sample_chunks.json`
+  - `outputs/chunking_strategy_comparison.log`
 - **Implementation Subtasks**:
-  1. [ ] Define recursive split hierarchy: `# ` headings -> `\n\n` paragraphs -> `\n` lines -> sentence boundaries.
-  2. [ ] Implement section tracking to identify the nearest enclosing heading.
-  3. [ ] Build recursive text splitter function.
+  1. [x] Define recursive split hierarchy: `# ` headings -> `\n\n` paragraphs -> `\n` lines -> sentence boundaries.
+  2. [x] Implement section tracking to identify the nearest enclosing heading.
+  3. [x] Build recursive text splitter function.
+  4. [x] Implement fixed-size with overlap and sentence-based chunking for comparative evaluation.
+  5. [x] Calculate statistical metrics (chunk count, average characters and tokens, min/max).
+  6. [x] Save sample chunks and comparison execution logs for reviewer inspection.
 - **Acceptance Criteria**:
   - Splits documents into logical units without breaking mid-sentence or mid-definition.
   - Section headers are preserved and prepended to chunks to retain context.
 - **Required Tests**:
   - `tests/test_chunker.py`: Test chunking sample text with markdown headers; verify sentences are not split mid-word.
+- **Verification Evidence**:
+  - Automated tests passing in `tests/test_chunker.py`.
+  - Comparative strategy audit record saved in `outputs/chunking_strategy_comparison.log`.
+  - Reviewer sample chunks with boundary inspection in `outputs/sample_chunks.json`.
 
 ---
 
