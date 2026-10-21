@@ -277,6 +277,8 @@
   4. [x] Attach section context to individual chunk metadata.
   5. [x] Implement source tracing engine (`trace_chunk_to_source`) linking retrieved chunks back to exact parent documents.
   6. [x] Standardize uniform 14-field schema contract across the entire public health corpus.
+  7. [x] Implement metadata-based chunk filtering (`filter_chunks_by_metadata`) for targeted retrieval.
+  8. [x] Implement automated completeness validation (`validate_chunk_metadata_completeness`).
 - **Acceptance Criteria**:
   - Every chunk contains 100% of required metadata attributes.
   - Chunk IDs are deterministic and reproducible across runs.

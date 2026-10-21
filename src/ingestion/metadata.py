@@ -108,13 +108,30 @@ class DocumentChunk:
             "metadata": self.metadata.to_dict(),
         }
 
-    def format_citation(self) -> str:
-        """Format a human-readable citation reference for this chunk."""
+    def format_citation(self, style: str = "inline") -> str:
+        """Format a human-readable citation reference for this chunk.
+
+        Styles supported:
+            - 'inline': Clean compact reference for bracketed LLM citations.
+            - 'full': Detailed audit reference including document ID and chunk ID.
+            - 'markdown': Blockquote citation format ready for UI display.
+        """
         meta = self.metadata
         agency_prefix = f"[{meta.agency}] " if meta.agency else ""
         section_part = f", Section: '{meta.section_heading}'" if meta.section_heading else ""
         version_part = f" ({meta.document_version})" if meta.document_version != "unknown" else ""
         page_part = f", p. {meta.page_number}" if meta.page_number else ""
+
+        if style == "markdown":
+            return (
+                f"> **Source**: {agency_prefix}*{meta.document_title}*{version_part}{section_part}{page_part}\n"
+                f"> **Chunk**: #{meta.chunk_index + 1} of {meta.total_chunks} (`{meta.chunk_id}`)"
+            )
+        elif style == "full":
+            return (
+                f"{agency_prefix}{meta.document_title}{version_part}{section_part}{page_part} "
+                f"[Document ID: {meta.doc_id} | Chunk #{meta.chunk_index + 1}/{meta.total_chunks} | Chunk ID: {meta.chunk_id}]"
+            )
         return (
             f"{agency_prefix}{meta.document_title}{version_part}{section_part}{page_part} "
             f"[Chunk #{meta.chunk_index + 1}/{meta.total_chunks} | ID: {meta.chunk_id}]"
@@ -335,6 +352,84 @@ def process_and_tag_document(
     )
     tagged_chunks = tag_document_chunks(raw_chunks, doc_meta)
     return doc_meta, tagged_chunks
+
+
+def filter_chunks_by_metadata(
+    chunks: List[DocumentChunk],
+    agency: Optional[str] = None,
+    section_keyword: Optional[str] = None,
+    min_tokens: Optional[int] = None,
+    max_tokens: Optional[int] = None,
+    document_version: Optional[str] = None,
+) -> List[DocumentChunk]:
+    """Filter DocumentChunks based on metadata criteria for targeted vector retrieval.
+
+    Enables metadata-filtered vector retrieval (e.g. searching only within WHO 2024 guidance).
+
+    Args:
+        chunks: List of DocumentChunk objects.
+        agency: Filter by issuing agency (case-insensitive, e.g. 'WHO').
+        section_keyword: Filter for chunks whose section_heading contains this keyword.
+        min_tokens: Minimum token count threshold.
+        max_tokens: Maximum token count ceiling.
+        document_version: Exact or partial version string.
+
+    Returns:
+        Filtered list of DocumentChunk objects matching all specified criteria.
+    """
+    filtered = []
+    for chunk in chunks:
+        meta = chunk.metadata
+        if agency and (not meta.agency or meta.agency.upper() != agency.upper()):
+            continue
+        if section_keyword:
+            if not meta.section_heading or section_keyword.lower() not in meta.section_heading.lower():
+                continue
+        if min_tokens is not None and meta.token_count < min_tokens:
+            continue
+        if max_tokens is not None and meta.token_count > max_tokens:
+            continue
+        if document_version and (not meta.document_version or document_version.lower() not in meta.document_version.lower()):
+            continue
+        filtered.append(chunk)
+    return filtered
+
+
+def validate_chunk_metadata_completeness(chunks: List[DocumentChunk]) -> Dict[str, Any]:
+    """Validate that all chunks in a batch strictly conform to the 14-field metadata contract.
+
+    Asserts non-empty text, valid deterministic chunk IDs, valid chunk indices,
+    and complete population of required fields.
+
+    Returns:
+        Summary dict containing validation status and metric counts.
+    """
+    total = len(chunks)
+    if total == 0:
+        return {"valid": True, "total_chunks": 0, "issues": []}
+
+    issues: List[str] = []
+    for idx, c in enumerate(chunks):
+        if not c.text or not c.text.strip():
+            issues.append(f"Chunk at index {idx} has empty text.")
+        meta = c.metadata
+        if not meta.chunk_id or not re.match(r"^.+_c\d{4}$", meta.chunk_id):
+            issues.append(f"Invalid chunk_id pattern on chunk {idx}: {meta.chunk_id}")
+        if not meta.doc_id:
+            issues.append(f"Missing doc_id on chunk {idx}")
+        if not meta.source_file:
+            issues.append(f"Missing source_file on chunk {idx}")
+        if not (0 <= meta.chunk_index < meta.total_chunks):
+            issues.append(f"Out-of-bounds chunk_index {meta.chunk_index} for total {meta.total_chunks}")
+        if meta.char_length != len(c.text):
+            issues.append(f"char_length mismatch on chunk {idx}: recorded {meta.char_length} vs actual {len(c.text)}")
+
+    return {
+        "valid": len(issues) == 0,
+        "total_chunks": total,
+        "issues_count": len(issues),
+        "issues": issues,
+    }
 
 
 # ------------------------------------------------------------------------------

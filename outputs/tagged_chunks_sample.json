@@ -19,7 +19,9 @@
       "token_count",
       "page_number",
       "extra_metadata"
-    ]
+    ],
+    "validation_status": "PASSED",
+    "filtering_supported": true
   },
   "documents": [
     {

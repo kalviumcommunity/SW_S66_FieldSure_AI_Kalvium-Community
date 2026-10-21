@@ -196,8 +196,58 @@ def test_chunk_citation_formatting(sample_dengue_doc: LoadedDocument):
     _, chunks = process_and_tag_document(sample_dengue_doc)
     first_chunk = chunks[0]
 
-    citation = first_chunk.format_citation()
-    assert "[WHO]" in citation
-    assert "Dengue" in citation
-    assert "Chunk #1" in citation
-    assert first_chunk.chunk_id in citation
+    # Test inline style
+    inline_citation = first_chunk.format_citation(style="inline")
+    assert "[WHO]" in inline_citation
+    assert "Dengue" in inline_citation
+    assert "Chunk #1" in inline_citation
+    assert first_chunk.chunk_id in inline_citation
+
+    # Test markdown blockquote style
+    markdown_citation = first_chunk.format_citation(style="markdown")
+    assert "> **Source**:" in markdown_citation
+    assert "> **Chunk**:" in markdown_citation
+
+    # Test full audit style
+    full_citation = first_chunk.format_citation(style="full")
+    assert "Document ID:" in full_citation
+    assert "Chunk ID:" in full_citation
+
+
+# ------------------------------------------------------------------------------
+# Filtering & Validation Tests
+# ------------------------------------------------------------------------------
+
+def test_filter_chunks_by_metadata(sample_dengue_doc: LoadedDocument, sample_cdc_doc: LoadedDocument):
+    """Verify filtering DocumentChunks by agency, section keyword, and token limits."""
+    from src.ingestion.metadata import filter_chunks_by_metadata
+
+    _, dengue_chunks = process_and_tag_document(sample_dengue_doc, chunk_size=300)
+    _, cdc_chunks = process_and_tag_document(sample_cdc_doc, chunk_size=300)
+    combined = dengue_chunks + cdc_chunks
+
+    # Filter by agency
+    who_only = filter_chunks_by_metadata(combined, agency="WHO")
+    assert len(who_only) == len(dengue_chunks)
+    assert all(c.metadata.agency == "WHO" for c in who_only)
+
+    cdc_only = filter_chunks_by_metadata(combined, agency="CDC")
+    assert len(cdc_only) == len(cdc_chunks)
+    assert all(c.metadata.agency == "CDC" for c in cdc_only)
+
+    # Filter by section keyword
+    danger_chunks = filter_chunks_by_metadata(combined, section_keyword="Danger")
+    assert len(danger_chunks) >= 1
+    assert any("Danger Signs" in c.metadata.section_heading for c in danger_chunks)
+
+
+def test_validate_chunk_metadata_completeness(sample_dengue_doc: LoadedDocument):
+    """Verify batch validation of chunk metadata completeness."""
+    from src.ingestion.metadata import validate_chunk_metadata_completeness
+
+    _, valid_chunks = process_and_tag_document(sample_dengue_doc)
+    report = validate_chunk_metadata_completeness(valid_chunks)
+
+    assert report["valid"] is True
+    assert report["issues_count"] == 0
+    assert report["total_chunks"] == len(valid_chunks)

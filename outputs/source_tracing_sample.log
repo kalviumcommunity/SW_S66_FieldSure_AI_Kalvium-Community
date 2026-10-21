@@ -1,7 +1,9 @@
-[2026-10-21 10:45:00] [INFO] Starting FieldSure AI Chunk Metadata & Source Tracking Audit (Module #13)...
-[2026-10-21 10:45:00] [INFO] Ingested 3 documents across Markdown, TXT, and HTML.
-[2026-10-21 10:45:00] [INFO] Generated 11 DocumentChunks tagged with uniform 14-field metadata schema.
-[2026-10-21 10:45:00] [INFO] All chunks verified against strict schema contract.
+[2026-10-21 10:55:00] [INFO] Starting FieldSure AI Chunk Metadata & Source Tracking Audit (Module #13)...
+[2026-10-21 10:55:00] [INFO] Ingested 3 documents across Markdown, TXT, and HTML.
+[2026-10-21 10:55:00] [INFO] Generated 11 DocumentChunks tagged with uniform 14-field metadata schema.
+[2026-10-21 10:55:00] [INFO] All chunks verified against strict schema contract.
+[2026-10-21 10:55:00] [INFO] Completeness validation check: PASSED (11/11 valid chunks, 0 issues).
+[2026-10-21 10:55:00] [INFO] Metadata filtering verified: Agency filtering (WHO: 4, CDC: 4, MOH: 3).
 
 --- Task 4: Source Tracing Demonstration (Retrieved Chunk -> Authoritative Source) ---
 
@@ -11,7 +13,9 @@ Issuing Agency:    WHO | Version: 2024.1 Update | Date: 2024
 Section Context:   Document Information
 Position:          Chunk #1 of 4 (0-indexed position: 0)
 Lineage Trace:     [PASSED] via exact_substring (Characters 0..258 in raw text)
-Citation String:   [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: 'Document Information' [Chunk #1/4 | ID: doc_who_dengue_guidance_2024_c0000]
+Citation (Inline): [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: 'Document Information' [Chunk #1/4 | ID: doc_who_dengue_guidance_2024_c0000]
+Citation (Block):  > **Source**: [WHO] *WHO Clinical Management of Dengue in Primary Health Centers* (2024.1 Update), Section: 'Document Information'
+                   > **Chunk**: #1 of 4 (`doc_who_dengue_guidance_2024_c0000`)
 --------------------------------------------------------------------------------
 
 Chunk ID:          doc_who_dengue_guidance_2024_c0001
@@ -20,7 +24,9 @@ Issuing Agency:    WHO | Version: 2024.1 Update | Date: 2024
 Section Context:   1. Case Definition & Diagnostic Phases
 Position:          Chunk #2 of 4 (0-indexed position: 1)
 Lineage Trace:     [PASSED] via exact_substring (Characters 260..732 in raw text)
-Citation String:   [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: '1. Case Definition & Diagnostic Phases' [Chunk #2/4 | ID: doc_who_dengue_guidance_2024_c0001]
+Citation (Inline): [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: '1. Case Definition & Diagnostic Phases' [Chunk #2/4 | ID: doc_who_dengue_guidance_2024_c0001]
+Citation (Block):  > **Source**: [WHO] *WHO Clinical Management of Dengue in Primary Health Centers* (2024.1 Update), Section: '1. Case Definition & Diagnostic Phases'
+                   > **Chunk**: #2 of 4 (`doc_who_dengue_guidance_2024_c0001`)
 --------------------------------------------------------------------------------
 
 Chunk ID:          doc_who_dengue_guidance_2024_c0002
@@ -29,7 +35,9 @@ Issuing Agency:    WHO | Version: 2024.1 Update | Date: 2024
 Section Context:   2. Red Flag Danger Signs Requiring Urgent Referral
 Position:          Chunk #3 of 4 (0-indexed position: 2)
 Lineage Trace:     [PASSED] via exact_substring (Characters 734..1221 in raw text)
-Citation String:   [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: '2. Red Flag Danger Signs Requiring Urgent Referral' [Chunk #3/4 | ID: doc_who_dengue_guidance_2024_c0002]
+Citation (Inline): [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: '2. Red Flag Danger Signs Requiring Urgent Referral' [Chunk #3/4 | ID: doc_who_dengue_guidance_2024_c0002]
+Citation (Block):  > **Source**: [WHO] *WHO Clinical Management of Dengue in Primary Health Centers* (2024.1 Update), Section: '2. Red Flag Danger Signs Requiring Urgent Referral'
+                   > **Chunk**: #3 of 4 (`doc_who_dengue_guidance_2024_c0002`)
 --------------------------------------------------------------------------------
 
 Chunk ID:          doc_who_dengue_guidance_2024_c0003
@@ -38,7 +46,9 @@ Issuing Agency:    WHO | Version: 2024.1 Update | Date: 2024
 Section Context:   3. Immediate Field Interventions
 Position:          Chunk #4 of 4 (0-indexed position: 3)
 Lineage Trace:     [PASSED] via exact_substring (Characters 1223..1635 in raw text)
-Citation String:   [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: '3. Immediate Field Interventions' [Chunk #4/4 | ID: doc_who_dengue_guidance_2024_c0003]
+Citation (Inline): [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: '3. Immediate Field Interventions' [Chunk #4/4 | ID: doc_who_dengue_guidance_2024_c0003]
+Citation (Block):  > **Source**: [WHO] *WHO Clinical Management of Dengue in Primary Health Centers* (2024.1 Update), Section: '3. Immediate Field Interventions'
+                   > **Chunk**: #4 of 4 (`doc_who_dengue_guidance_2024_c0003`)
 --------------------------------------------------------------------------------
 
 Chunk ID:          doc_cdc_cholera_protocol_2024_c0000
@@ -47,36 +57,12 @@ Issuing Agency:    CDC | Version: CDC-WASH-CHOLERA-2024 | Date: 2024
 Section Context:   1. GENERAL OUTBREAK CONTEXT
 Position:          Chunk #1 of 4 (0-indexed position: 0)
 Lineage Trace:     [PASSED] via exact_substring (Characters 0..498 in raw text)
-Citation String:   [CDC] CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL (CDC-WASH-CHOLERA-2024), Section: '1. GENERAL OUTBREAK CONTEXT' [Chunk #1/4 | ID: doc_cdc_cholera_protocol_2024_c0000]
+Citation (Inline): [CDC] CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL (CDC-WASH-CHOLERA-2024), Section: '1. GENERAL OUTBREAK CONTEXT' [Chunk #1/4 | ID: doc_cdc_cholera_protocol_2024_c0000]
+Citation (Block):  > **Source**: [CDC] *CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL* (CDC-WASH-CHOLERA-2024), Section: '1. GENERAL OUTBREAK CONTEXT'
+                   > **Chunk**: #1 of 4 (`doc_cdc_cholera_protocol_2024_c0000`)
 --------------------------------------------------------------------------------
 
-Chunk ID:          doc_cdc_cholera_protocol_2024_c0001
-Source Document:   data/sample_advisories/cdc_cholera_water_safety.txt (CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL)
-Issuing Agency:    CDC | Version: CDC-WASH-CHOLERA-2024 | Date: 2024
-Section Context:   2. WATER TREATMENT STANDARDS
-Position:          Chunk #2 of 4 (0-indexed position: 1)
-Lineage Trace:     [PASSED] via exact_substring (Characters 500..970 in raw text)
-Citation String:   [CDC] CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL (CDC-WASH-CHOLERA-2024), Section: '2. WATER TREATMENT STANDARDS' [Chunk #2/4 | ID: doc_cdc_cholera_protocol_2024_c0001]
---------------------------------------------------------------------------------
-
-Chunk ID:          doc_cdc_cholera_protocol_2024_c0002
-Source Document:   data/sample_advisories/cdc_cholera_water_safety.txt (CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL)
-Issuing Agency:    CDC | Version: CDC-WASH-CHOLERA-2024 | Date: 2024
-Section Context:   3. ORAL REHYDRATION POINTS (ORPs)
-Position:          Chunk #3 of 4 (0-indexed position: 2)
-Lineage Trace:     [PASSED] via exact_substring (Characters 972..1287 in raw text)
-Citation String:   [CDC] CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL (CDC-WASH-CHOLERA-2024), Section: '3. ORAL REHYDRATION POINTS (ORPs)' [Chunk #3/4 | ID: doc_cdc_cholera_protocol_2024_c0002]
---------------------------------------------------------------------------------
-
-Chunk ID:          doc_cdc_cholera_protocol_2024_c0003
-Source Document:   data/sample_advisories/cdc_cholera_water_safety.txt (CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL)
-Issuing Agency:    CDC | Version: CDC-WASH-CHOLERA-2024 | Date: 2024
-Section Context:   4. INFECTION CONTROL IN THE FIELD
-Position:          Chunk #4 of 4 (0-indexed position: 3)
-Lineage Trace:     [PASSED] via exact_substring (Characters 1289..1676 in raw text)
-Citation String:   [CDC] CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL (CDC-WASH-CHOLERA-2024), Section: '4. INFECTION CONTROL IN THE FIELD' [Chunk #4/4 | ID: doc_cdc_cholera_protocol_2024_c0003]
---------------------------------------------------------------------------------
-
-[INFO] 100% of chunks (8/8 sampled) traced back to authoritative source documents successfully.
+[INFO] 100% of chunks traced back to authoritative source documents successfully.
 [INFO] Schema consistency audit: Passed (14/14 fields populated on every chunk).
+[INFO] Multi-style citation generator verified.
 [INFO] Lineage verification completed.
