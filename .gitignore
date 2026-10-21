@@ -36,6 +36,7 @@ outputs/*.json
 !outputs/chat_completion_sample.log
 !outputs/prompt_comparison_sample.log
 !outputs/token_cost_estimation_sample.log
+!outputs/context_window_management_sample.log
 !outputs/ingestion_validation_report.json
 
 # Operating System & IDE Artifacts
