@@ -26,6 +26,7 @@
 | **#21** | Vector Database Setup & Collection Design | `Completed` | `src/vector_store.py`, `src/vector_db_demo.py`, `tests/test_vector_store.py`, `outputs/vector_db_readback_sample.md` |
 | **#22** | Indexing Embeddings & Metadata Storage | `Completed` | `src/index_embeddings.py`, `tests/test_index_embeddings.py`, `outputs/indexing_summary_sample.md` |
 | **#23** | Similarity Search & Top-K Retrieval | `Completed` | `src/retrieve_chunks.py`, `tests/test_retrieve_chunks.py`, `outputs/top_k_retrieval_sample.md` |
+| **#24** | Metadata Filtering & Hybrid Search | `Completed` | `src/filtered_retrieval.py`, `tests/test_filtered_retrieval.py`, `outputs/filtered_retrieval_sample.md` |
 
 ---
 
@@ -538,3 +539,31 @@
   - Focused test run: 23 tests passed across retrieval and vector-store coverage.
   - Sample ChromaDB query ran with `k=2` and `k=5`; rankings, scores, and source metadata were printed and saved in `outputs/top_k_retrieval_sample.md`.
   - As no live embeddings file or API credentials were available, the committed sample clearly labels its query/document vectors as illustrative fixtures.
+
+---
+
+### Module #24: Metadata Filtering & Hybrid Search
+- **Status**: `Completed`
+- **Objective**: Compare filtered and unfiltered vector search and optionally rerank filtered results with exact keyword coverage.
+- **Dependencies**: Module #23 (Similarity Search & Top-K Retrieval).
+- **Expected Files**:
+  - `src/filtered_retrieval.py`
+  - `tests/test_filtered_retrieval.py`
+  - `outputs/filtered_retrieval_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Add ChromaDB metadata filtering for retrieval.
+  2. [x] Compare unfiltered and source-filtered results for the same embedded query.
+  3. [x] Add optional hybrid reranking with exact query-term matching.
+  4. [x] Demonstrate improved precision on a dengue-source example.
+  5. [x] Save filtered, unfiltered, and hybrid results with scores and metadata.
+- **Acceptance Criteria**:
+  - Filtered and unfiltered queries share the same query embedding and vector collection.
+  - Filtered matches meet the requested metadata predicate and retain text and metadata.
+  - Hybrid scoring reports vector and keyword components alongside the combined score.
+  - Sample results explicitly distinguish illustrative test vectors from live embeddings.
+- **Required Tests**:
+  - `tests/test_filtered_retrieval.py`: Verify metadata filtering, query embedding reuse, hybrid keyword ranking, precision comparison, and validation.
+- **Verification Evidence**:
+  - Focused tests: 30 passed across filtering, query retrieval, and vector storage.
+  - Illustrative sample ChromaDB run improved precision@2 from 0/2 unfiltered to 2/2 after applying the source filter; filtered hybrid results include vector and keyword component scores.
+  - The sample uses explicit fixture vectors and a mocked query embedding, not live API output.

@@ -171,8 +171,9 @@ class ChromaVectorStore:
         self,
         query_embedding: Sequence[float],
         limit: int,
+        where: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
-        """Return the nearest chunks with cosine similarity and source metadata."""
+        """Return nearest chunks with cosine similarity and optional metadata filter."""
         if limit < 1:
             raise ValueError("Search result limit must be at least 1.")
         if not query_embedding or any(
@@ -186,10 +187,15 @@ class ChromaVectorStore:
             raise VectorStoreError("Cannot search an empty ChromaDB collection.")
 
         try:
+            query_options: dict[str, Any] = {
+                "query_embeddings": [[float(value) for value in query_embedding]],
+                "n_results": limit,
+                "include": ["distances", "documents", "metadatas"],
+            }
+            if where is not None:
+                query_options["where"] = where
             result = self.collection.query(
-                query_embeddings=[[float(value) for value in query_embedding]],
-                n_results=limit,
-                include=["distances", "documents", "metadatas"],
+                **query_options,
             )
         except Exception as err:
             raise VectorStoreError(f"ChromaDB similarity search failed: {err}") from err

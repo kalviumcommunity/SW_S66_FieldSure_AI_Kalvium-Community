@@ -224,6 +224,24 @@ first. `VECTOR_DB_PATH` and `VECTOR_DB_COLLECTION` select the collection. See
 sample uses explicitly illustrative vectors because no live API credentials or
 generated embeddings file were available when it was run.
 
+### Filter Retrieval by Metadata and Exact Terms
+Compare unfiltered results with results restricted to a source, and optionally
+rerank the filtered candidates using keyword coverage:
+```bash
+uv run python -m src.filtered_retrieval \
+  --query "dengue mosquito prevention" \
+  --where-field source_file \
+  --where-value "data/sample_advisories/who_dengue_clinical_guidance.md" \
+  --k 5
+```
+The command embeds the query using `EMBEDDING_MODEL`, runs the same vector
+search with and without the ChromaDB metadata filter, then reports a filtered
+hybrid ranking. Use `--vector-only` to disable keyword reranking. The hybrid
+score combines normalized cosine similarity with exact query-term coverage.
+See `outputs/filtered_retrieval_sample.md` for the comparison, including an
+illustrative precision@2 example. The sample vectors are fixtures, not live
+model embeddings or production relevance scores.
+
 > **Note on Prompt Comparison**:  
 > Sends identical field-worker questions across a vague system prompt versus a constrained, citation-enforced prompt. Prints responses and logs payloads, token usage, and metadata without exposing API keys. Configuration and API failures are handled cleanly without raw tracebacks and return non-zero exit codes.
 

@@ -2,13 +2,13 @@
 
 > **Role**: Member 1 — Document Processing & LLM Foundation  
 > **Last Updated**: 2026-10-22
-> **Current Sprint Phase**: Similarity Search & Top-K Retrieval (Module #23)
+> **Current Sprint Phase**: Metadata Filtering & Hybrid Search (Module #24)
 
 ---
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #23 (Similarity Search & Top-K Retrieval) completed for this assignment.
+- **Current Active Task**: Module #24 (Metadata Filtering & Hybrid Search) completed for this assignment.
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
@@ -23,6 +23,7 @@
   - Module #21 (Vector Database Setup & Collection Design: `src/vector_store.py`, `src/vector_db_demo.py`, `tests/test_vector_store.py`, `outputs/vector_db_readback_sample.md`).
   - Module #22 (Indexing Embeddings & Metadata Storage: `src/index_embeddings.py`, `tests/test_index_embeddings.py`, `outputs/indexing_summary_sample.md`).
   - Module #23 (Similarity Search & Top-K Retrieval: `src/retrieve_chunks.py`, `tests/test_retrieve_chunks.py`, `outputs/top_k_retrieval_sample.md`).
+  - Module #24 (Metadata Filtering & Hybrid Search: `src/filtered_retrieval.py`, `tests/test_filtered_retrieval.py`, `outputs/filtered_retrieval_sample.md`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
 - **Next Planned Module**: Awaiting the next assigned module.
 
@@ -84,6 +85,7 @@
 - `src.index_embeddings.run_indexing_job(...)`: Indexes the complete embeddings file, compares it with the source corpus, validates the indexed count, and spot-checks stored records.
 - `src.vector_store.ChromaVectorStore.search(...)`: Retrieves nearest stored chunks with cosine similarity, source text, and restored metadata.
 - `src.retrieve_chunks.retrieve_for_k_values(...)`: Embeds a query with the configured model and runs searches for each requested top-k value.
+- `src.filtered_retrieval.retrieve_filtered_comparison(...)`: Compares unfiltered and metadata-filtered vector search, with optional keyword-coverage reranking.
 
 ---
 
