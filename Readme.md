@@ -141,6 +141,17 @@ Generate embeddings for sample texts and compare their cosine similarity:
 uv run python -m src.embedding_fundamentals
 ```
 
+### Embed Prepared Corpus Chunks
+Generate embeddings for the first three prepared chunks using `API_KEY`,
+`API_BASE_URL`, and `EMBEDDING_MODEL` from `.env`. Each vector is saved with its
+source text and metadata:
+```bash
+uv run python -m src.embed_corpus
+```
+Use `--input`, `--output`, and `--limit` to choose a JSONL corpus, output path,
+and number of chunks. The default full-vector output is
+`outputs/embedded_chunks.jsonl`.
+
 > **Note on Prompt Comparison**:  
 > Sends identical field-worker questions across a vague system prompt versus a constrained, citation-enforced prompt. Prints responses and logs payloads, token usage, and metadata without exposing API keys. Configuration and API failures are handled cleanly without raw tracebacks and return non-zero exit codes.
 
@@ -191,6 +202,7 @@ uv run python -m src.embedding_fundamentals
   - `outputs/chat_completion_sample.log`
   - `outputs/prompt_comparison_sample.log`
   - `outputs/embedding_fundamentals_sample.md`
+  - `outputs/embedding_api_sample.md`
 
 ---
 

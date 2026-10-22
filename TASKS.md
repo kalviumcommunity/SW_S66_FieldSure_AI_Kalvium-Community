@@ -375,3 +375,28 @@
 - **Verification Evidence**:
   - Automated tests passing in `tests/test_embedding_fundamentals.py`.
   - Captured output and vector representation explanation saved in `outputs/embedding_fundamentals_sample.md`.
+
+---
+
+### Module #17: Generating Embeddings via API
+- **Status**: `Completed`
+- **Objective**: Embed a small prepared corpus through the configured OpenAI-compatible API and store each vector with its source text and metadata.
+- **Expected Files**:
+  - `src/embed_corpus.py`
+  - `tests/test_embed_corpus.py`
+  - `outputs/embedding_api_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Read prepared chunks from the ingestion JSONL output and request embeddings through the API.
+  2. [x] Preserve source chunk text and metadata alongside each generated vector.
+  3. [x] Read the API key, optional base URL, and embedding model from environment configuration.
+  4. [x] Report embedded chunk count, vector length, and sample vector values.
+  5. [x] Save a clearly labeled sample output showing chunk content, source metadata, vector length, and trimmed vector values.
+- **Acceptance Criteria**:
+  - Every stored vector corresponds to its source chunk and preserves retrieval metadata.
+  - API failures and invalid corpus records are surfaced with actionable errors.
+  - No API secrets or embedding model settings are hardcoded in the script.
+- **Required Tests**:
+  - `tests/test_embed_corpus.py`: Verify corpus validation, metadata preservation, output serialization, environment configuration, and verification output.
+- **Verification Evidence**:
+  - Focused automated tests pass.
+  - Sample corpus output is saved in `outputs/embedding_api_sample.md` and identifies mocked vectors as illustrative.

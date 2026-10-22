@@ -2,13 +2,13 @@
 
 > **Role**: Member 1 — Document Processing & LLM Foundation  
 > **Last Updated**: 2026-10-22
-> **Current Sprint Phase**: Embedding Fundamentals Demonstration (Module #16)
+> **Current Sprint Phase**: Generating Embeddings via API (Module #17)
 
 ---
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #16 (Embeddings Fundamentals & Vector Representation) completed for this assignment.
+- **Current Active Task**: Module #17 (Generating Embeddings via API) completed for this assignment.
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
@@ -17,6 +17,7 @@
   - Module #6 (Context Windows & Message History Management: `src/context_manager.py`, `outputs/context_window_management_sample.log`, `tests/test_context_manager.py`).
   - Module #10 (Document Loading & Multi-Format Intake: `src/ingestion/loader.py`, `data/sample_advisories/`, `outputs/document_loading_sample.log`, `tests/test_loader.py`).
   - Module #16 (Embeddings Fundamentals & Vector Representation: `src/embedding_fundamentals.py`, `outputs/embedding_fundamentals_sample.md`, `tests/test_embedding_fundamentals.py`).
+  - Module #17 (Generating Embeddings via API: `src/embed_corpus.py`, `outputs/embedding_api_sample.md`, `tests/test_embed_corpus.py`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
 - **Next Planned Module**: Awaiting the next assigned module.
 
@@ -70,6 +71,7 @@
 - `src.ingestion.loader.load_document(path)`: Robust multi-format document reader (`.pdf`, `.docx`, `.md`, `.txt`, `.html`) with source metadata preservation.
 - `src.ingestion.loader.load_corpus(dir)`: Batch intake runner surviving bad files with detailed error ledger reporting.
 - `src.embedding_fundamentals.generate_embeddings(...)`: Requests and validates embedding vectors from an OpenAI-compatible API; `cosine_similarity(...)` compares vectors.
+- `src.embedding_fundamentals.embed_corpus_chunks(...)`: Keeps embedding vectors paired with original chunk text and metadata.
 
 ---
 
