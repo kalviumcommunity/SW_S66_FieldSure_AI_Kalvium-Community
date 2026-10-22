@@ -192,6 +192,22 @@ must match. The command validates dimensions, stores the source text and
 metadata, then reads a record back and reports its ID, vector length, and
 metadata. See `outputs/vector_db_readback_sample.md` for the fixture result.
 
+### Index Every Embedded Chunk
+Generate vectors for the entire prepared corpus, then index them into the
+configured ChromaDB collection and compare stored records with the source
+corpus:
+```bash
+uv run python -m src.embed_corpus --limit 11
+uv run python -m src.index_embeddings
+```
+The indexer reads all of `outputs/embedded_chunks.jsonl`, checks IDs, source
+text, and metadata against `outputs/ingested_chunks.jsonl`, then verifies the
+stored count and reads back first and last records. Set `VECTOR_DB_PATH` and
+`VECTOR_DB_COLLECTION` to choose the persistent collection. A JSON summary is
+written to `outputs/indexing_summary.json`; the committed
+`outputs/indexing_summary_sample.md` shows the count and integrity checks from
+a clearly labeled illustrative-vector run.
+
 > **Note on Prompt Comparison**:  
 > Sends identical field-worker questions across a vague system prompt versus a constrained, citation-enforced prompt. Prints responses and logs payloads, token usage, and metadata without exposing API keys. Configuration and API failures are handled cleanly without raw tracebacks and return non-zero exit codes.
 

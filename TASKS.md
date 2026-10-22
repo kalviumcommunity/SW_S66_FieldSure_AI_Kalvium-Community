@@ -24,6 +24,7 @@
 | **#14** | Token-Aware Chunk Sizing & Overlap | `Completed` | `src/ingestion/chunker.py`, `tests/test_token_chunker.py`, `outputs/token_chunks_sample.json`, `outputs/token_chunking_sample.log` |
 | **#15** | Corpus Preparation & Ingestion Validation | `Completed` | `src/ingestion/pipeline.py`, `tests/test_ingestion_pipeline.py`, `outputs/ingested_chunks.jsonl`, `outputs/ingestion_validation_report.json`, `outputs/ingestion_summary.log` |
 | **#21** | Vector Database Setup & Collection Design | `Completed` | `src/vector_store.py`, `src/vector_db_demo.py`, `tests/test_vector_store.py`, `outputs/vector_db_readback_sample.md` |
+| **#22** | Indexing Embeddings & Metadata Storage | `Completed` | `src/index_embeddings.py`, `tests/test_index_embeddings.py`, `outputs/indexing_summary_sample.md` |
 
 ---
 
@@ -481,3 +482,31 @@
   - Focused test run: 7 tests passed.
   - The local persistence smoke test reported a readable record ID, 8-value vector, source text, and original metadata. The vector is an illustrative fixture, not a model embedding.
   - Sample output is saved in `outputs/vector_db_readback_sample.md`.
+
+---
+
+### Module #22: Indexing Embeddings & Metadata Storage
+- **Status**: `Completed`
+- **Objective**: Insert every prepared corpus embedding into ChromaDB, compare the indexed count with the source corpus, and verify stored IDs, vectors, text, and metadata.
+- **Expected Files**:
+  - `src/index_embeddings.py`
+  - `tests/test_index_embeddings.py`
+  - `outputs/indexing_summary_sample.md`
+- **Dependencies**: Module #21 (Vector Database Setup & Collection Design).
+- **Implementation Subtasks**:
+  1. [x] Load and index every record from the prepared embedded-corpus JSONL file.
+  2. [x] Persist vectors, source text, and retrieval metadata in the configured collection.
+  3. [x] Compare collection count and embedded chunk IDs against the original source corpus.
+  4. [x] Read back first and last records and verify ID, vector, text, and metadata.
+  5. [x] Save count, failures, and spot-check evidence in the committed summary.
+- **Acceptance Criteria**:
+  - The indexer processes the complete embedded corpus without a chunk limit.
+  - Indexed record count matches the source corpus count for a complete input; failures and missing embeddings are reported.
+  - Spot-checks verify stored vector values and original chunk content/metadata.
+- **Required Tests**:
+  - `tests/test_index_embeddings.py`: Verify all-record indexing, count comparison, spot-check integrity, idempotent upsert, and failure reporting.
+- **Verification Evidence**:
+  - Focused tests: 11 passed across indexing and vector-store coverage.
+  - Full-corpus sample indexed 11 of 11 source chunks; count validation passed and both readback checks preserved vector values, IDs, source text, and metadata.
+  - Vectors used for the sample were explicitly labeled illustrative fixtures, not live model embeddings.
+  - Summary evidence is saved in `outputs/indexing_summary_sample.md`.
