@@ -1,14 +1,14 @@
 # FieldSure AI — Project Memory (MEMORY.md)
 
 > **Role**: Member 1 — Document Processing & LLM Foundation  
-> **Last Updated**: 2026-10-19  
-> **Current Sprint Phase**: Documentation & Architectural Planning (Pre-Implementation)
+> **Last Updated**: 2026-10-22
+> **Current Sprint Phase**: Embedding Fundamentals Demonstration (Module #16)
 
 ---
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #10 (Document Loading & Multi-Format Intake) Completed; Ready for Module #11 (Text Extraction & Cleaning Pipeline).
+- **Current Active Task**: Module #16 (Embeddings Fundamentals & Vector Representation) completed for this assignment.
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
@@ -16,8 +16,9 @@
   - Module #5 (Tokens, Tokenization & Cost Estimation: `src/token_cost_estimator.py`, `outputs/token_cost_estimation_sample.log`, `tests/test_token_cost.py`).
   - Module #6 (Context Windows & Message History Management: `src/context_manager.py`, `outputs/context_window_management_sample.log`, `tests/test_context_manager.py`).
   - Module #10 (Document Loading & Multi-Format Intake: `src/ingestion/loader.py`, `data/sample_advisories/`, `outputs/document_loading_sample.log`, `tests/test_loader.py`).
+  - Module #16 (Embeddings Fundamentals & Vector Representation: `src/embedding_fundamentals.py`, `outputs/embedding_fundamentals_sample.md`, `tests/test_embedding_fundamentals.py`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
-- **Next Planned Module**: Module #11 (Text Extraction & Cleaning Pipeline).
+- **Next Planned Module**: Awaiting the next assigned module.
 
 ---
 
@@ -68,6 +69,7 @@
 - `src.context_manager.ContextWindowManager`: Multi-turn dialogue manager with pre-request token measurement, system prompt preservation, and sliding-window trimming.
 - `src.ingestion.loader.load_document(path)`: Robust multi-format document reader (`.pdf`, `.docx`, `.md`, `.txt`, `.html`) with source metadata preservation.
 - `src.ingestion.loader.load_corpus(dir)`: Batch intake runner surviving bad files with detailed error ledger reporting.
+- `src.embedding_fundamentals.generate_embeddings(...)`: Requests and validates embedding vectors from an OpenAI-compatible API; `cosine_similarity(...)` compares vectors.
 
 ---
 
