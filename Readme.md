@@ -242,6 +242,21 @@ See `outputs/filtered_retrieval_sample.md` for the comparison, including an
 illustrative precision@2 example. The sample vectors are fixtures, not live
 model embeddings or production relevance scores.
 
+### Tune Retrieval Settings Against Known Sources
+Run the reproducible tuning experiment over the prepared sample corpus:
+```bash
+uv run python -m src.tune_retrieval
+```
+It evaluates dengue, cholera, and malaria queries against expected source
+documents, comparing unfiltered `k=2` retrieval with source-filtered `k=5`
+retrieval and a `0.5` minimum similarity threshold. Results include
+precision@k, recall@k, F1, hit rates, retrieved chunks, and the selected
+setting. The JSON report is written to `outputs/retrieval_tuning_report.json`;
+the interpretation is in `outputs/retrieval_tuning_summary.md`. With no live
+embedding file or API credentials available, the committed experiment uses
+deterministic illustrative vectors and does not represent measured production
+semantic quality.
+
 > **Note on Prompt Comparison**:  
 > Sends identical field-worker questions across a vague system prompt versus a constrained, citation-enforced prompt. Prints responses and logs payloads, token usage, and metadata without exposing API keys. Configuration and API failures are handled cleanly without raw tracebacks and return non-zero exit codes.
 
