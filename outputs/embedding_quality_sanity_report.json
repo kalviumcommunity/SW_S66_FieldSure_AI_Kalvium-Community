@@ -1,0 +1,71 @@
+{
+  "metric": "cosine_similarity",
+  "metric_justification": "Cosine similarity compares embedding direction, reducing the effect of vector magnitude when matching semantic representations.",
+  "borderline_margin_threshold": 0.05,
+  "test_count": 3,
+  "pass_count": 2,
+  "failure_count": 0,
+  "borderline_count": 1,
+  "borderline_cases": [
+    "malaria urgent treatment"
+  ],
+  "results": [
+    {
+      "name": "dengue field interventions",
+      "query": "What immediate actions and medicines are recommended for dengue?",
+      "status": "passed",
+      "expected_chunk_id": "doc_who_dengue_guidance_2024_c0003",
+      "expected_source": "data/sample_advisories/who_dengue_clinical_guidance.md",
+      "expected_rank": 1,
+      "expected_score": 1.0,
+      "top_chunk_id": "doc_who_dengue_guidance_2024_c0003",
+      "top_source": "data/sample_advisories/who_dengue_clinical_guidance.md",
+      "top_section": "3. Immediate Field Interventions",
+      "top_score": 1.0,
+      "runner_up_chunk_id": "doc_who_dengue_guidance_2024_c0001",
+      "runner_up_score": 0.0,
+      "margin_over_runner_up": 1.0,
+      "note": "Expected chunk ranked first with a 1.000000 lead over the next result."
+    },
+    {
+      "name": "cholera water safety",
+      "query": "How should drinking water be disinfected during a cholera outbreak?",
+      "status": "passed",
+      "expected_chunk_id": "doc_cdc_cholera_protocol_2024_c0001",
+      "expected_source": "data/sample_advisories/cdc_cholera_water_safety.txt",
+      "expected_rank": 1,
+      "expected_score": 1.0,
+      "top_chunk_id": "doc_cdc_cholera_protocol_2024_c0001",
+      "top_source": "data/sample_advisories/cdc_cholera_water_safety.txt",
+      "top_section": "2. WATER TREATMENT STANDARDS",
+      "top_score": 1.0,
+      "runner_up_chunk_id": "doc_who_dengue_guidance_2024_c0001",
+      "runner_up_score": 0.021001668753888897,
+      "margin_over_runner_up": 0.9789983312461111,
+      "note": "Expected chunk ranked first with a 0.978998 lead over the next result."
+    },
+    {
+      "name": "malaria urgent treatment",
+      "query": "What treatment and urgent referral steps are required for malaria?",
+      "status": "borderline",
+      "expected_chunk_id": "doc_moh_malaria_triage_2024_c0002",
+      "expected_source": "data/sample_advisories/moh_malaria_rapid_triage.html",
+      "expected_rank": 1,
+      "expected_score": 0.9999999999999998,
+      "top_chunk_id": "doc_moh_malaria_triage_2024_c0002",
+      "top_source": "data/sample_advisories/moh_malaria_rapid_triage.html",
+      "top_section": "Treatment & Urgent Referral Protocols",
+      "top_score": 0.9999999999999998,
+      "runner_up_chunk_id": "doc_who_dengue_guidance_2024_c0001",
+      "runner_up_score": 0.9999994981185201,
+      "margin_over_runner_up": 5.018814797086435e-07,
+      "note": "Expected chunk ranked first, but its lead (0.000001) is within the 0.050000 borderline threshold."
+    }
+  ],
+  "overall_note": "Borderline case 'malaria urgent treatment': expected chunk leads 'doc_who_dengue_guidance_2024_c0001' by only 0.000001; inspect this near-tie before trusting retrieval.",
+  "model": "illustrative-mock-model",
+  "query_vector_source": "illustrative mocked vector; not a live API result",
+  "corpus_path": "outputs\\quality_fixture_chunks.jsonl",
+  "stored_vector_source": "illustrative mocked vectors attached to real prepared sample chunks",
+  "sample_note": "The malaria query narrowly outranks a dengue chunk that shares vector-borne disease context. This borderline is deliberately represented with illustrative vectors to verify the warning; it is not evidence of a live model failure. Run the checker with API-generated embeddings to measure actual corpus quality."
+}

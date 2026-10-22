@@ -161,6 +161,17 @@ uv run python -m src.rank_chunks --query "How can field workers reduce dengue ri
 The command reports the most and least similar chunks with their scores and
 source metadata. See `outputs/embedding_similarity_sample.md` for a sample.
 
+### Run Embedding Quality Sanity Checks
+Embed the full prepared corpus so each known relevance target is present, then
+run the query-chunk checks:
+```bash
+uv run python -m src.embed_corpus --limit 11
+uv run python -m src.embedding_quality
+```
+The sanity checker reports pass/fail and borderline cases, and writes
+`outputs/embedding_quality_sanity_report.json`. A close top-score margin is
+flagged for review even when the expected chunk ranks first.
+
 > **Note on Prompt Comparison**:  
 > Sends identical field-worker questions across a vague system prompt versus a constrained, citation-enforced prompt. Prints responses and logs payloads, token usage, and metadata without exposing API keys. Configuration and API failures are handled cleanly without raw tracebacks and return non-zero exit codes.
 
@@ -213,6 +224,7 @@ source metadata. See `outputs/embedding_similarity_sample.md` for a sample.
   - `outputs/embedding_fundamentals_sample.md`
   - `outputs/embedding_api_sample.md`
   - `outputs/embedding_similarity_sample.md`
+  - `outputs/embedding_quality_sanity_report.json`
 
 ---
 
