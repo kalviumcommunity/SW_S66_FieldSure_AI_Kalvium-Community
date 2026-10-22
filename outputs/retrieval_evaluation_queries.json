@@ -1,0 +1,26 @@
+[
+  {
+    "query_id": "dengue-warning-signs",
+    "query": "Which warning signs require urgent referral for a dengue patient?",
+    "relevant_chunk_ids": [
+      "doc_who_dengue_guidance_2024_c0002"
+    ],
+    "relevance_note": "This chunk lists warning signs that community health workers should monitor during the critical phase."
+  },
+  {
+    "query_id": "cholera-water-treatment",
+    "query": "What chlorine levels are required for drinking water in settlement camps?",
+    "relevant_chunk_ids": [
+      "doc_cdc_cholera_protocol_2024_c0001"
+    ],
+    "relevance_note": "This chunk states free residual chlorine targets at distribution and household storage."
+  },
+  {
+    "query_id": "malaria-rapid-test",
+    "query": "What are the steps for field testing with a malaria rapid diagnostic test?",
+    "relevant_chunk_ids": [
+      "doc_moh_malaria_triage_2024_c0001"
+    ],
+    "relevance_note": "This chunk describes the step-by-step malaria RDT field testing procedure."
+  }
+]

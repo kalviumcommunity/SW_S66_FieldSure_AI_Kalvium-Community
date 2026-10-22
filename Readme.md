@@ -257,6 +257,32 @@ embedding file or API credentials available, the committed experiment uses
 deterministic illustrative vectors and does not represent measured production
 semantic quality.
 
+### Evaluate Retrieval Precision and Recall
+Run the labeled-query evaluation against the configured ChromaDB collection:
+```bash
+uv run python -m src.evaluate_retrieval
+```
+The labeled queries and relevant chunk IDs are in
+`outputs/retrieval_evaluation_queries.json`. The live run embeds each query
+using `EMBEDDING_MODEL` (which must match the model used for indexed chunks),
+then reports precision@k, recall@k, hit@k, top-1 hit rate, retrieved text,
+metadata, and diagnoses missing or low-ranked relevant chunks. Precision@k
+uses the requested k as its denominator, even if fewer than k results pass the
+score threshold. Configure `VECTOR_DB_PATH`, `VECTOR_DB_COLLECTION`, and the
+existing API environment variables for a live run.
+
+Run the offline fixture demonstration without API credentials:
+```bash
+uv run python -m src.evaluate_retrieval --self-test
+```
+This creates deterministic fixture vectors in a temporary ChromaDB collection
+to verify metric calculations and failure diagnostics; its scores are not live
+embedding quality measurements. The committed sample report deliberately
+demonstrates relevant chunks ranked second, so it is marked failed for top-1
+retrieval despite full recall@3. See `outputs/retrieval_evaluation_summary.md`
+for the interpretation and `outputs/retrieval_evaluation_report.json` for
+query-level results.
+
 > **Note on Prompt Comparison**:  
 > Sends identical field-worker questions across a vague system prompt versus a constrained, citation-enforced prompt. Prints responses and logs payloads, token usage, and metadata without exposing API keys. Configuration and API failures are handled cleanly without raw tracebacks and return non-zero exit codes.
 

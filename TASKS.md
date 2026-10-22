@@ -598,3 +598,33 @@
   - On three sample queries, the baseline achieved mean precision@2 `0.500`, mean recall@2 `0.278`, mean F1@2 `0.356`, and top-1 hit `0.000`.
   - Expected-source filter + `k=5` + threshold `0.5` achieved precision, recall, F1, and top-1 hit `1.000`.
   - The reproducible sample uses deterministic fixtures, not live model embeddings; detailed results are saved in the JSON report and summary.
+
+---
+
+### Module #27: Retrieval Evaluation & Recall Testing
+- **Status**: `Completed`
+- **Objective**: Evaluate retrieval against labeled relevant chunk IDs and inspect misses using precision@k and recall@k.
+- **Dependencies**: Module #25 (Retrieval Relevance Tuning).
+- **Expected Files**:
+  - `src/evaluate_retrieval.py`
+  - `tests/test_evaluate_retrieval.py`
+  - `outputs/retrieval_evaluation_queries.json`
+  - `outputs/retrieval_evaluation_report.json`
+  - `outputs/retrieval_evaluation_summary.md`
+- **Implementation Subtasks**:
+  1. [x] Label representative dengue, cholera, and malaria queries with relevant source chunk IDs.
+  2. [x] Compute per-query and aggregate precision@k, recall@k, hit@k, and top-1 hit rate.
+  3. [x] Report retrieved scores, source text, metadata, and missing or low-ranked relevant chunks.
+  4. [x] Analyze a deliberate top-1 miss and document the limitations of illustrative fixture vectors.
+  5. [x] Save a reproducible JSON report and readable interpretation.
+- **Acceptance Criteria**:
+  - Every evaluation query identifies one or more known relevant chunk IDs.
+  - Query vectors use the configured embedding model for live evaluation.
+  - The report distinguishes live evaluation from deterministic fixture output.
+  - Evaluation failures include query-level evidence and likely causes.
+- **Required Tests**:
+  - `tests/test_evaluate_retrieval.py`: Verify label validation, precision/recall aggregation, missing-ID diagnostics, top-1 misses, live query embedding, and the offline fixture run.
+- **Verification Evidence**:
+  - Focused evaluation tests pass; the fixture report is generated without API credentials.
+  - The committed fixture report has three labeled queries, full recall@3, precision@3 of `0.333`, and top-1 hit rate `0.000`.
+  - Fixture scores validate the report and failure-analysis path only; they are not production embedding-quality results.
