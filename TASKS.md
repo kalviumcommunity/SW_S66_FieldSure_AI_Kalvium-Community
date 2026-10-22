@@ -23,6 +23,7 @@
 | **#13** | Chunk Metadata & Source Tracking | `Completed` | `src/ingestion/metadata.py`, `tests/test_metadata.py`, `outputs/tagged_chunks_sample.json`, `outputs/source_tracing_sample.log` |
 | **#14** | Token-Aware Chunk Sizing & Overlap | `Completed` | `src/ingestion/chunker.py`, `tests/test_token_chunker.py`, `outputs/token_chunks_sample.json`, `outputs/token_chunking_sample.log` |
 | **#15** | Corpus Preparation & Ingestion Validation | `Completed` | `src/ingestion/pipeline.py`, `tests/test_ingestion_pipeline.py`, `outputs/ingested_chunks.jsonl`, `outputs/ingestion_validation_report.json`, `outputs/ingestion_summary.log` |
+| **#21** | Vector Database Setup & Collection Design | `Completed` | `src/vector_store.py`, `src/vector_db_demo.py`, `tests/test_vector_store.py`, `outputs/vector_db_readback_sample.md` |
 
 ---
 
@@ -450,3 +451,33 @@
 - **Verification Evidence**:
   - Focused automated tests pass.
   - Sample sanity results are saved in `outputs/embedding_quality_sanity_report.json`.
+
+---
+
+### Module #21: Vector Database Setup & Collection Design
+- **Status**: `Completed`
+- **Objective**: Configure a persistent local ChromaDB collection for embedded chunks, preserve source text and retrieval metadata, and verify an inserted record can be read back.
+- **Expected Files**:
+  - `src/vector_store.py`
+  - `src/vector_db_demo.py`
+  - `tests/test_vector_store.py`
+  - `tests/test_vector_db_demo.py`
+  - `outputs/vector_db_readback_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Configure a local persistent ChromaDB client from `VECTOR_DB_PATH` and collection name from `VECTOR_DB_COLLECTION`.
+  2. [x] Create a cosine-similarity collection; infer and record its vector dimension on first insertion, then reject dimension mismatches.
+  3. [x] Store chunk IDs, embeddings, source text, and JSON-preserved retrieval metadata.
+  4. [x] Insert and read back a test record, verifying its ID, vector length, source, and metadata.
+  5. [x] Save the verified readback output and usage/configuration documentation.
+- **Acceptance Criteria**:
+  - Local persistence is reachable without a separately running database server.
+  - All vectors in a collection have a consistent dimension; the first insertion establishes that dimension.
+  - Retrieved test records preserve their IDs, source text, metadata, and vector length.
+  - The smoke-test fixture is clearly distinguished from a live model embedding.
+- **Required Tests**:
+  - `tests/test_vector_store.py`: Verify persistence, readback, metadata preservation, and dimension validation.
+  - `tests/test_vector_db_demo.py`: Verify user-visible readback output and configuration behavior.
+- **Verification Evidence**:
+  - Focused test run: 7 tests passed.
+  - The local persistence smoke test reported a readable record ID, 8-value vector, source text, and original metadata. The vector is an illustrative fixture, not a model embedding.
+  - Sample output is saved in `outputs/vector_db_readback_sample.md`.

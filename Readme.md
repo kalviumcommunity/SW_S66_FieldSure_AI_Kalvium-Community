@@ -118,6 +118,7 @@ cp .env.example .env
 | `CHAT_MODEL` | Target chat completion model name |
 | `EMBEDDING_MODEL` | Embedding model used for indexing and vector search |
 | `VECTOR_DB_URL` / `VECTOR_DB_PATH` | Vector database connection string or local storage path |
+| `VECTOR_DB_COLLECTION` | Name of the persistent ChromaDB collection |
 
 ---
 
@@ -172,6 +173,25 @@ The sanity checker reports pass/fail and borderline cases, and writes
 `outputs/embedding_quality_sanity_report.json`. A close top-score margin is
 flagged for review even when the expected chunk ranks first.
 
+### Set Up the Local ChromaDB Vector Collection
+Run a local persistence and insert/readback smoke test without API credentials:
+```bash
+uv run python -m src.vector_db_demo --self-test
+```
+This writes an explicitly labeled 8-dimensional fixture to a separate
+`fieldsure_chunks_smoke_test` collection. To store actual corpus embeddings,
+first create `outputs/embedded_chunks.jsonl` with the embedding workflow, then
+run:
+```bash
+uv run python -m src.vector_db_demo
+```
+`VECTOR_DB_PATH` selects the local persistence directory and
+`VECTOR_DB_COLLECTION` selects the collection. ChromaDB determines a
+collection's vector dimension from its first inserted embedding; later inserts
+must match. The command validates dimensions, stores the source text and
+metadata, then reads a record back and reports its ID, vector length, and
+metadata. See `outputs/vector_db_readback_sample.md` for the fixture result.
+
 > **Note on Prompt Comparison**:  
 > Sends identical field-worker questions across a vague system prompt versus a constrained, citation-enforced prompt. Prints responses and logs payloads, token usage, and metadata without exposing API keys. Configuration and API failures are handled cleanly without raw tracebacks and return non-zero exit codes.
 
@@ -225,6 +245,7 @@ flagged for review even when the expected chunk ranks first.
   - `outputs/embedding_api_sample.md`
   - `outputs/embedding_similarity_sample.md`
   - `outputs/embedding_quality_sanity_report.json`
+  - `outputs/vector_db_readback_sample.md`
 
 ---
 
