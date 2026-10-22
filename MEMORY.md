@@ -2,13 +2,13 @@
 
 > **Role**: Member 1 — Document Processing & LLM Foundation  
 > **Last Updated**: 2026-10-22
-> **Current Sprint Phase**: Generating Embeddings via API (Module #17)
+> **Current Sprint Phase**: Embedding Similarity & Distance Metrics (Module #18)
 
 ---
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #17 (Generating Embeddings via API) completed for this assignment.
+- **Current Active Task**: Module #18 (Embedding Similarity & Distance Metrics) completed for this assignment.
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
@@ -18,6 +18,7 @@
   - Module #10 (Document Loading & Multi-Format Intake: `src/ingestion/loader.py`, `data/sample_advisories/`, `outputs/document_loading_sample.log`, `tests/test_loader.py`).
   - Module #16 (Embeddings Fundamentals & Vector Representation: `src/embedding_fundamentals.py`, `outputs/embedding_fundamentals_sample.md`, `tests/test_embedding_fundamentals.py`).
   - Module #17 (Generating Embeddings via API: `src/embed_corpus.py`, `outputs/embedding_api_sample.md`, `tests/test_embed_corpus.py`).
+  - Module #18 (Embedding Similarity & Distance Metrics: `src/rank_chunks.py`, `outputs/embedding_similarity_sample.md`, `tests/test_rank_chunks.py`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
 - **Next Planned Module**: Awaiting the next assigned module.
 
@@ -72,6 +73,7 @@
 - `src.ingestion.loader.load_corpus(dir)`: Batch intake runner surviving bad files with detailed error ledger reporting.
 - `src.embedding_fundamentals.generate_embeddings(...)`: Requests and validates embedding vectors from an OpenAI-compatible API; `cosine_similarity(...)` compares vectors.
 - `src.embedding_fundamentals.embed_corpus_chunks(...)`: Keeps embedding vectors paired with original chunk text and metadata.
+- `src.rank_chunks.rank_chunks(...)`: Ranks stored corpus embeddings against a query vector by cosine similarity.
 
 ---
 
