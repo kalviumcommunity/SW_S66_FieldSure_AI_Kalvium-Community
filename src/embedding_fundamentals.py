@@ -119,6 +119,40 @@ def generate_embeddings(
     return vectors
 
 
+def embed_corpus_chunks(
+    chunks: Sequence[dict[str, Any]],
+    model: str,
+    config: LLMConfig,
+) -> list[dict[str, Any]]:
+    """Embed prepared chunks while preserving source text and retrieval metadata."""
+    if not chunks:
+        raise ValueError("Provide at least one corpus chunk to embed.")
+
+    texts: list[str] = []
+    for index, chunk in enumerate(chunks):
+        if not isinstance(chunk, dict):
+            raise ValueError(f"Corpus chunk {index} must be an object.")
+        if not isinstance(chunk.get("chunk_id"), str) or not chunk["chunk_id"]:
+            raise ValueError(f"Corpus chunk {index} must contain a chunk ID.")
+        if not isinstance(chunk.get("text"), str) or not chunk["text"].strip():
+            raise ValueError(f"Corpus chunk {index} must contain non-empty text.")
+        if not isinstance(chunk.get("metadata"), dict):
+            raise ValueError(f"Corpus chunk {index} must contain metadata.")
+        texts.append(chunk["text"])
+
+    vectors = generate_embeddings(texts, model, config)
+    return [
+        {
+            "chunk_id": chunk.get("chunk_id"),
+            "text": chunk["text"],
+            "metadata": chunk["metadata"],
+            "embedding": vector,
+            "vector_dimension": len(vector),
+        }
+        for chunk, vector in zip(chunks, vectors)
+    ]
+
+
 def cosine_similarity(first: Sequence[float], second: Sequence[float]) -> float:
     """Return cosine similarity for two non-empty vectors of equal length."""
     if not first or len(first) != len(second):
