@@ -2,13 +2,13 @@
 
 > **Role**: Member 1 — Document Processing & LLM Foundation  
 > **Last Updated**: 2026-10-22
-> **Current Sprint Phase**: Vector Database Setup & Collection Design (Module #21)
+> **Current Sprint Phase**: Indexing Embeddings & Metadata Storage (Module #22)
 
 ---
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #21 (Vector Database Setup & Collection Design) completed for this assignment.
+- **Current Active Task**: Module #22 (Indexing Embeddings & Metadata Storage) completed for this assignment.
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
@@ -21,6 +21,7 @@
   - Module #18 (Embedding Similarity & Distance Metrics: `src/rank_chunks.py`, `outputs/embedding_similarity_sample.md`, `tests/test_rank_chunks.py`).
   - Module #20 (Embedding Quality Checks & Sanity Tests: `src/embedding_quality.py`, `outputs/embedding_quality_sanity_report.json`, `tests/test_embedding_quality.py`).
   - Module #21 (Vector Database Setup & Collection Design: `src/vector_store.py`, `src/vector_db_demo.py`, `tests/test_vector_store.py`, `outputs/vector_db_readback_sample.md`).
+  - Module #22 (Indexing Embeddings & Metadata Storage: `src/index_embeddings.py`, `tests/test_index_embeddings.py`, `outputs/indexing_summary_sample.md`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
 - **Next Planned Module**: Awaiting the next assigned module.
 
@@ -79,6 +80,7 @@
 - `src.embedding_quality.evaluate_quality_cases(...)`: Checks known query/chunk relevance, detects failures and borderline score margins, and prepares a sanity report.
 - `src.vector_store.ChromaVectorStore`: Persists embedded source chunks and retrieval metadata in a local ChromaDB cosine collection, enforcing one vector dimension.
 - `src.vector_db_demo.run_demo(...)`: Inserts embedded chunks and verifies source record readback from the configured persistent collection.
+- `src.index_embeddings.run_indexing_job(...)`: Indexes the complete embeddings file, compares it with the source corpus, validates the indexed count, and spot-checks stored records.
 
 ---
 
