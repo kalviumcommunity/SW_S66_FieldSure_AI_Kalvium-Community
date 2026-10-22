@@ -25,6 +25,7 @@
 | **#15** | Corpus Preparation & Ingestion Validation | `Completed` | `src/ingestion/pipeline.py`, `tests/test_ingestion_pipeline.py`, `outputs/ingested_chunks.jsonl`, `outputs/ingestion_validation_report.json`, `outputs/ingestion_summary.log` |
 | **#21** | Vector Database Setup & Collection Design | `Completed` | `src/vector_store.py`, `src/vector_db_demo.py`, `tests/test_vector_store.py`, `outputs/vector_db_readback_sample.md` |
 | **#22** | Indexing Embeddings & Metadata Storage | `Completed` | `src/index_embeddings.py`, `tests/test_index_embeddings.py`, `outputs/indexing_summary_sample.md` |
+| **#23** | Similarity Search & Top-K Retrieval | `Completed` | `src/retrieve_chunks.py`, `tests/test_retrieve_chunks.py`, `outputs/top_k_retrieval_sample.md` |
 
 ---
 
@@ -510,3 +511,30 @@
   - Full-corpus sample indexed 11 of 11 source chunks; count validation passed and both readback checks preserved vector values, IDs, source text, and metadata.
   - Vectors used for the sample were explicitly labeled illustrative fixtures, not live model embeddings.
   - Summary evidence is saved in `outputs/indexing_summary_sample.md`.
+
+---
+
+### Module #23: Similarity Search & Top-K Retrieval
+- **Status**: `Completed`
+- **Objective**: Embed a user query with the corpus embedding model, perform ChromaDB top-k similarity search, and return ranked chunks with scores, text, and metadata.
+- **Dependencies**: Module #22 (Indexing Embeddings & Metadata Storage).
+- **Expected Files**:
+  - `src/retrieve_chunks.py`
+  - `tests/test_retrieve_chunks.py`
+  - `outputs/top_k_retrieval_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Embed a query with the model configured by `EMBEDDING_MODEL`.
+  2. [x] Search the configured ChromaDB collection using cosine distance.
+  3. [x] Return ranked similarity scores, source text, and original metadata.
+  4. [x] Run the sample query at two different k values and show how the result set changes.
+  5. [x] Save sample results and document production usage.
+- **Acceptance Criteria**:
+  - Query vectors use the configured same model as indexed chunk embeddings.
+  - Top-k results are ordered by similarity and contain scores, source text, and metadata.
+  - Invalid k values, missing model configuration, empty collections, and embedding/search failures are explicit.
+- **Required Tests**:
+  - `tests/test_retrieve_chunks.py`: Verify score order, result metadata, k behavior, query embedding/model use, and invalid input handling.
+- **Verification Evidence**:
+  - Focused test run: 23 tests passed across retrieval and vector-store coverage.
+  - Sample ChromaDB query ran with `k=2` and `k=5`; rankings, scores, and source metadata were printed and saved in `outputs/top_k_retrieval_sample.md`.
+  - As no live embeddings file or API credentials were available, the committed sample clearly labels its query/document vectors as illustrative fixtures.
