@@ -425,3 +425,28 @@
 - **Verification Evidence**:
   - Focused automated tests pass.
   - Sample ranking is saved in `outputs/embedding_similarity_sample.md`.
+
+---
+
+### Module #20: Embedding Quality Checks & Sanity Tests
+- **Status**: `Completed`
+- **Objective**: Check known query-to-source relevance using cosine ranking, report pass/fail and borderline cases, and highlight a surprising near-tie.
+- **Expected Files**:
+  - `src/embedding_quality.py`
+  - `tests/test_embedding_quality.py`
+  - `outputs/embedding_quality_sanity_report.json`
+- **Implementation Subtasks**:
+  1. [x] Define known dengue, cholera, and malaria query-to-chunk relevance pairs.
+  2. [x] Confirm expected relevant chunks rank above unrelated chunks.
+  3. [x] Identify and explain close-score borderline cases and report actual misrankings as failures.
+  4. [x] Summarize counts, expected/top-ranked sources, scores, margins, and notes.
+  5. [x] Save a reproducible sample sanity report with clearly identified illustrative vectors.
+- **Acceptance Criteria**:
+  - Each known target chunk is present and compared against the stored corpus vectors.
+  - A target that is not ranked first is recorded as a failure; a small lead is flagged as borderline.
+  - API-generated report is saved as JSON and failures produce a non-zero exit status.
+- **Required Tests**:
+  - `tests/test_embedding_quality.py`: Verify known relevance, failures, borderline detection, report output, and environment-configured API calls.
+- **Verification Evidence**:
+  - Focused automated tests pass.
+  - Sample sanity results are saved in `outputs/embedding_quality_sanity_report.json`.
