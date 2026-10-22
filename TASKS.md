@@ -351,3 +351,27 @@
   - Exported JSONL chunk dataset saved in `outputs/ingested_chunks.jsonl`.
   - Completeness validation report saved in `outputs/ingestion_validation_report.json`.
   - Ingestion run dashboard log recorded in `outputs/ingestion_summary.log`.
+
+---
+
+### Module #16: Embeddings Fundamentals & Vector Representation
+- **Status**: `Completed`
+- **Objective**: Generate text embeddings for related and unrelated samples, verify vector dimensions, compare cosine similarity, and explain the meaning of embedding vectors.
+- **Expected Files**:
+  - `src/embedding_fundamentals.py`
+  - `tests/test_embedding_fundamentals.py`
+  - `outputs/embedding_fundamentals_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Request embeddings for similar dengue-prevention texts and an unrelated library-book text.
+  2. [x] Report vector dimensions and verify every returned vector has the same length.
+  3. [x] Compare similar and unrelated pairs using cosine similarity and require the similar pair to score higher.
+  4. [x] Explain that embeddings are numeric representations of meaning, not random IDs or keyword counts.
+  5. [x] Save the demo output, vector preview, similarity scores, and explanation.
+- **Acceptance Criteria**:
+  - The demo uses the configured OpenAI-compatible embeddings API and handles malformed responses explicitly.
+  - The output reports consistent dimensions and the similar pair scores higher than the unrelated pair.
+- **Required Tests**:
+  - `tests/test_embedding_fundamentals.py`: Verify API request and response handling, vector validation, cosine similarity, and demo output.
+- **Verification Evidence**:
+  - Automated tests passing in `tests/test_embedding_fundamentals.py`.
+  - Captured output and vector representation explanation saved in `outputs/embedding_fundamentals_sample.md`.
