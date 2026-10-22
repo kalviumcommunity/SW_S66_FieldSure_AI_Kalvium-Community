@@ -27,6 +27,7 @@
 | **#22** | Indexing Embeddings & Metadata Storage | `Completed` | `src/index_embeddings.py`, `tests/test_index_embeddings.py`, `outputs/indexing_summary_sample.md` |
 | **#23** | Similarity Search & Top-K Retrieval | `Completed` | `src/retrieve_chunks.py`, `tests/test_retrieve_chunks.py`, `outputs/top_k_retrieval_sample.md` |
 | **#24** | Metadata Filtering & Hybrid Search | `Completed` | `src/filtered_retrieval.py`, `tests/test_filtered_retrieval.py`, `outputs/filtered_retrieval_sample.md` |
+| **#25** | Retrieval Relevance Tuning | `Completed` | `src/tune_retrieval.py`, `tests/test_tune_retrieval.py`, `outputs/retrieval_tuning_summary.md`, `outputs/retrieval_tuning_report.json` |
 
 ---
 
@@ -567,3 +568,33 @@
   - Focused tests: 30 passed across filtering, query retrieval, and vector storage.
   - Illustrative sample ChromaDB run improved precision@2 from 0/2 unfiltered to 2/2 after applying the source filter; filtered hybrid results include vector and keyword component scores.
   - The sample uses explicit fixture vectors and a mocked query embedding, not live API output.
+
+---
+
+### Module #25: Retrieval Relevance Tuning
+- **Status**: `Completed`
+- **Objective**: Compare retrieval settings against known query-to-source relevance judgments and select the best measured configuration.
+- **Dependencies**: Module #24 (Metadata Filtering & Hybrid Search).
+- **Expected Files**:
+  - `src/tune_retrieval.py`
+  - `tests/test_tune_retrieval.py`
+  - `outputs/retrieval_tuning_summary.md`
+  - `outputs/retrieval_tuning_report.json`
+- **Implementation Subtasks**:
+  1. [x] Define dengue, cholera, and malaria queries with expected source documents.
+  2. [x] Compare unfiltered vector `k=2` with expected-source filtering, `k=5`, and a `0.5` score threshold.
+  3. [x] Report precision@k, recall@k, F1, top-1 hit, and hit@k.
+  4. [x] Select the setting with the highest macro F1@k and explain the result.
+  5. [x] Save query-level rankings, text, metadata, metrics, and the recommended setting.
+- **Acceptance Criteria**:
+  - Each evaluation query has a known expected source and relevant chunk set.
+  - Settings are compared using consistent relevance measures.
+  - Selected settings are justified by measured experiment results.
+  - Illustrative-vector limitations are disclosed where live embeddings are unavailable.
+- **Required Tests**:
+  - `tests/test_tune_retrieval.py`: Verify expected-source labeling, ChromaDB experiment metrics, setting choice, and failure handling.
+- **Verification Evidence**:
+  - Focused tuning and retrieval regression suite: 39 tests passed.
+  - On three sample queries, the baseline achieved mean precision@2 `0.500`, mean recall@2 `0.278`, mean F1@2 `0.356`, and top-1 hit `0.000`.
+  - Expected-source filter + `k=5` + threshold `0.5` achieved precision, recall, F1, and top-1 hit `1.000`.
+  - The reproducible sample uses deterministic fixtures, not live model embeddings; detailed results are saved in the JSON report and summary.

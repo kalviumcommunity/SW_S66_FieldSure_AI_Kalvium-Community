@@ -32,6 +32,7 @@ data/*
 outputs/*.log
 outputs/*.jsonl
 outputs/*.json
+!outputs/retrieval_tuning_report.json
 !outputs/.gitkeep
 !outputs/chat_completion_sample.log
 !outputs/prompt_comparison_sample.log
