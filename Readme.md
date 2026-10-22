@@ -208,6 +208,22 @@ written to `outputs/indexing_summary.json`; the committed
 `outputs/indexing_summary_sample.md` shows the count and integrity checks from
 a clearly labeled illustrative-vector run.
 
+### Retrieve Top-K Similar Chunks
+With corpus vectors indexed in ChromaDB, run a query using the configured
+`EMBEDDING_MODEL` (the same model used to embed the chunks):
+```bash
+uv run python -m src.retrieve_chunks \
+  --query "How can field workers prevent dengue?" \
+  --k-values 2,5
+```
+The command embeds the query once, searches the configured collection for each
+requested `k`, and prints ranked similarity scores, source text, and metadata.
+The score is `1 - cosine_distance`; similarity values are ordered highest
+first. `VECTOR_DB_PATH` and `VECTOR_DB_COLLECTION` select the collection. See
+`outputs/top_k_retrieval_sample.md` for sample output at two `k` values. That
+sample uses explicitly illustrative vectors because no live API credentials or
+generated embeddings file were available when it was run.
+
 > **Note on Prompt Comparison**:  
 > Sends identical field-worker questions across a vague system prompt versus a constrained, citation-enforced prompt. Prints responses and logs payloads, token usage, and metadata without exposing API keys. Configuration and API failures are handled cleanly without raw tracebacks and return non-zero exit codes.
 

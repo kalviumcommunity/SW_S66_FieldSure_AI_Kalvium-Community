@@ -166,3 +166,62 @@ class ChromaVectorStore:
             raise VectorStoreError(
                 f"Could not count ChromaDB collection records: {err}"
             ) from err
+
+    def search(
+        self,
+        query_embedding: Sequence[float],
+        limit: int,
+    ) -> list[dict[str, Any]]:
+        """Return the nearest chunks with cosine similarity and source metadata."""
+        if limit < 1:
+            raise ValueError("Search result limit must be at least 1.")
+        if not query_embedding or any(
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(value)
+            for value in query_embedding
+        ):
+            raise ValueError("Query embedding must contain finite numeric values.")
+        if self.count() == 0:
+            raise VectorStoreError("Cannot search an empty ChromaDB collection.")
+
+        try:
+            result = self.collection.query(
+                query_embeddings=[[float(value) for value in query_embedding]],
+                n_results=limit,
+                include=["distances", "documents", "metadatas"],
+            )
+        except Exception as err:
+            raise VectorStoreError(f"ChromaDB similarity search failed: {err}") from err
+
+        ids = result.get("ids", [[]])[0]
+        distances = result.get("distances", [[]])[0]
+        documents = result.get("documents", [[]])[0]
+        metadatas = result.get("metadatas", [[]])[0]
+        if not (len(ids) == len(distances) == len(documents) == len(metadatas)):
+            raise VectorStoreError("ChromaDB returned incomplete similarity results.")
+
+        matches: list[dict[str, Any]] = []
+        for record_id, distance, document, stored_metadata in zip(
+            ids, distances, documents, metadatas, strict=True
+        ):
+            if distance is None or document is None or stored_metadata is None:
+                raise VectorStoreError(
+                    f"ChromaDB returned incomplete data for record '{record_id}'."
+                )
+            try:
+                metadata = json.loads(stored_metadata["metadata_json"])
+            except (KeyError, TypeError, json.JSONDecodeError) as err:
+                raise VectorStoreError(
+                    f"Record '{record_id}' has invalid stored source metadata."
+                ) from err
+            matches.append(
+                {
+                    "chunk_id": record_id,
+                    "text": document,
+                    "metadata": metadata,
+                    "cosine_distance": float(distance),
+                    "similarity_score": 1.0 - float(distance),
+                }
+            )
+        return matches

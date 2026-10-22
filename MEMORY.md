@@ -2,13 +2,13 @@
 
 > **Role**: Member 1 — Document Processing & LLM Foundation  
 > **Last Updated**: 2026-10-22
-> **Current Sprint Phase**: Indexing Embeddings & Metadata Storage (Module #22)
+> **Current Sprint Phase**: Similarity Search & Top-K Retrieval (Module #23)
 
 ---
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #22 (Indexing Embeddings & Metadata Storage) completed for this assignment.
+- **Current Active Task**: Module #23 (Similarity Search & Top-K Retrieval) completed for this assignment.
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
@@ -22,6 +22,7 @@
   - Module #20 (Embedding Quality Checks & Sanity Tests: `src/embedding_quality.py`, `outputs/embedding_quality_sanity_report.json`, `tests/test_embedding_quality.py`).
   - Module #21 (Vector Database Setup & Collection Design: `src/vector_store.py`, `src/vector_db_demo.py`, `tests/test_vector_store.py`, `outputs/vector_db_readback_sample.md`).
   - Module #22 (Indexing Embeddings & Metadata Storage: `src/index_embeddings.py`, `tests/test_index_embeddings.py`, `outputs/indexing_summary_sample.md`).
+  - Module #23 (Similarity Search & Top-K Retrieval: `src/retrieve_chunks.py`, `tests/test_retrieve_chunks.py`, `outputs/top_k_retrieval_sample.md`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
 - **Next Planned Module**: Awaiting the next assigned module.
 
@@ -81,6 +82,8 @@
 - `src.vector_store.ChromaVectorStore`: Persists embedded source chunks and retrieval metadata in a local ChromaDB cosine collection, enforcing one vector dimension.
 - `src.vector_db_demo.run_demo(...)`: Inserts embedded chunks and verifies source record readback from the configured persistent collection.
 - `src.index_embeddings.run_indexing_job(...)`: Indexes the complete embeddings file, compares it with the source corpus, validates the indexed count, and spot-checks stored records.
+- `src.vector_store.ChromaVectorStore.search(...)`: Retrieves nearest stored chunks with cosine similarity, source text, and restored metadata.
+- `src.retrieve_chunks.retrieve_for_k_values(...)`: Embeds a query with the configured model and runs searches for each requested top-k value.
 
 ---
 
