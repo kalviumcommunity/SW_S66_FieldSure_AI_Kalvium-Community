@@ -400,3 +400,28 @@
 - **Verification Evidence**:
   - Focused automated tests pass.
   - Sample corpus output is saved in `outputs/embedding_api_sample.md` and identifies mocked vectors as illustrative.
+
+---
+
+### Module #18: Embedding Similarity & Distance Metrics
+- **Status**: `Completed`
+- **Objective**: Embed a query, compare it with stored corpus vectors using cosine similarity, and rank chunks from most to least related.
+- **Expected Files**:
+  - `src/rank_chunks.py`
+  - `tests/test_rank_chunks.py`
+  - `outputs/embedding_similarity_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Compute cosine similarity using the shared embedding fundamentals utility.
+  2. [x] Embed a user query and compare it against stored sample corpus chunk embeddings.
+  3. [x] Rank matching chunks and report the most and least similar results with source text and metadata.
+  4. [x] Explain that cosine similarity compares vector direction, independent of magnitude.
+  5. [x] Save a sample ranking with scores and retrieval metadata.
+- **Acceptance Criteria**:
+  - All compared vectors have equal dimensions and valid finite values.
+  - Ranking is in descending score order, with query/API and stored chunk data validated.
+  - Sample output labels mocked scores clearly and identifies the most and least related chunks.
+- **Required Tests**:
+  - `tests/test_rank_chunks.py`: Verify ranking order, malformed corpus handling, query embedding use, and reported metadata.
+- **Verification Evidence**:
+  - Focused automated tests pass.
+  - Sample ranking is saved in `outputs/embedding_similarity_sample.md`.

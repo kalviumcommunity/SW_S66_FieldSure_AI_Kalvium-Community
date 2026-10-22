@@ -152,6 +152,15 @@ Use `--input`, `--output`, and `--limit` to choose a JSONL corpus, output path,
 and number of chunks. The default full-vector output is
 `outputs/embedded_chunks.jsonl`.
 
+### Rank Chunks by Embedding Similarity
+After generating stored chunk vectors, embed a query and rank the chunks by
+cosine similarity:
+```bash
+uv run python -m src.rank_chunks --query "How can field workers reduce dengue risk?"
+```
+The command reports the most and least similar chunks with their scores and
+source metadata. See `outputs/embedding_similarity_sample.md` for a sample.
+
 > **Note on Prompt Comparison**:  
 > Sends identical field-worker questions across a vague system prompt versus a constrained, citation-enforced prompt. Prints responses and logs payloads, token usage, and metadata without exposing API keys. Configuration and API failures are handled cleanly without raw tracebacks and return non-zero exit codes.
 
@@ -203,6 +212,7 @@ and number of chunks. The default full-vector output is
   - `outputs/prompt_comparison_sample.log`
   - `outputs/embedding_fundamentals_sample.md`
   - `outputs/embedding_api_sample.md`
+  - `outputs/embedding_similarity_sample.md`
 
 ---
 
