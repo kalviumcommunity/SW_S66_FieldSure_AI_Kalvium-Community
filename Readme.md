@@ -135,12 +135,6 @@ Compare output quality between baseline and constrained system prompts:
 uv run python src/prompt_comparison.py
 ```
 
-### Run the Embedding Fundamentals Demo
-Generate embeddings for sample texts and compare their cosine similarity:
-```bash
-uv run python -m src.embedding_fundamentals
-```
-
 > **Note on Prompt Comparison**:  
 > Sends identical field-worker questions across a vague system prompt versus a constrained, citation-enforced prompt. Prints responses and logs payloads, token usage, and metadata without exposing API keys. Configuration and API failures are handled cleanly without raw tracebacks and return non-zero exit codes.
 
@@ -190,7 +184,6 @@ uv run python -m src.embedding_fundamentals
 - **Sample Outputs & Logs**: Execution logs are versioned under `outputs/`:
   - `outputs/chat_completion_sample.log`
   - `outputs/prompt_comparison_sample.log`
-  - `outputs/embedding_fundamentals_sample.md`
 
 ---
 
