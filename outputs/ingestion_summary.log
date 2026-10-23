@@ -1,6 +1,6 @@
-[2026-10-23 09:49:12] [INFO] Starting FieldSure AI End-to-End Ingestion Validation (Module #15)...
-[2026-10-23 09:49:12] [INFO] Input Directory: /Users/shebin.cee/Kalvium/sem 5/Sprint/FieldSure-RAG/data/sample_advisories
-[2026-10-23 09:49:12] [INFO] Output JSONL:    /private/var/folders/ql/_pvyyq_13gxfcx4l2x7dztfh0000gn/T/pytest-of-shebin.cee/pytest-40/test_jsonl_export_validity0/test_export.jsonl
+[2026-10-23 10:06:57] [INFO] Starting FieldSure AI End-to-End Ingestion Validation (Module #15)...
+[2026-10-23 10:06:57] [INFO] Input Directory: /Users/shebin.cee/Kalvium/sem 5/Sprint/FieldSure-RAG/data/sample_advisories
+[2026-10-23 10:06:57] [INFO] Output JSONL:    /private/var/folders/ql/_pvyyq_13gxfcx4l2x7dztfh0000gn/T/pytest-of-shebin.cee/pytest-41/test_jsonl_export_validity0/test_export.jsonl
 
 --- Ingestion Summary Dashboard (Task 2) ---
 Total Source Documents Discovered:  4
@@ -50,5 +50,5 @@ Snippet:      [Section: 2. WATER TREATMENT STANDARDS] - All drinking water distr
 --------------------------------------------------------------------------------
 
 [INFO] Ingestion run completed successfully.
-[INFO] Serialized dataset exported to /private/var/folders/ql/_pvyyq_13gxfcx4l2x7dztfh0000gn/T/pytest-of-shebin.cee/pytest-40/test_jsonl_export_validity0/test_export.jsonl
+[INFO] Serialized dataset exported to /private/var/folders/ql/_pvyyq_13gxfcx4l2x7dztfh0000gn/T/pytest-of-shebin.cee/pytest-41/test_jsonl_export_validity0/test_export.jsonl
 [INFO] Validation report saved to /Users/shebin.cee/Kalvium/sem 5/Sprint/FieldSure-RAG/outputs/ingestion_validation_report.json
