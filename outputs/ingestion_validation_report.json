@@ -1,9 +1,9 @@
 {
   "metadata": {
     "module": "Module #15 — Corpus Preparation & Ingestion Validation",
-    "timestamp": "2026-10-23T10:06:57.416078+00:00",
+    "timestamp": "2026-10-23T10:32:35.312775+00:00",
     "input_directory": "/Users/shebin.cee/Kalvium/sem 5/Sprint/FieldSure-RAG/data/sample_advisories",
-    "output_jsonl_file": "/private/var/folders/ql/_pvyyq_13gxfcx4l2x7dztfh0000gn/T/pytest-of-shebin.cee/pytest-41/test_jsonl_export_validity0/test_export.jsonl"
+    "output_jsonl_file": "/private/var/folders/ql/_pvyyq_13gxfcx4l2x7dztfh0000gn/T/pytest-of-shebin.cee/pytest-46/test_jsonl_export_validity0/test_export.jsonl"
   },
   "completeness_audit": {
     "reconciliation_passed": true,
