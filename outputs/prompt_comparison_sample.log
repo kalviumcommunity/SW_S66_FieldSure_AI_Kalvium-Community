@@ -67,3 +67,5 @@
     }
   ]
 }
+[2026-10-23 15:19:12] [INFO] Initializing FieldSure AI Prompt Comparison Runner...
+[2026-10-23 15:19:12] [ERROR] Configuration Error: API_KEY is not configured or still set to the placeholder. Please configure 'API_KEY' in your .env file (copy from .env.example) with a valid OpenAI-compatible API key.

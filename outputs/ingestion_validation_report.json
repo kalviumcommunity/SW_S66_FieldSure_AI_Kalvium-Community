@@ -1,78 +1,77 @@
 {
   "metadata": {
     "module": "Module #15 — Corpus Preparation & Ingestion Validation",
-    "timestamp": "2026-10-21T11:20:00+00:00",
-    "input_directory": "data/sample_advisories",
-    "output_jsonl_file": "outputs/ingested_chunks.jsonl"
+    "timestamp": "2026-10-23T09:49:12.438769+00:00",
+    "input_directory": "/Users/shebin.cee/Kalvium/sem 5/Sprint/FieldSure-RAG/data/sample_advisories",
+    "output_jsonl_file": "/private/var/folders/ql/_pvyyq_13gxfcx4l2x7dztfh0000gn/T/pytest-of-shebin.cee/pytest-40/test_jsonl_export_validity0/test_export.jsonl"
   },
   "completeness_audit": {
     "reconciliation_passed": true,
     "total_source_files_discovered": 4,
     "documents_successfully_ingested": 3,
     "documents_failed_or_skipped": 1,
-    "total_chunks_created": 11,
+    "total_chunks_created": 9,
     "zero_empty_chunks": true,
     "token_budget_compliant": true,
     "metadata_contract_compliant": true,
-    "reconciliation_formula": "4 discovered == 3 ingested + 1 failed",
     "issues": []
   },
   "ingested_documents": [
     {
-      "source_file": "data/sample_advisories/who_dengue_clinical_guidance.md",
-      "file_name": "who_dengue_clinical_guidance.md",
-      "doc_id": "doc_who_dengue_guidance_2024",
-      "document_title": "WHO Clinical Management of Dengue in Primary Health Centers",
-      "agency": "WHO",
-      "document_version": "2024.1 Update",
-      "file_type": "md",
-      "original_char_count": 1532,
-      "cleaned_char_count": 1518,
-      "total_chunks": 4,
-      "total_tokens": 321,
-      "avg_chunk_tokens": 80.25,
-      "min_chunk_tokens": 48,
-      "max_chunk_tokens": 96
-    },
-    {
-      "source_file": "data/sample_advisories/cdc_cholera_water_safety.txt",
+      "source_file": "cdc_cholera_water_safety.txt",
       "file_name": "cdc_cholera_water_safety.txt",
-      "doc_id": "doc_cdc_cholera_protocol_2024",
+      "doc_id": "doc_cdc_cholera_water_safety_567b1289",
       "document_title": "CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL",
       "agency": "CDC",
-      "document_version": "CDC-WASH-CHOLERA-2024",
+      "document_version": "1.0",
       "file_type": "txt",
-      "original_char_count": 1394,
-      "cleaned_char_count": 1372,
+      "original_char_count": 1559,
+      "cleaned_char_count": 1553,
       "total_chunks": 4,
-      "total_tokens": 319,
-      "avg_chunk_tokens": 79.75,
-      "min_chunk_tokens": 64,
-      "max_chunk_tokens": 92
+      "total_tokens": 388,
+      "avg_chunk_tokens": 97.0,
+      "min_chunk_tokens": 53,
+      "max_chunk_tokens": 196
     },
     {
-      "source_file": "data/sample_advisories/moh_malaria_rapid_triage.html",
+      "source_file": "moh_malaria_rapid_triage.html",
       "file_name": "moh_malaria_rapid_triage.html",
-      "doc_id": "doc_moh_malaria_triage_2024",
-      "document_title": "National Vector-Borne Disease Control Programme — Community Malaria Rapid Diagnostic Protocol",
-      "agency": "MOH",
-      "document_version": "NVBDCP-SOP-2024",
+      "doc_id": "doc_moh_malaria_rapid_triage_a855fea4",
+      "document_title": "Ministry of Health - Community Malaria Rapid Triage Protocol",
+      "agency": "WHO",
+      "document_version": "1.0",
       "file_type": "html",
-      "original_char_count": 1285,
-      "cleaned_char_count": 1064,
-      "total_chunks": 3,
-      "total_tokens": 218,
-      "avg_chunk_tokens": 72.67,
-      "min_chunk_tokens": 56,
-      "max_chunk_tokens": 86
+      "original_char_count": 1820,
+      "cleaned_char_count": 1417,
+      "total_chunks": 1,
+      "total_tokens": 325,
+      "avg_chunk_tokens": 325.0,
+      "min_chunk_tokens": 325,
+      "max_chunk_tokens": 325
+    },
+    {
+      "source_file": "who_dengue_clinical_guidance.md",
+      "file_name": "who_dengue_clinical_guidance.md",
+      "doc_id": "doc_who_dengue_clinical_guidance_3e7da99b",
+      "document_title": "WHO Clinical Management of Dengue in Primary Health Centers",
+      "agency": "WHO",
+      "document_version": "- **Category**: Vector-Borne Communicable Disease Protocol",
+      "file_type": "md",
+      "original_char_count": 1742,
+      "cleaned_char_count": 1742,
+      "total_chunks": 4,
+      "total_tokens": 428,
+      "avg_chunk_tokens": 107.0,
+      "min_chunk_tokens": 40,
+      "max_chunk_tokens": 165
     }
   ],
   "failed_files": [
     {
-      "file_path": "data/sample_advisories/unsupported_format.xyz",
+      "file_path": "/Users/shebin.cee/Kalvium/sem 5/Sprint/FieldSure-RAG/data/sample_advisories/unsupported_format.xyz",
       "file_name": "unsupported_format.xyz",
       "error_type": "UnsupportedFileError",
-      "error_message": "Unsupported file format '.xyz'. Supported extensions: .pdf, .docx, .md, .txt, .html, .htm"
+      "error_message": "Unsupported file format '.xyz' for file 'unsupported_format.xyz'. Supported extensions: ['.docx', '.htm', '.html', '.md', '.pdf', '.txt']"
     }
   ]
 }
