@@ -1,12 +1,12 @@
-[2026-10-21 11:20:00] [INFO] Starting FieldSure AI End-to-End Ingestion Validation (Module #15)...
-[2026-10-21 11:20:00] [INFO] Input Directory: data/sample_advisories
-[2026-10-21 11:20:00] [INFO] Output JSONL:    outputs/ingested_chunks.jsonl
+[2026-10-23 09:49:12] [INFO] Starting FieldSure AI End-to-End Ingestion Validation (Module #15)...
+[2026-10-23 09:49:12] [INFO] Input Directory: /Users/shebin.cee/Kalvium/sem 5/Sprint/FieldSure-RAG/data/sample_advisories
+[2026-10-23 09:49:12] [INFO] Output JSONL:    /private/var/folders/ql/_pvyyq_13gxfcx4l2x7dztfh0000gn/T/pytest-of-shebin.cee/pytest-40/test_jsonl_export_validity0/test_export.jsonl
 
 --- Ingestion Summary Dashboard (Task 2) ---
 Total Source Documents Discovered:  4
 Successfully Ingested Documents:    3
 Failed or Skipped Documents:        1
-Total Chunks Created:               11
+Total Chunks Created:               9
 
 --- Mathematical Completeness Reconciliation (Task 3) ---
 Equation: Discovered (4) = Ingested (3) + Recorded Failures (1)
@@ -16,39 +16,39 @@ Token Budget Ceiling Compliant:     [PASSED]
 Metadata Schema Contract Compliant: [PASSED]
 
 --- Document Ingestion Breakdown ---
-• [WHO] who_dengue_clinical_guidance.md    | Chunks:  4 | Tokens:  321 | Avg Tokens:  80.2 | Version: 2024.1 Update
-• [CDC] cdc_cholera_water_safety.txt       | Chunks:  4 | Tokens:  319 | Avg Tokens:  79.8 | Version: CDC-WASH-CHOLERA-2024
-• [MOH] moh_malaria_rapid_triage.html      | Chunks:  3 | Tokens:  218 | Avg Tokens:  72.7 | Version: NVBDCP-SOP-2024
+• [CDC] cdc_cholera_water_safety.txt       | Chunks:  4 | Tokens:  388 | Avg Tokens:  97.0 | Version: 1.0
+• [WHO] moh_malaria_rapid_triage.html      | Chunks:  1 | Tokens:  325 | Avg Tokens: 325.0 | Version: 1.0
+• [WHO] who_dengue_clinical_guidance.md    | Chunks:  4 | Tokens:  428 | Avg Tokens: 107.0 | Version: - **Category**: Vector-Borne Communicable Disease Protocol
 
 --- Recorded Skipped / Failed Files Ledger ---
-• [SKIPPED] unsupported_format.xyz         | Error: UnsupportedFileError (Unsupported file format '.xyz'. Supported extensions: .pdf, .docx, .md, .txt, .html, .htm)
+• [SKIPPED] unsupported_format.xyz         | Error: UnsupportedFileError (Unsupported file format '.xyz' for file 'unsupported_format.xyz'. Supported extensions: ['.docx', '.htm', '.html', '.md', '.pdf', '.txt'])
 
 --- Sample Chunks Inspection (Task 4) ---
-Chunk ID:     doc_who_dengue_guidance_2024_c0000
-Source File:  data/sample_advisories/who_dengue_clinical_guidance.md
-Section:      Document Information
+Chunk ID:     doc_cdc_cholera_water_safety_567b1289_c0000
+Source File:  cdc_cholera_water_safety.txt
+Section:      None
 Position:     Chunk #1 of 4
-Token Count:  48 tokens (258 chars)
-Citation:     [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: 'Document Information' [Chunk #1/4 | ID: doc_who_dengue_guidance_2024_c0000]
-Snippet:      [Section: Document Information] # WHO Clinical Management of Dengue in Primary Health Centers  ## Document Information - **Source**: World Health Organization / Regional Disease Su...
+Token Count:  53 tokens (205 chars)
+Citation:     [CDC] CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL (1.0) [Chunk #1/4 | ID: doc_cdc_cholera_water_safety_567b1289_c0000]
+Snippet:      CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL  DOCUMENT IDENTIFIER: CDC-WASH-CHOLERA-2024 TARGET AUDIENCE: Community Health Workers, Disaster Relief...
 --------------------------------------------------------------------------------
-Chunk ID:     doc_who_dengue_guidance_2024_c0001
-Source File:  data/sample_advisories/who_dengue_clinical_guidance.md
-Section:      1. Case Definition & Diagnostic Phases
+Chunk ID:     doc_cdc_cholera_water_safety_567b1289_c0001
+Source File:  cdc_cholera_water_safety.txt
+Section:      1. GENERAL OUTBREAK CONTEXT
 Position:     Chunk #2 of 4
-Token Count:  96 tokens (472 chars)
-Citation:     [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: '1. Case Definition & Diagnostic Phases' [Chunk #2/4 | ID: doc_who_dengue_guidance_2024_c0001]
-Snippet:      [Section: 1. Case Definition & Diagnostic Phases] Dengue is a severe arboviral infection transmitted by *Aedes aegypti* mosquitoes. The clinical course consists of three distinct ph...
+Token Count:  58 tokens (310 chars)
+Citation:     [CDC] CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL (1.0), Section: '1. GENERAL OUTBREAK CONTEXT' [Chunk #2/4 | ID: doc_cdc_cholera_water_safety_567b1289_c0001]
+Snippet:      [Section: 1. GENERAL OUTBREAK CONTEXT] Vibrio cholerae transmission is predominantly waterborne through ingestion of water or food contaminated with feces from an infected person. ...
 --------------------------------------------------------------------------------
-Chunk ID:     doc_who_dengue_guidance_2024_c0002
-Source File:  data/sample_advisories/who_dengue_clinical_guidance.md
-Section:      2. Red Flag Danger Signs Requiring Urgent Referral
+Chunk ID:     doc_cdc_cholera_water_safety_567b1289_c0002
+Source File:  cdc_cholera_water_safety.txt
+Section:      2. WATER TREATMENT STANDARDS
 Position:     Chunk #3 of 4
-Token Count:  95 tokens (487 chars)
-Citation:     [WHO] WHO Clinical Management of Dengue in Primary Health Centers (2024.1 Update), Section: '2. Red Flag Danger Signs Requiring Urgent Referral' [Chunk #3/4 | ID: doc_who_dengue_guidance_2024_c0002]
-Snippet:      [Section: 2. Red Flag Danger Signs Requiring Urgent Referral] Community health workers must evaluate patients daily during the critical phase for warning signs: - Persistent vomiting...
+Token Count:  196 tokens (711 chars)
+Citation:     [CDC] CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL (1.0), Section: '2. WATER TREATMENT STANDARDS' [Chunk #3/4 | ID: doc_cdc_cholera_water_safety_567b1289_c0002]
+Snippet:      [Section: 2. WATER TREATMENT STANDARDS] - All drinking water distributed in settlement camps must be disinfected with sodium dichloroisocyanurate (NaDCC) or calcium hypochlorite. -...
 --------------------------------------------------------------------------------
 
 [INFO] Ingestion run completed successfully.
-[INFO] Serialized dataset exported to outputs/ingested_chunks.jsonl
-[INFO] Validation report saved to outputs/ingestion_validation_report.json
+[INFO] Serialized dataset exported to /private/var/folders/ql/_pvyyq_13gxfcx4l2x7dztfh0000gn/T/pytest-of-shebin.cee/pytest-40/test_jsonl_export_validity0/test_export.jsonl
+[INFO] Validation report saved to /Users/shebin.cee/Kalvium/sem 5/Sprint/FieldSure-RAG/outputs/ingestion_validation_report.json
