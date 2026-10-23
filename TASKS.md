@@ -32,6 +32,7 @@
 | **#28** | RAG Pipeline Architecture & Flow Design | `Completed` | `src/rag_pipeline.py`, `tests/test_rag_pipeline.py`, `outputs/rag_pipeline_sample.md` |
 | **#38** | Context Injection & Prompt Augmentation | `Completed` | `src/context_injection.py`, `tests/test_context_injection.py`, `outputs/context_injection_sample.md` |
 | **#39** | Grounded Answer Generation | `Completed` | `src/grounded_generation.py`, `tests/test_grounded_generation.py`, `outputs/grounded_generation_sample.md` |
+| **#40** | Source Citation & Attribution | `Completed` | `src/source_citation.py`, `src/citation.py`, `tests/test_source_citation.py`, `outputs/source_citation_sample.md` |
 
 ---
 
@@ -719,5 +720,39 @@
 - **Verification Evidence**:
   - 52 tests passing in `tests/test_grounded_generation.py`; 293 total test suite passing without regression.
   - Execution report and verified sample answers generated in `outputs/grounded_generation_sample.md`.
+
+---
+
+### Module #40: Source Citation & Attribution
+- **Status**: `Completed`
+- **Objective**: Connect answer claims back to retrieved source chunks using traceable metadata (document name, page, section, chunk ID), verify citations against original chunk text, avoid fabricated citations with deterministic fallback, and commit verification evidence.
+- **Dependencies**: Module #39 (Grounded Answer Generation), Module #38 (Context Injection & Prompt Augmentation).
+- **Expected Files**:
+  - `src/source_citation.py`
+  - `src/citation.py`
+  - `tests/test_source_citation.py`
+  - `outputs/source_citation_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Implement `build_citation_map(chunks)` mapping citations `[1]`, `[2]` back to real documents and chunk locations (`source`, `chunk_id`, `chunk_index`, `section`, `text`, `page`).
+  2. [x] Implement `assemble_context(chunks)` with dual string and tuple unpacking support (`context, _ = assemble_context(chunks)`).
+  3. [x] Implement `build_cited_prompt(question, chunks)` instructing the model to cite only provided sources with markers and refuse when context is insufficient.
+  4. [x] Implement `answer_with_citations(question)` returning user-facing response with answer and citation details dict.
+  5. [x] Implement citation verification routines (`verify_citation`, `verify_all_citations`) confirming claims are supported by mapped source chunk text.
+  6. [x] Implement fabricated citation detection (`detect_fabricated_citations`, `sanitize_answer_citations`) and no-source fallback returning `"I don't have enough information in the provided context."` with empty citations.
+  7. [x] Support dictionary-style subscripting (`result["answer"]`, `result["citations"]`), attribute access, and plain dict conversion.
+  8. [x] Author comprehensive unit and integration test suite in `tests/test_source_citation.py` (27 tests).
+  9. [x] Generate execution verification report in `outputs/source_citation_sample.md`.
+- **Acceptance Criteria**:
+  - Generated answers include references to source chunks (`[1]`, `[2]`).
+  - Each citation maps back to real document and location metadata.
+  - Users can inspect and verify cited sources against original chunk text (`result["citations"]["[1]"]["text"]`).
+  - Unsupported questions return safe fallback without fabricated citations.
+  - Zero hardcoded secrets, zero credential leakage.
+- **Required Tests**:
+  - `tests/test_source_citation.py`: 27 automated tests covering citation mapping, prompt construction, answer generation, verification, fabrication detection, and dictionary compatibility.
+- **Verification Evidence**:
+  - 27 tests passing in `tests/test_source_citation.py`; 320 total test suite passing without regression.
+  - Execution report and verified sample answers generated in `outputs/source_citation_sample.md`.
+
 
 
