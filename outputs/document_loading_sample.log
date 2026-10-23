@@ -90,3 +90,45 @@
     }
   ]
 }
+
+--- Structured Document Intake Audit ---
+{
+  "module": "Module #10 — Document Loading & Multi-Format Intake",
+  "timestamp": "2026-10-23T10:06:57.453733+00:00",
+  "total_loaded": 3,
+  "total_skipped": 1,
+  "documents": [
+    {
+      "source_file": "who_dengue_clinical_guidance.md",
+      "file_type": "md",
+      "char_count": 1742,
+      "word_count": 237,
+      "page_count": null,
+      "sample_preview": "# WHO Clinical Management of Dengue in Primary Health Centers  ## Document Information - **Source**: World Health Organization / Regional Di..."
+    },
+    {
+      "source_file": "cdc_cholera_water_safety.txt",
+      "file_type": "txt",
+      "char_count": 1559,
+      "word_count": 224,
+      "page_count": null,
+      "sample_preview": "CDC EMERGENCY HEALTH BULLETIN: CHOLERA OUTBREAK WATER AND SANITATION PROTOCOL  DOCUMENT IDENTIFIER: CDC-WASH-CHOLERA-2024 TARGET AUDIENCE: C..."
+    },
+    {
+      "source_file": "moh_malaria_rapid_triage.html",
+      "file_type": "html",
+      "char_count": 1820,
+      "word_count": 210,
+      "page_count": null,
+      "sample_preview": "<!DOCTYPE html> <html lang=\"en\"> <head>     <meta charset=\"UTF-8\">     <title>Ministry of Health - Community Malaria Rapid Triage Protocol</..."
+    }
+  ],
+  "error_ledger": [
+    {
+      "file": "unsupported_format.xyz",
+      "path": "/Users/shebin.cee/Kalvium/sem 5/Sprint/FieldSure-RAG/data/sample_advisories/unsupported_format.xyz",
+      "error_type": "UnsupportedFileError",
+      "error_message": "Unsupported file format '.xyz' for file 'unsupported_format.xyz'. Supported extensions: ['.docx', '.htm', '.html', '.md', '.pdf', '.txt']"
+    }
+  ]
+}

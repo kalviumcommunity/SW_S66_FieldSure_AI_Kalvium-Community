@@ -42,3 +42,11 @@
 [2026-10-23 15:19:12] [INFO]   [Message 1 - SYSTEM]: You are FieldSure AI, an expert assistant for community health workers. Provide accurate, practical, and grounded public health guidance. Always state that guidance is for triage and reference, not diagnostic decisions.
 [2026-10-23 15:19:12] [INFO]   [Message 2 - USER]: What are the early warning signs of dehydration in pediatric diarrhea cases, and what immediate field actions are recommended before referral to a health center?
 [2026-10-23 15:19:12] [ERROR] Authentication Failure: Authentication failed (HTTP 401): Invalid or expired API key. Please verify 'API_KEY' in your .env file. Provider message: Invalid API key
+[2026-10-23 15:36:57] [INFO] Initializing FieldSure AI LLM client...
+[2026-10-23 15:36:57] [ERROR] Configuration Error: API_KEY is not configured or still set to the placeholder. Please configure 'API_KEY' in your .env file (copy from .env.example) with a valid OpenAI-compatible API key.
+[2026-10-23 15:36:57] [INFO] Initializing FieldSure AI LLM client...
+[2026-10-23 15:36:57] [INFO] Configuration loaded: Base URL=https://api.openai.com/v1 | Model=gpt-4o-mini | Key=sk-...-000
+[2026-10-23 15:36:57] [INFO] Sending chat completion request with 2 messages...
+[2026-10-23 15:36:57] [INFO]   [Message 1 - SYSTEM]: You are FieldSure AI, an expert assistant for community health workers. Provide accurate, practical, and grounded public health guidance. Always state that guidance is for triage and reference, not diagnostic decisions.
+[2026-10-23 15:36:57] [INFO]   [Message 2 - USER]: What are the early warning signs of dehydration in pediatric diarrhea cases, and what immediate field actions are recommended before referral to a health center?
+[2026-10-23 15:36:57] [ERROR] Authentication Failure: Authentication failed (HTTP 401): Invalid or expired API key. Please verify 'API_KEY' in your .env file. Provider message: Invalid API key

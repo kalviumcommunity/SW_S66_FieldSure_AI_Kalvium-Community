@@ -30,6 +30,8 @@
 | **#25** | Retrieval Relevance Tuning | `Completed` | `src/tune_retrieval.py`, `tests/test_tune_retrieval.py`, `outputs/retrieval_tuning_summary.md`, `outputs/retrieval_tuning_report.json` |
 | **#27** | Retrieval Evaluation & Recall Testing | `Completed` | `src/evaluate_retrieval.py`, `tests/test_evaluate_retrieval.py`, `outputs/retrieval_evaluation_report.json`, `outputs/retrieval_evaluation_summary.md` |
 | **#28** | RAG Pipeline Architecture & Flow Design | `Completed` | `src/rag_pipeline.py`, `tests/test_rag_pipeline.py`, `outputs/rag_pipeline_sample.md` |
+| **#38** | Context Injection & Prompt Augmentation | `Completed` | `src/context_injection.py`, `tests/test_context_injection.py`, `outputs/context_injection_sample.md` |
+| **#39** | Grounded Answer Generation | `Completed` | `src/grounded_generation.py`, `tests/test_grounded_generation.py`, `outputs/grounded_generation_sample.md` |
 
 ---
 
@@ -658,4 +660,64 @@
 - **Verification Evidence**:
   - 19 automated tests passing in `tests/test_rag_pipeline.py`; 197 total test suite passing.
   - Sample query execution audit and sequence flow diagram captured in `outputs/rag_pipeline_sample.md`.
+
+---
+
+### Module #38: Context Injection & Prompt Augmentation
+- **Status**: `Completed`
+- **Objective**: Turn raw retrieved chunks into a grounded, citation-rich prompt that stays within the model's token budget and explicitly instructs the LLM to answer only from the provided context.
+- **Dependencies**: Module #28 (RAG Pipeline Architecture & Flow Design), Module #5 (Tokens, Tokenization & Cost Estimation).
+- **Expected Files**:
+  - `src/context_injection.py`
+  - `tests/test_context_injection.py`
+  - `outputs/context_injection_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Implement `format_chunk` adding clear source markers (`[1]`, `[2]`), source file, section, and document ID.
+  2. [x] Implement `assemble_context` enforcing token budgeting with `count_tokens` to prevent context window overflow.
+  3. [x] Implement `build_augmented_prompt` combining system grounding instructions, numbered context blocks, and user query.
+  4. [x] Return structured prompt data including raw prompt, context block, token accounting, and source metadata.
+  5. [x] Handle edge cases gracefully: empty chunks return fallback notice, oversized chunks are budget-capped.
+  6. [x] Author comprehensive test suite in `tests/test_context_injection.py`.
+  7. [x] Commit execution report and prompt inspection sample to `outputs/context_injection_sample.md`.
+- **Acceptance Criteria**:
+  - Formatted chunks include provenance header with source file, section, and chunk index.
+  - Token budget is strictly enforced; chunks exceeding budget are omitted with warning log.
+  - Augmented prompt clearly conveys grounding constraints and source attribution rules.
+  - Returns `AugmentedPrompt` dataclass with prompt string, context text, token counts, and source list.
+- **Required Tests**:
+  - `tests/test_context_injection.py`: 44 automated tests covering chunk formatting, budget enforcement, prompt assembly, and edge cases.
+- **Verification Evidence**:
+  - 44 tests passing in `tests/test_context_injection.py`.
+  - Sample report verified at `outputs/context_injection_sample.md`.
+
+---
+
+### Module #39: Grounded Answer Generation
+- **Status**: `Completed`
+- **Objective**: Generate answers strictly grounded in retrieved context, check that answers accurately reflect source material, return fallback when context is missing, and compare grounded vs ungrounded answers.
+- **Dependencies**: Module #38 (Context Injection & Prompt Augmentation), Module #28 (RAG Pipeline Architecture & Flow Design).
+- **Expected Files**:
+  - `src/grounded_generation.py`
+  - `tests/test_grounded_generation.py`
+  - `outputs/grounded_generation_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Implement `generate_grounded_answer(question, retrieved_chunks)` using `build_augmented_prompt` with explicit grounding rules.
+  2. [x] Implement `verify_grounding(answer, context)` checking keyword overlap and sentence-level context support to detect unsupported claims.
+  3. [x] Implement `answer_query(question, retrieved_chunks)` returning explicit fallback (`"I don't have enough information in the provided context."`) when chunks are missing or empty.
+  4. [x] Implement `compare_grounded_vs_ungrounded(question, retrieved_chunks)` comparing answers generated with vs without retrieval.
+  5. [x] Implement `print_grounding_check(result)` formatting grounding metrics, source citations, and supported sentence counts.
+  6. [x] Support dictionary-style subscripting (`result["answer"]`) and `.to_dict()` on output dataclasses.
+  7. [x] Implement CLI runner generating verification evidence and sample report at `outputs/grounded_generation_sample.md`.
+  8. [x] Author comprehensive unit and integration test suite in `tests/test_grounded_generation.py`.
+- **Acceptance Criteria**:
+  - Answers are strictly generated from injected context; unsupported questions trigger clean fallback without hallucination.
+  - Grounding verification accurately computes keyword overlap score and flags unsupported sentences.
+  - Side-by-side comparison quantitatively demonstrates higher overlap with grounded RAG context vs parametric ungrounded responses.
+  - All output structures support both dataclass attribute access and dictionary subscripting.
+- **Required Tests**:
+  - `tests/test_grounded_generation.py`: 52 automated tests covering context generation, grounding verification, fallback behaviour, ungrounded comparison, dictionary subscripting, and end-to-end integration.
+- **Verification Evidence**:
+  - 52 tests passing in `tests/test_grounded_generation.py`; 293 total test suite passing without regression.
+  - Execution report and verified sample answers generated in `outputs/grounded_generation_sample.md`.
+
 

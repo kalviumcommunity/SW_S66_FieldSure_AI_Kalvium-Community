@@ -1,14 +1,14 @@
 # FieldSure AI — Project Memory (MEMORY.md)
 
-> **Role**: Member 3 — RAG, Backend & Application (Module #28)  
+> **Role**: Member 3 — RAG, Backend & Application (Module #39)  
 > **Last Updated**: 2026-10-23
-> **Current Sprint Phase**: RAG Pipeline Architecture & Flow Design (Module #28)
+> **Current Sprint Phase**: Grounded Answer Generation (Module #39)
 
 ---
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #28 (RAG Pipeline Architecture & Flow Design) completed for this assignment.
+- **Current Active Task**: Module #39 (Grounded Answer Generation) completed.
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
@@ -27,8 +27,10 @@
   - Module #25 (Retrieval Relevance Tuning: `src/tune_retrieval.py`, `tests/test_tune_retrieval.py`, `outputs/retrieval_tuning_summary.md`).
   - Module #27 (Retrieval Evaluation & Recall Testing: `src/evaluate_retrieval.py`, `tests/test_evaluate_retrieval.py`, `outputs/retrieval_evaluation_queries.json`, `outputs/retrieval_evaluation_report.json`, `outputs/retrieval_evaluation_summary.md`).
   - Module #28 (RAG Pipeline Architecture & Flow Design: `src/rag_pipeline.py`, `tests/test_rag_pipeline.py`, `outputs/rag_pipeline_sample.md`).
+  - Module #38 (Context Injection & Prompt Augmentation: `src/context_injection.py`, `tests/test_context_injection.py`, `outputs/context_injection_sample.md`).
+  - Module #39 (Grounded Answer Generation: `src/grounded_generation.py`, `tests/test_grounded_generation.py`, `outputs/grounded_generation_sample.md`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
-- **Next Planned Module**: Module #29 (Context Augmentation & Prompt Assembly).
+- **Next Planned Module**: Module #40 (Hallucination Detection & Citation Verification).
 
 ---
 
@@ -61,6 +63,10 @@
    - System prompt at index 0 is strictly immutable and preserved across all trimming actions.
    - Pre-request token measurement accounts for subword content and message framing overhead (~3 tokens/message).
    - Sliding-window eviction prunes oldest turns while appending a concise summary tag to retain continuity and keep history within context ceilings.
+9. **Grounded Generation & Source Accuracy Verification**:
+   - Dual verification: content keyword overlap against injected context plus sentence-level support validation.
+   - Informational disclaimer excluded from sentence-level checks to prevent false-positive hallucination flags.
+   - Explicit fallback guarantee returning `"I don't have enough information in the provided context."` with empty sources when context is absent or unsupported.
 
 ---
 
@@ -94,6 +100,15 @@
 - `src.rag_pipeline.assemble_context(chunks)`: Assembles numbered, provenance-tagged context blocks (`[1] Source: {source} (Section: {section})`).
 - `src.rag_pipeline.generate_answer(query, context, ...)`: Enforces strict grounding and context injection into prompt with safe refusal fallback.
 - `src.rag_pipeline.answer_query(query, k, store, ...)`: Main pipeline orchestrator connecting embed -> retrieve -> assemble -> generate, handling empty retrieval deterministically.
+- `src.context_injection.format_chunk(chunk, index)`: Attaches clear provenance header (`[N] Source: ... | Section: ...`) with metadata.
+- `src.context_injection.assemble_context(chunks, max_tokens)`: Assembles numbered context blocks while enforcing subword token ceilings.
+- `src.context_injection.build_augmented_prompt(question, chunks)`: Wraps context with explicit grounding instructions and fallback instructions into structured prompt.
+- `src.grounded_generation.generate_grounded_answer(question, chunks)`: Synthesizes answers based strictly on injected context with explicit source attribution.
+- `src.grounded_generation.verify_grounding(answer, context)`: Analyzes keyword overlap and sentence-level support, flagging unsupported claims.
+- `src.grounded_generation.answer_query(question, chunks, retriever_fn)`: Main query answerer with missing-context fallback guarantee.
+- `src.grounded_generation.direct_llm_call(question)`: Generates ungrounded answer directly from parametric memory for comparison.
+- `src.grounded_generation.compare_grounded_vs_ungrounded(question, chunks)`: Runs side-by-side RAG grounded vs ungrounded comparison with overlap metrics.
+- `src.grounded_generation.print_grounding_check(result)`: Renders human-readable grounding inspection report with citations and claim validation.
 
 ---
 
