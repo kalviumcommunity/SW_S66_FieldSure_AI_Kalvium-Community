@@ -679,7 +679,13 @@ def chunk_text_by_strategy(
     Returns:
         List of typed, indexed Chunk objects.
     """
-    strat_enum = ChunkingStrategy(str(strategy))
+    if isinstance(strategy, ChunkingStrategy):
+        strat_enum = strategy
+    elif hasattr(strategy, "value"):
+        strat_enum = ChunkingStrategy(strategy.value)
+    else:
+        val = str(strategy).split(".")[-1].lower() if "." in str(strategy) else str(strategy)
+        strat_enum = ChunkingStrategy(val)
     extra = extra_metadata or {}
 
     raw_chunks: List[Tuple[str, Optional[str]]] = []
@@ -854,7 +860,9 @@ def compare_strategies_on_document(
     stats_by_strategy: Dict[str, ChunkingStats] = {}
 
     for strat in target_strategies:
-        strat_key = ChunkingStrategy(str(strat)).value
+        strat_key = strat.value if isinstance(strat, ChunkingStrategy) else (
+            strat.value if hasattr(strat, "value") else ChunkingStrategy(str(strat).split(".")[-1].lower() if "." in str(strat) else str(strat)).value
+        )
         chunks = chunk_document(
             doc=doc,
             strategy=strat,

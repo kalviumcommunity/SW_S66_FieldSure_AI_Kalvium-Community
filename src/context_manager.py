@@ -112,6 +112,15 @@ class ContextWindowManager:
 
         evicted_points: List[str] = []
 
+        # If an existing context summary was previously inserted at index 1, remove it
+        # before trimming turns so it does not block turn eviction or double-count tokens
+        if (
+            len(self.messages) > 1
+            and self.messages[1]["role"] == "system"
+            and "[Context Summary:" in self.messages[1]["content"]
+        ):
+            del self.messages[1]
+
         # Keep trimming oldest turns until within budget or down to system + recent turns
         # Messages structure: [0] = System, [1..N-2*preserve] = older turns, [-2*preserve..] = recent turns
         while self.get_total_tokens() > self.max_history_tokens:
@@ -182,7 +191,11 @@ class ContextWindowManager:
         # 3. Add assistant response
         self.add_assistant_message(assistant_reply)
 
-        # 4. Final tokens after complete turn
+        # 4. Enforce final token budget ceiling after complete turn
+        trim_after, _, _ = self.trim_history_if_needed()
+        if trim_after:
+            was_trimmed = True
+
         tokens_final = self.get_total_tokens()
 
         log_entry = ChatTurnLog(

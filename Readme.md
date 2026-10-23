@@ -337,6 +337,7 @@ query-level results.
   - `outputs/embedding_similarity_sample.md`
   - `outputs/embedding_quality_sanity_report.json`
   - `outputs/vector_db_readback_sample.md`
+  - `outputs/rag_pipeline_sample.md`
 
 ---
 

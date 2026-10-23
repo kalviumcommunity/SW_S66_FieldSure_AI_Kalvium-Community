@@ -28,6 +28,8 @@
 | **#23** | Similarity Search & Top-K Retrieval | `Completed` | `src/retrieve_chunks.py`, `tests/test_retrieve_chunks.py`, `outputs/top_k_retrieval_sample.md` |
 | **#24** | Metadata Filtering & Hybrid Search | `Completed` | `src/filtered_retrieval.py`, `tests/test_filtered_retrieval.py`, `outputs/filtered_retrieval_sample.md` |
 | **#25** | Retrieval Relevance Tuning | `Completed` | `src/tune_retrieval.py`, `tests/test_tune_retrieval.py`, `outputs/retrieval_tuning_summary.md`, `outputs/retrieval_tuning_report.json` |
+| **#27** | Retrieval Evaluation & Recall Testing | `Completed` | `src/evaluate_retrieval.py`, `tests/test_evaluate_retrieval.py`, `outputs/retrieval_evaluation_report.json`, `outputs/retrieval_evaluation_summary.md` |
+| **#28** | RAG Pipeline Architecture & Flow Design | `Completed` | `src/rag_pipeline.py`, `tests/test_rag_pipeline.py`, `outputs/rag_pipeline_sample.md` |
 
 ---
 
@@ -628,3 +630,32 @@
   - Focused evaluation tests pass; the fixture report is generated without API credentials.
   - The committed fixture report has three labeled queries, full recall@3, precision@3 of `0.333`, and top-1 hit rate `0.000`.
   - Fixture scores validate the report and failure-analysis path only; they are not production embedding-quality results.
+
+---
+
+### Module #28: RAG Pipeline Architecture & Flow Design
+- **Status**: `Completed`
+- **Objective**: Design and implement the end-to-end RAG pipeline connecting user query, embedding generation, vector retrieval, context assembly, and grounded answer generation into clean, modular, testable stages.
+- **Dependencies**: Module #23 (Similarity Search & Top-K Retrieval), Module #25 (Retrieval Relevance Tuning), Module #4 (Prompt Construction).
+- **Expected Files**:
+  - `src/rag_pipeline.py`
+  - `tests/test_rag_pipeline.py`
+  - `outputs/rag_pipeline_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Document the full query-to-answer RAG flow including query embedding, retrieval, context assembly, grounded generation, and returned source metadata.
+  2. [x] Represent each stage in code via dedicated, single-responsibility functions: `embed_query`, `retrieve_context`, `assemble_context`, and `generate_answer`.
+  3. [x] Implement the pipeline orchestrator `answer_query` connecting the stages with graceful handling of empty retrieval states without hallucination.
+  4. [x] Run the pipeline end to end on sample domain queries and demonstrate the generated answer plus retrieved sources.
+  5. [x] Verify stage separation and testability through unit tests isolating each stage.
+  6. [x] Commit pipeline structure, sequence diagram, stage responsibility table, and sample run output to `outputs/rag_pipeline_sample.md`.
+- **Acceptance Criteria**:
+  - Each RAG stage is represented as an independent, single-responsibility function.
+  - Pipeline successfully executes end-to-end and returns `{"query": ..., "answer": ..., "sources": ..., "context": ..., "chunks": ...}`.
+  - Empty retrieval deterministically returns fallback message (`"I could not find relevant context for that question."`) and empty sources list without hallucination or unnecessary LLM calls.
+  - Functions can be tested in isolation (retrieval without generation, assembly without database).
+- **Required Tests**:
+  - `tests/test_rag_pipeline.py`: Comprehensive test suite verifying input validation, stage isolation, top-k retrieval, context formatting, LLM prompt framing, empty retrieval fallback, and CLI execution.
+- **Verification Evidence**:
+  - 19 automated tests passing in `tests/test_rag_pipeline.py`; 197 total test suite passing.
+  - Sample query execution audit and sequence flow diagram captured in `outputs/rag_pipeline_sample.md`.
+

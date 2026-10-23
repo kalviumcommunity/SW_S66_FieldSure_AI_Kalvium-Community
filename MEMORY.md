@@ -1,14 +1,14 @@
 # FieldSure AI — Project Memory (MEMORY.md)
 
-> **Role**: Member 1 — Document Processing & LLM Foundation  
-> **Last Updated**: 2026-10-22
-> **Current Sprint Phase**: Retrieval Evaluation & Recall Testing (Module #27)
+> **Role**: Member 3 — RAG, Backend & Application (Module #28)  
+> **Last Updated**: 2026-10-23
+> **Current Sprint Phase**: RAG Pipeline Architecture & Flow Design (Module #28)
 
 ---
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #27 (Retrieval Evaluation & Recall Testing) completed for this assignment.
+- **Current Active Task**: Module #28 (RAG Pipeline Architecture & Flow Design) completed for this assignment.
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
@@ -26,8 +26,9 @@
   - Module #24 (Metadata Filtering & Hybrid Search: `src/filtered_retrieval.py`, `tests/test_filtered_retrieval.py`, `outputs/filtered_retrieval_sample.md`).
   - Module #25 (Retrieval Relevance Tuning: `src/tune_retrieval.py`, `tests/test_tune_retrieval.py`, `outputs/retrieval_tuning_summary.md`).
   - Module #27 (Retrieval Evaluation & Recall Testing: `src/evaluate_retrieval.py`, `tests/test_evaluate_retrieval.py`, `outputs/retrieval_evaluation_queries.json`, `outputs/retrieval_evaluation_report.json`, `outputs/retrieval_evaluation_summary.md`).
+  - Module #28 (RAG Pipeline Architecture & Flow Design: `src/rag_pipeline.py`, `tests/test_rag_pipeline.py`, `outputs/rag_pipeline_sample.md`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
-- **Next Planned Module**: Awaiting the next assigned module.
+- **Next Planned Module**: Module #29 (Context Augmentation & Prompt Assembly).
 
 ---
 
@@ -87,8 +88,12 @@
 - `src.index_embeddings.run_indexing_job(...)`: Indexes the complete embeddings file, compares it with the source corpus, validates the indexed count, and spot-checks stored records.
 - `src.vector_store.ChromaVectorStore.search(...)`: Retrieves nearest stored chunks with cosine similarity, source text, and restored metadata.
 - `src.retrieve_chunks.retrieve_for_k_values(...)`: Embeds a query with the configured model and runs searches for each requested top-k value.
-- `src.filtered_retrieval.retrieve_filtered_comparison(...)`: Compares unfiltered and metadata-filtered vector search, with optional keyword-coverage reranking.
 - `src.tune_retrieval.run_tuning_experiment(...)`: Evaluates retrieval settings against known source relevance and selects the best macro F1@k configuration.
+- `src.rag_pipeline.embed_query(query, ...)`: Encodes query into dense vector via live API or unit-normalized deterministic hash vector.
+- `src.rag_pipeline.retrieve_context(query_vector, store, k, ...)`: Performs vector lookup in ChromaDB with optional metadata filtering and score thresholding.
+- `src.rag_pipeline.assemble_context(chunks)`: Assembles numbered, provenance-tagged context blocks (`[1] Source: {source} (Section: {section})`).
+- `src.rag_pipeline.generate_answer(query, context, ...)`: Enforces strict grounding and context injection into prompt with safe refusal fallback.
+- `src.rag_pipeline.answer_query(query, k, store, ...)`: Main pipeline orchestrator connecting embed -> retrieve -> assemble -> generate, handling empty retrieval deterministically.
 
 ---
 

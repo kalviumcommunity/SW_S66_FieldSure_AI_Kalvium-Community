@@ -171,6 +171,35 @@ sequenceDiagram
     end
 ```
 
+### 3.3 End-to-End RAG Pipeline Architecture & Flow (Module #28)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Field Worker
+    participant Orchestrator as Pipeline Orchestrator (answer_query)
+    participant Embedder as Query Embedder (embed_query)
+    participant Store as Vector Store (retrieve_context)
+    participant Assembler as Context Assembler (assemble_context)
+    participant Generator as Grounded Generator (generate_answer)
+
+    User->>Orchestrator: 1. Submit Query
+    Orchestrator->>Embedder: 2. embed_query(query)
+    Embedder-->>Orchestrator: Dense Vector (e.g. 1024 or 1536 dim)
+    Orchestrator->>Store: 3. retrieve_context(vector, k=4)
+    alt Relevant Chunks Retrieved (similarity >= threshold)
+        Store-->>Orchestrator: Top-k Ranked Chunks with Metadata
+        Orchestrator->>Assembler: 4. assemble_context(chunks)
+        Assembler-->>Orchestrator: Assembled Context with [1] Source: ...
+        Orchestrator->>Generator: 5. generate_answer(query, context)
+        Generator-->>Orchestrator: Grounded Response + Inline Citations
+        Orchestrator-->>User: {"answer": ..., "sources": [...], "context": ...}
+    else Empty Retrieval / Below Threshold
+        Store-->>Orchestrator: Empty Chunks List []
+        Orchestrator-->>User: Fallback: "I could not find relevant context for that question." (sources: [])
+    end
+```
+
 ---
 
 ## 4. Shared Interfaces & Data Contracts

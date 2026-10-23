@@ -1,6 +1,7 @@
 """Unit and regression tests for chunk metadata tagging and source tracking (Module #13)."""
 
 from pathlib import Path
+import re
 import pytest
 
 from src.ingestion.loader import LoadedDocument

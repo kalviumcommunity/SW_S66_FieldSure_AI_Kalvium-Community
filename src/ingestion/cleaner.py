@@ -295,8 +295,7 @@ def run_cleaning_pipeline(corpus_dir: Optional[Path] = None) -> int:
     repo_root = Path(__file__).resolve().parent.parent.parent
     sample_dir = corpus_dir or (repo_root / "data" / "sample_advisories")
     outputs_dir = repo_root / "outputs"
-    outputs_dir.mkdir(parents=True, exist_ok=True)
-    log_file = outputs_dir / "text_cleaning_sample.log"
+    log_file = LOG_FILE_PATH
 
     print("\n" + "=" * 80)
     print("FIELDSURE AI — TEXT EXTRACTION & CLEANING PIPELINE")
