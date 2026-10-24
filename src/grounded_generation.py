@@ -108,6 +108,18 @@ class GroundedAnswer:
         except AttributeError:
             raise KeyError(key)
 
+    def keys(self) -> List[str]:
+        return ["question", "answer", "context", "sources", "chunks_used", "is_fallback"]
+
+    def values(self) -> List[Any]:
+        return [getattr(self, k) for k in self.keys()]
+
+    def items(self) -> List[Tuple[str, Any]]:
+        return [(k, getattr(self, k)) for k in self.keys()]
+
+    def get(self, key: str, default: Any = None) -> Any:
+        return getattr(self, key, default)
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "question": self.question,

@@ -33,6 +33,7 @@
 | **#38** | Context Injection & Prompt Augmentation | `Completed` | `src/context_injection.py`, `tests/test_context_injection.py`, `outputs/context_injection_sample.md` |
 | **#39** | Grounded Answer Generation | `Completed` | `src/grounded_generation.py`, `tests/test_grounded_generation.py`, `outputs/grounded_generation_sample.md` |
 | **#40** | Source Citation & Attribution | `Completed` | `src/source_citation.py`, `src/citation.py`, `tests/test_source_citation.py`, `outputs/source_citation_sample.md` |
+| **#41** | Hallucination Guardrails & Refusal Handling | `Completed` | `src/guardrails.py`, `src/hallucination_guardrails.py`, `tests/test_guardrails.py`, `outputs/guardrails_sample.md` |
 
 ---
 
@@ -753,6 +754,39 @@
 - **Verification Evidence**:
   - 27 tests passing in `tests/test_source_citation.py`; 320 total test suite passing without regression.
   - Execution report and verified sample answers generated in `outputs/source_citation_sample.md`.
+
+---
+
+### Module #41: Hallucination Guardrails & Refusal Handling
+- **Status**: `Completed`
+- **Objective**: Detect weak, empty, or unrelated retrieval context before generation, return a safe refusal ("I don't have enough reliable context to answer that.") with status `refused_weak_context` when evidence is insufficient, apply relevance thresholds (`MIN_TOP_SCORE = 0.72`, `MIN_SUPPORTING_CHUNKS = 1`), preserve confident grounded answers (`answered`) when strong context exists, and commit sample refusal and answer outputs with execution evidence.
+- **Dependencies**: Module #40 (Source Citation & Attribution), Module #39 (Grounded Answer Generation), Module #27 (Retrieval Evaluation & Recall Testing).
+- **Expected Files**:
+  - `src/guardrails.py`
+  - `src/hallucination_guardrails.py`
+  - `tests/test_guardrails.py`
+  - `outputs/guardrails_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Implement `retrieval_is_strong(chunks)` and `get_chunk_score(chunk)` detecting weak context using signals (empty chunks, low similarity score < 0.72, too few chunks).
+  2. [x] Implement `evaluate_retrieval_quality(chunks)` providing comprehensive diagnostics (`is_strong`, `top_score`, `strong_chunks_count`, `reason`).
+  3. [x] Implement `guarded_answer(question)` returning safe refusal (`"I don't have enough reliable context to answer that."`, status `refused_weak_context`, sources `[]`) when retrieval is weak.
+  4. [x] Establish relevance thresholds (`MIN_TOP_SCORE = 0.72`, `MIN_SUPPORTING_CHUNKS = 1`) derived from retrieval evaluation tuning.
+  5. [x] Preserve confident grounded answers (status `answered`, sources populated) when strong supporting context exists.
+  6. [x] Support dictionary-style subscripting (`result["answer"]`, `result["status"]`, `result["sources"]`), attribute access, and dict unpacking (`{**result}`).
+  7. [x] Author comprehensive unit and integration test suite in `tests/test_guardrails.py` (30 tests).
+  8. [x] Generate execution verification report and sample outputs in `outputs/guardrails_sample.md`.
+- **Acceptance Criteria**:
+  - Detects weak or missing retrieval context using empty results, low similarity score (< 0.72), or too few chunks.
+  - Returns safe refusal with empty sources and status `refused_weak_context` when context is insufficient.
+  - Configurable relevance thresholds control refusal behavior.
+  - Produces confident grounded answers with status `answered` when strong supporting context exists.
+  - Zero hardcoded secrets, zero credential leakage.
+- **Required Tests**:
+  - `tests/test_guardrails.py`: 30 automated tests covering weak retrieval signals, threshold checks, safe refusals, confident answers, dict unpacking, and end-to-end report generation.
+- **Verification Evidence**:
+  - 30 tests passing in `tests/test_guardrails.py`; 350 total test suite passing without regression.
+  - Execution report and verified sample answers generated in `outputs/guardrails_sample.md`.
+
 
 
 
