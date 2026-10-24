@@ -787,6 +787,38 @@
   - 30 tests passing in `tests/test_guardrails.py`; 350 total test suite passing without regression.
   - Execution report and verified sample answers generated in `outputs/guardrails_sample.md`.
 
+---
+
+### Module #42: Conversational RAG & Follow-Up Context
+- **Status**: `Completed`
+- **Objective**: Track conversation history across multiple turns, rewrite follow-up questions into standalone retrieval queries resolving conversational context and coreferences, retrieve relevant context using rewritten queries, demonstrate multi-turn dialogue with safe refusal guardrails on weak context, and commit sample dialogue evidence.
+- **Dependencies**: Module #41 (Hallucination Guardrails & Refusal Handling), Module #40 (Source Citation & Attribution), Module #39 (Grounded Answer Generation).
+- **Expected Files**:
+  - `src/conversational_rag.py`
+  - `src/conversation.py`
+  - `tests/test_conversational_rag.py`
+  - `outputs/conversational_rag_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Implement conversation history tracking (`format_history_text`, `trim_history`) balancing turn and token limits across user and assistant turns.
+  2. [x] Implement `rewrite_followup(history, question)` transforming dependent follow-ups into standalone retrieval queries while preserving search intent.
+  3. [x] Implement `retrieve(question)` and `compare_retrieval(history, question)` showing naive retrieval disadvantages vs. rewritten query retrieval precision.
+  4. [x] Implement `conversational_answer(history, user_question)` orchestrating query rewriting, retrieval, guardrail strength validation, grounded generation, and in-place history appending.
+  5. [x] Implement `ConversationalAnswer` dict subclass supporting dictionary subscripting (`res["answer"]`, `res["rewritten_query"]`), attribute access, and dict unpacking.
+  6. [x] Author comprehensive unit and integration test suite in `tests/test_conversational_rag.py` (27 tests).
+  7. [x] Generate execution verification report and sample dialogues in `outputs/conversational_rag_sample.md`.
+- **Acceptance Criteria**:
+  - Conversation history tracks user and assistant turns without exceeding token ceilings.
+  - Ambiguous follow-ups ("What about the video?", "Does it apply to Sprint 2?", "Can you explain that?") are resolved into standalone retrieval queries.
+  - Rewritten queries retrieve relevant context chunks while naive retrieval returns unrelated chunks or weak relevance.
+  - Safe refusal is maintained when retrieved context is weak or out of corpus.
+  - Zero hardcoded secrets, zero credential leakage.
+- **Required Tests**:
+  - `tests/test_conversational_rag.py`: 27 automated tests covering history tracking, follow-up rewriting, comparative retrieval, conversational answer orchestration, dictionary compatibility, and end-to-end report generation.
+- **Verification Evidence**:
+  - 27 tests passing in `tests/test_conversational_rag.py`; 377 total test suite passing without regression.
+  - Execution report and verified sample dialogues generated in `outputs/conversational_rag_sample.md`.
+
+
 
 
 
