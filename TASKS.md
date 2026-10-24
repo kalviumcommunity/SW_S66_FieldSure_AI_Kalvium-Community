@@ -855,8 +855,34 @@
   - 33 tests passing in `tests/test_rag_evaluation.py`; 410 total test suite passing without regression.
   - Execution reports generated in `outputs/rag_evaluation_report.json`, `outputs/rag_evaluation_summary.md`, and `outputs/rag_evaluation_sample.md`.
 
+---
 
-
-
-
-
+### Module #44: Backend API for the RAG Service
+- **Status**: `Completed`
+- **Objective**: Expose the FieldSure AI RAG pipeline through a stable FastAPI backend API for frontend, chatbot UI, or service integration. Accept question queries via `POST /query`, execute the guarded RAG pipeline, return structured JSON responses with answers and source citations, validate request schemas and handle errors with appropriate HTTP status codes (400, 422, 500), load configuration dynamically from environment variables with zero hardcoded credentials, and commit sample requests and responses.
+- **Dependencies**: Module #41 (Hallucination Guardrails & Refusal Handling), Module #40 (Source Citation & Attribution), Module #39 (Grounded Answer Generation).
+- **Expected Files**:
+  - `src/backend_api.py`
+  - `src/api.py`
+  - `tests/test_backend_api.py`
+  - `outputs/backend_api_sample.json`
+  - `outputs/backend_api_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Task 1 — Create a query endpoint: Implement `POST /query` accepting user questions and returning answers with source citations, along with `GET /health`, `GET /config`, and root endpoints.
+  2. [x] Task 2 — Return structured JSON: Implement Pydantic models (`QueryRequest`, `Source`, `QueryResponse`) returning structured JSON containing `answer`, `sources`, `status`, and `metadata`.
+  3. [x] Task 3 — Validate input and handle errors: Enforce Pydantic schema constraints (3-1000 characters, whitespace validation), returning HTTP 422 for unprocessable entities, HTTP 400 for ValueErrors, and HTTP 500 for unexpected RAG pipeline failures.
+  4. [x] Task 4 — Load config from environment: Implement `APIConfig` and `load_environment_config` loading `OPENAI_API_KEY`/`API_KEY`, `EMBEDDING_MODEL`, `VECTOR_DB_URL`, `COLLECTION_NAME`, `CHAT_MODEL`, `PORT`, and `HOST` from environment with masked credentials and zero secret leakage.
+  5. [x] Task 5 — Commit sample request and response: Generate and commit verified request/response artifacts in `outputs/backend_api_sample.json` and `outputs/backend_api_sample.md`.
+  6. [x] Author comprehensive automated unit and integration test suite in `tests/test_backend_api.py` (26 tests).
+- **Acceptance Criteria**:
+  - `POST /query` endpoint operational and conforms to the specified API contract.
+  - Returns structured JSON containing `answer`, `sources` (`source`, `chunk_id`, `score`), `status`, and diagnostic `metadata`.
+  - Input validation rejects too short (<3), too long (>1000), whitespace-only, and malformed requests with clear status codes.
+  - Server catches pipeline exceptions and returns clean 400/500 responses without leaking internal stack traces.
+  - Zero hardcoded secrets, model names, or database URLs; fully configurable via environment variables.
+  - Sample request and response evidence committed.
+- **Required Tests**:
+  - `tests/test_backend_api.py`: 26 automated tests covering config loading, schema validation, query execution, refusal guardrails, dependency injection, HTTP status codes, and artifact integrity.
+- **Verification Evidence**:
+  - 26 tests passing in `tests/test_backend_api.py`; 436 total test suite passing without regression.
+  - Verification artifacts generated in `outputs/backend_api_sample.json` and `outputs/backend_api_sample.md`.

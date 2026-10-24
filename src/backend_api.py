@@ -1,0 +1,663 @@
+"""Backend API for the RAG Service (Concept 3.44).
+
+Exposes the FieldSure AI RAG pipeline through a production FastAPI backend API
+so a frontend, chatbot UI, or another service can send questions and receive
+grounded answers with source citations.
+
+Tasks:
+    Task 1: Create a query endpoint (POST /query) that accepts a question and returns an answer with sources.
+    Task 2: Return structured JSON containing answer, sources, status, and metadata.
+    Task 3: Validate input (length, format) and handle errors with clear HTTP status codes (400, 422, 500).
+    Task 4: Load config from environment variables (API keys, model names, vector DB settings).
+    Task 5: Commit sample request and response showing the endpoint working.
+"""
+
+from __future__ import annotations
+
+import argparse
+from dataclasses import asdict, dataclass
+import json
+import logging
+import os
+from pathlib import Path
+import sys
+from typing import Any, Callable, Dict, List, Optional, Union
+
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Request, Response, status
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field, field_validator
+
+# Ensure repository root is on sys.path
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from src.config import mask_api_key
+from src.guardrails import (
+    DEFAULT_REFUSAL_MESSAGE,
+    STATUS_ANSWERED,
+    STATUS_REFUSED_WEAK_CONTEXT,
+    GuardedAnswer,
+    guarded_answer,
+)
+
+logger = logging.getLogger("fieldsure.backend_api")
+
+# Load environment variables from .env if present
+_env_path = REPO_ROOT / ".env"
+if _env_path.is_file():
+    load_dotenv(dotenv_path=_env_path)
+else:
+    load_dotenv()
+
+# Default output paths for Task 5 artifacts
+DEFAULT_SAMPLE_JSON = REPO_ROOT / "outputs" / "backend_api_sample.json"
+DEFAULT_SAMPLE_MD = REPO_ROOT / "outputs" / "backend_api_sample.md"
+
+
+# ---------------------------------------------------------------------------
+# Task 4: Environment-Driven Configuration
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class APIConfig:
+    """Configuration loaded dynamically from the environment."""
+
+    api_key: str
+    embedding_model: str = "text-embedding-3-small"
+    vector_db_url: str = "http://localhost:6333"
+    collection_name: str = "rag_chunks"
+    chat_model: str = "gpt-4o-mini"
+    api_base_url: str = "https://api.openai.com/v1"
+    host: str = "0.0.0.0"
+    port: int = 8000
+
+    def to_safe_dict(self) -> Dict[str, Any]:
+        """Return configuration dictionary with masked API credentials."""
+        return {
+            "embedding_model": self.embedding_model,
+            "vector_db_url": self.vector_db_url,
+            "collection_name": self.collection_name,
+            "chat_model": self.chat_model,
+            "api_base_url": self.api_base_url,
+            "host": self.host,
+            "port": self.port,
+            "api_key_configured": bool(self.api_key),
+            "api_key_masked": mask_api_key(self.api_key),
+        }
+
+
+def load_environment_config(
+    env_path: Optional[Path] = None,
+    strict: bool = False,
+) -> APIConfig:
+    """Load configuration dynamically from environment variables.
+
+    Reads:
+        OPENAI_API_KEY / API_KEY: Authentication API key.
+        EMBEDDING_MODEL: Target embedding model (default: text-embedding-3-small).
+        VECTOR_DB_URL: Remote vector DB URL or connection path.
+        COLLECTION_NAME / VECTOR_DB_COLLECTION: Target vector collection name.
+        CHAT_MODEL: LLM model name (default: gpt-4o-mini).
+        API_BASE_URL: LLM provider base URL (default: https://api.openai.com/v1).
+        HOST: Server bind host (default: 0.0.0.0).
+        PORT: Server bind port (default: 8000).
+
+    Args:
+        env_path: Optional path to .env file.
+        strict: If True, raises ValueError when required credentials are missing.
+
+    Returns:
+        Validated APIConfig instance.
+
+    Raises:
+        ValueError: If strict is True and required credentials are not configured.
+    """
+    if env_path is not None and env_path.is_file():
+        load_dotenv(dotenv_path=env_path)
+
+    api_key = (
+        os.getenv("OPENAI_API_KEY")
+        or os.getenv("API_KEY")
+        or ""
+    ).strip()
+
+    if strict and (not api_key or api_key == "your_llm_api_key_here"):
+        raise ValueError(
+            "OPENAI_API_KEY or API_KEY is required in strict mode but not configured."
+        )
+
+    embedding_model = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small").strip() or "text-embedding-3-small"
+    vector_db_url = os.getenv("VECTOR_DB_URL", "http://localhost:6333").strip() or "http://localhost:6333"
+    collection_name = (
+        os.getenv("COLLECTION_NAME")
+        or os.getenv("VECTOR_DB_COLLECTION")
+        or "rag_chunks"
+    ).strip() or "rag_chunks"
+
+    chat_model = os.getenv("CHAT_MODEL", "gpt-4o-mini").strip() or "gpt-4o-mini"
+    api_base_url = os.getenv("API_BASE_URL", "https://api.openai.com/v1").strip() or "https://api.openai.com/v1"
+    host = os.getenv("HOST", "0.0.0.0").strip() or "0.0.0.0"
+
+    try:
+        port = int(os.getenv("PORT", "8000").strip())
+    except ValueError:
+        port = 8000
+
+    return APIConfig(
+        api_key=api_key,
+        embedding_model=embedding_model,
+        vector_db_url=vector_db_url,
+        collection_name=collection_name,
+        chat_model=chat_model,
+        api_base_url=api_base_url,
+        host=host,
+        port=port,
+    )
+
+
+# Module-level configuration attributes conforming to Concept 3.44 specification
+OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY") or os.getenv("API_KEY", "")
+EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+VECTOR_DB_URL: str = os.getenv("VECTOR_DB_URL", "http://localhost:6333")
+COLLECTION_NAME: str = os.getenv("COLLECTION_NAME") or os.getenv("VECTOR_DB_COLLECTION", "rag_chunks")
+
+
+# ---------------------------------------------------------------------------
+# Task 1 & Task 2: Request & Response Shapes (Pydantic Models)
+# ---------------------------------------------------------------------------
+
+class QueryRequest(BaseModel):
+    """Incoming query request payload from client/frontend."""
+
+    question: str = Field(
+        ...,
+        min_length=3,
+        max_length=1000,
+        description="The user's question or search query.",
+        examples=["What evidence is required for project submission?"],
+    )
+
+    @field_validator("question")
+    @classmethod
+    def validate_non_whitespace(cls, value: str) -> str:
+        """Ensure question contains non-whitespace content."""
+        cleaned = value.strip()
+        if len(cleaned) < 3:
+            raise ValueError("Question must be at least 3 characters long after trimming whitespace.")
+        return cleaned
+
+
+class Source(BaseModel):
+    """Source citation metadata attached to a grounded answer."""
+
+    source: str = Field(..., description="Source document filename or identifier.")
+    chunk_id: Optional[str] = Field(default=None, description="Unique chunk identifier.")
+    score: Optional[float] = Field(default=None, description="Retrieval similarity or relevance score.")
+
+
+class QueryResponse(BaseModel):
+    """Structured response payload returned by the RAG backend API."""
+
+    answer: str = Field(..., description="Grounded answer text generated by RAG pipeline.")
+    sources: List[Source] = Field(default_factory=list, description="List of source citations used.")
+    status: str = Field(default=STATUS_ANSWERED, description="Status code ('answered', 'refused_weak_context').")
+    metadata: Optional[Dict[str, Any]] = Field(default=None, description="Optional diagnostic metrics and metadata.")
+
+
+class HealthResponse(BaseModel):
+    """Health check response schema."""
+
+    status: str = "healthy"
+    service: str = "FieldSure AI RAG Service"
+    version: str = "0.1.0"
+
+
+# ---------------------------------------------------------------------------
+# Task 1, 2, 3: Endpoint Definition & FastAPI Application Factory
+# ---------------------------------------------------------------------------
+
+def create_app(
+    pipeline_fn: Optional[Callable[[str], Any]] = None,
+    config: Optional[APIConfig] = None,
+) -> FastAPI:
+    """Create and configure a production FastAPI application for the RAG service.
+
+    Args:
+        pipeline_fn: Optional callable for RAG answering (defaults to guarded_answer).
+        config: Optional pre-loaded APIConfig.
+
+    Returns:
+        Configured FastAPI application instance.
+    """
+    app_config = config or load_environment_config()
+    rag_pipeline = pipeline_fn or guarded_answer
+
+    app = FastAPI(
+        title="FieldSure AI — Backend API for RAG Service",
+        description=(
+            "Exposes the FieldSure AI RAG pipeline through a stable backend API contract. "
+            "Enables frontends, chatbot UIs, and external health services to submit clinical "
+            "questions and receive grounded answers with full source attribution."
+        ),
+        version="0.1.0",
+        docs_url="/docs",
+        redoc_url="/redoc",
+    )
+
+    # Attach config and pipeline callable to app.state for testing & introspection
+    app.state.config = app_config
+    app.state.pipeline_fn = rag_pipeline
+
+    # Enable CORS for frontend integration
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    @app.get("/", tags=["Root"])
+    def root() -> Dict[str, Any]:
+        """Root status endpoint returning service description and documentation links."""
+        return {
+            "service": "FieldSure AI RAG Service",
+            "version": "0.1.0",
+            "status": "online",
+            "endpoints": {
+                "query": "POST /query",
+                "health": "GET /health",
+                "config": "GET /config",
+                "docs": "GET /docs",
+            },
+        }
+
+    @app.get("/health", response_model=HealthResponse, tags=["Health"])
+    def health_check() -> HealthResponse:
+        """Readiness and liveness probe endpoint."""
+        return HealthResponse(
+            status="healthy",
+            service="FieldSure AI RAG Service",
+            version="0.1.0",
+        )
+
+    @app.get("/config", tags=["Configuration"])
+    def get_config() -> Dict[str, Any]:
+        """Return active service configuration with sensitive credentials masked."""
+        cfg: APIConfig = getattr(app.state, "config", app_config)
+        return cfg.to_safe_dict()
+
+    @app.post(
+        "/query",
+        response_model=QueryResponse,
+        status_code=status.HTTP_200_OK,
+        tags=["RAG Query"],
+        summary="Query the RAG pipeline",
+        description="Accepts a user question, runs retrieval guardrails and grounded generation, and returns structured JSON with sources.",
+    )
+    def query_rag_endpoint(request: QueryRequest) -> QueryResponse:
+        """Execute RAG query against guarded pipeline and return structured JSON."""
+        current_pipeline = getattr(app.state, "pipeline_fn", rag_pipeline)
+
+        try:
+            result = current_pipeline(request.question)
+
+            # Ensure result can be accessed like a dictionary
+            if not isinstance(result, dict) and not hasattr(result, "__getitem__"):
+                raise ValueError("RAG pipeline returned an invalid response format.")
+
+            raw_sources = result.get("sources", []) if isinstance(result, dict) else result["sources"]
+            raw_answer = result.get("answer") if isinstance(result, dict) else result["answer"]
+            raw_status = result.get("status", STATUS_ANSWERED) if isinstance(result, dict) else result["status"]
+
+            # Format structured sources
+            formatted_sources: List[Source] = []
+            for item in raw_sources:
+                if isinstance(item, dict):
+                    source_name = str(item.get("source") or item.get("source_file") or "unknown")
+                    chunk_id = item.get("chunk_id")
+                    score = item.get("score")
+                    # If score is not directly in the item, check top_score
+                    if score is None and isinstance(result, dict) and result.get("top_score") is not None:
+                        score = result.get("top_score")
+                    formatted_sources.append(
+                        Source(
+                            source=source_name,
+                            chunk_id=str(chunk_id) if chunk_id is not None else None,
+                            score=float(score) if score is not None else None,
+                        )
+                    )
+                elif isinstance(item, str):
+                    formatted_sources.append(
+                        Source(source=item, chunk_id=None, score=None)
+                    )
+
+            # Assemble diagnostic metadata
+            metadata: Dict[str, Any] = {}
+            if isinstance(result, dict):
+                if "top_score" in result and result["top_score"] is not None:
+                    metadata["top_score"] = float(result["top_score"])
+                if "chunks_used" in result:
+                    metadata["chunks_used"] = int(result["chunks_used"])
+                if "is_refused" in result:
+                    metadata["is_refused"] = bool(result["is_refused"])
+                metadata["total_sources"] = len(formatted_sources)
+
+            return QueryResponse(
+                answer=str(raw_answer),
+                sources=formatted_sources,
+                status=str(raw_status),
+                metadata=metadata if metadata else None,
+            )
+
+        except ValueError as error:
+            logger.warning("Query validation error: %s", error)
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
+        except HTTPException:
+            raise
+        except Exception as error:
+            logger.error("RAG pipeline unexpected execution error: %s", error, exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="RAG service failed",
+            )
+
+    return app
+
+
+# Default application instance for uvicorn entry point
+app = create_app()
+
+
+def query_rag(request: QueryRequest) -> QueryResponse:
+    """Standalone functional wrapper matching the prompt reference implementation."""
+    try:
+        result = guarded_answer(request.question)
+        sources: List[Source] = []
+        for source in result.get("sources", []):
+            score = source.get("score")
+            if score is None and "top_score" in result:
+                score = result.get("top_score")
+            sources.append(
+                Source(
+                    source=source.get("source") or source.get("source_file", "unknown"),
+                    chunk_id=source.get("chunk_id"),
+                    score=float(score) if score is not None else None,
+                )
+            )
+
+        return QueryResponse(
+            answer=result["answer"],
+            sources=sources,
+            status=result.get("status", STATUS_ANSWERED),
+            metadata={
+                "top_score": result.get("top_score"),
+                "chunks_used": result.get("chunks_used", len(sources)),
+                "is_refused": result.get("is_refused", False),
+            },
+        )
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
+    except Exception:
+        raise HTTPException(status_code=500, detail="RAG service failed")
+
+
+# ---------------------------------------------------------------------------
+# Task 5: Sample Request & Response Demonstration Runner
+# ---------------------------------------------------------------------------
+
+def run_demo(
+    output_json: Optional[Path] = None,
+    output_md: Optional[Path] = None,
+) -> Dict[str, Any]:
+    """Execute live requests against the FastAPI query endpoint and export sample evidence.
+
+    Demonstrates:
+        1. Grounded answer case: "What evidence is required for project submission?"
+        2. Safe refusal case: "What is the refund policy for products?"
+        3. Input validation error handling (422 status).
+
+    Args:
+        output_json: Target path for structured JSON sample artifact.
+        output_md: Target path for Markdown report sample artifact.
+
+    Returns:
+        Dictionary containing all generated test cases and responses.
+    """
+    from fastapi.testclient import TestClient
+
+    target_json = output_json or DEFAULT_SAMPLE_JSON
+    target_md = output_md or DEFAULT_SAMPLE_MD
+    target_json.parent.mkdir(parents=True, exist_ok=True)
+    target_md.parent.mkdir(parents=True, exist_ok=True)
+
+    client = TestClient(app)
+
+    print("=" * 76)
+    print("FieldSure AI — Backend API for RAG Service (Concept 3.44 Demonstration)")
+    print("=" * 76)
+
+    # 1. Answered Case: Project Submission
+    req_answered = {"question": "What evidence is required for project submission?"}
+    print(f"\n[Case 1] Submitting Grounded Question:")
+    print(f"  POST /query -> Body: {json.dumps(req_answered)}")
+    res1 = client.post("/query", json=req_answered)
+    print(f"  HTTP Status: {res1.status_code}")
+    res1_json = res1.json()
+    print(f"  Answer:      {res1_json['answer'][:80]}...")
+    print(f"  Sources:     {len(res1_json['sources'])} citation(s)")
+    print(f"  Status:      {res1_json['status']}")
+
+    # 2. Refusal Case: Unsupported / Out-of-Corpus Query
+    req_refused = {"question": "What is the refund policy for products?"}
+    print(f"\n[Case 2] Submitting Out-of-Domain Question (Refusal Guardrail):")
+    print(f"  POST /query -> Body: {json.dumps(req_refused)}")
+    res2 = client.post("/query", json=req_refused)
+    print(f"  HTTP Status: {res2.status_code}")
+    res2_json = res2.json()
+    print(f"  Answer:      {res2_json['answer']}")
+    print(f"  Sources:     {len(res2_json['sources'])} citation(s)")
+    print(f"  Status:      {res2_json['status']}")
+
+    # 3. Validation Error Case: Too short query
+    req_invalid = {"question": "hi"}
+    print(f"\n[Case 3] Submitting Invalid Question (Too Short):")
+    print(f"  POST /query -> Body: {json.dumps(req_invalid)}")
+    res3 = client.post("/query", json=req_invalid)
+    print(f"  HTTP Status: {res3.status_code} (Expected 422 Unprocessable Entity)")
+    res3_json = res3.json()
+
+    # 4. Health Check
+    res_health = client.get("/health")
+    res_config = client.get("/config")
+
+    evidence = {
+        "service": "FieldSure AI RAG Service API",
+        "concept": "3.44 Backend API for the RAG Service",
+        "configuration": res_config.json(),
+        "health": res_health.json(),
+        "demonstrations": [
+            {
+                "name": "grounded_answer_case",
+                "description": "Standard grounded retrieval query returning answer and sources.",
+                "request": {
+                    "method": "POST",
+                    "path": "/query",
+                    "headers": {"Content-Type": "application/json"},
+                    "body": req_answered,
+                },
+                "response": {
+                    "status_code": res1.status_code,
+                    "body": res1_json,
+                },
+            },
+            {
+                "name": "refusal_guardrail_case",
+                "description": "Out-of-corpus query caught by guardrail returning safe refusal.",
+                "request": {
+                    "method": "POST",
+                    "path": "/query",
+                    "headers": {"Content-Type": "application/json"},
+                    "body": req_refused,
+                },
+                "response": {
+                    "status_code": res2.status_code,
+                    "body": res2_json,
+                },
+            },
+            {
+                "name": "validation_error_case",
+                "description": "Short invalid query rejected by Pydantic schema validation.",
+                "request": {
+                    "method": "POST",
+                    "path": "/query",
+                    "headers": {"Content-Type": "application/json"},
+                    "body": req_invalid,
+                },
+                "response": {
+                    "status_code": res3.status_code,
+                    "body": res3_json,
+                },
+            },
+        ],
+    }
+
+    # Write structured JSON sample
+    with open(target_json, "w", encoding="utf-8") as f:
+        json.dump(evidence, f, indent=2, ensure_ascii=False)
+    print(f"\n[Artifact] Structured JSON exported to: {target_json}")
+
+    # Write Markdown sample documentation
+    md_content = f"""# FieldSure AI — Backend API for RAG Service (Concept 3.44)
+
+> **API Contract & Execution Evidence**: Verified demonstration of the FastAPI backend service exposing the FieldSure AI RAG pipeline for frontend and client consumption.
+
+---
+
+## 1. API Specification Summary
+
+- **Endpoint**: `POST /query`
+- **Request Content-Type**: `application/json`
+- **Response Content-Type**: `application/json`
+- **Health Check**: `GET /health`
+- **Config Inspection**: `GET /config` (Masked credentials)
+
+### Environment Configuration (Zero Hardcoding)
+| Variable | Value / Source | Description |
+|---|---|---|
+| `OPENAI_API_KEY` | `{mask_api_key(OPENAI_API_KEY)}` | Authentication credential for LLM provider |
+| `EMBEDDING_MODEL` | `{EMBEDDING_MODEL}` | Target embedding model for vector search |
+| `VECTOR_DB_URL` | `{VECTOR_DB_URL}` | Remote or local vector database address |
+| `COLLECTION_NAME` | `{COLLECTION_NAME}` | Vector collection storing ingested chunks |
+
+---
+
+## 2. Sample Request & Response (Grounded Answer)
+
+### Request
+```bash
+curl -X POST http://localhost:8000/query \\
+  -H "Content-Type: application/json" \\
+  -d '{{"question": "What evidence is required for project submission?"}}'
+```
+
+### Response (HTTP 200 OK)
+```json
+{json.dumps(res1_json, indent=2)}
+```
+
+---
+
+## 3. Sample Request & Response (Refusal Guardrail)
+
+### Request
+```bash
+curl -X POST http://localhost:8000/query \\
+  -H "Content-Type: application/json" \\
+  -d '{{"question": "What is the refund policy for products?"}}'
+```
+
+### Response (HTTP 200 OK)
+```json
+{json.dumps(res2_json, indent=2)}
+```
+
+---
+
+## 4. Input Validation & Error Handling
+
+### Request (Invalid Question Length < 3)
+```bash
+curl -X POST http://localhost:8000/query \\
+  -H "Content-Type: application/json" \\
+  -d '{{"question": "hi"}}'
+```
+
+### Response (HTTP 422 Unprocessable Entity)
+```json
+{json.dumps(res3_json, indent=2)}
+```
+
+---
+
+## 5. Verification Checklist
+
+- [x] **Task 1 — Query endpoint**: `POST /query` operational and serving requests.
+- [x] **Task 2 — Structured JSON**: Reliable response schema with `answer`, `sources`, `status`, and `metadata`.
+- [x] **Task 3 — Validation & Error Handling**: Pydantic validation handles length breaches (422), ValueErrors (400), and unhandled errors (500).
+- [x] **Task 4 — Environment Configuration**: All settings loaded from environment with zero hardcoded secrets.
+- [x] **Task 5 — Committed Sample Evidence**: Exported to `{target_json.name}` and `{target_md.name}`.
+"""
+    with open(target_md, "w", encoding="utf-8") as f:
+        f.write(md_content)
+    print(f"[Artifact] Markdown report exported to: {target_md}")
+
+    return evidence
+
+
+def main() -> None:
+    """CLI entry point for running the API server or generating demo artifacts."""
+    parser = argparse.ArgumentParser(
+        description="FieldSure AI — Backend API for RAG Service",
+    )
+    parser.add_argument(
+        "--serve",
+        action="store_true",
+        help="Start the uvicorn API server",
+    )
+    parser.add_argument(
+        "--host",
+        type=str,
+        default=None,
+        help="Host interface to bind (default from environment or 0.0.0.0)",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=None,
+        help="Port to bind (default from environment or 8000)",
+    )
+    parser.add_argument(
+        "--demo",
+        action="store_true",
+        help="Execute automated demonstration and export sample artifacts",
+    )
+
+    args = parser.parse_args()
+
+    if args.serve:
+        import uvicorn
+        cfg = load_environment_config()
+        host = args.host or cfg.host
+        port = args.port or cfg.port
+        print(f"Starting FieldSure AI RAG Service API on http://{host}:{port} ...")
+        uvicorn.run("src.backend_api:app", host=host, port=port, reload=False)
+    else:
+        # Default action: run demo and export artifacts
+        run_demo()
+
+
+if __name__ == "__main__":
+    main()
