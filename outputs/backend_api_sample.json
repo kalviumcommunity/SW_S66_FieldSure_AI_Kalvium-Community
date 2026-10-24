@@ -1,0 +1,117 @@
+{
+  "service": "FieldSure AI RAG Service API",
+  "concept": "3.44 Backend API for the RAG Service",
+  "configuration": {
+    "embedding_model": "text-embedding-3-small",
+    "vector_db_url": "http://localhost:6333",
+    "collection_name": "rag_chunks",
+    "chat_model": "gpt-4o-mini",
+    "api_base_url": "https://api.openai.com/v1",
+    "host": "0.0.0.0",
+    "port": 8000,
+    "api_key_configured": false,
+    "api_key_masked": "[NOT SET]"
+  },
+  "health": {
+    "status": "healthy",
+    "service": "FieldSure AI RAG Service",
+    "version": "0.1.0"
+  },
+  "demonstrations": [
+    {
+      "name": "grounded_answer_case",
+      "description": "Standard grounded retrieval query returning answer and sources.",
+      "request": {
+        "method": "POST",
+        "path": "/query",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "question": "What evidence is required for project submission?"
+        }
+      },
+      "response": {
+        "status_code": 200,
+        "body": {
+          "answer": "Based on verified protocol guidance :\nProject submission requires evidence such as git commits, automated test execution reports, and source citation traceability.\n\nNotice: FieldSure AI is an informational protocol assistant, not a clinical diagnostic system. Always refer patients with severe or worsening symptoms to the nearest primary health center (PHC).",
+          "sources": [
+            {
+              "source": "project_submission_policy.pdf",
+              "chunk_id": "proj_sub_std_2026_c0001",
+              "score": 0.75
+            }
+          ],
+          "status": "answered",
+          "metadata": {
+            "top_score": 0.75,
+            "chunks_used": 1,
+            "is_refused": false,
+            "total_sources": 1
+          }
+        }
+      }
+    },
+    {
+      "name": "refusal_guardrail_case",
+      "description": "Out-of-corpus query caught by guardrail returning safe refusal.",
+      "request": {
+        "method": "POST",
+        "path": "/query",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "question": "What is the refund policy for products?"
+        }
+      },
+      "response": {
+        "status_code": 200,
+        "body": {
+          "answer": "I don't have enough reliable context to answer that.",
+          "sources": [],
+          "status": "refused_weak_context",
+          "metadata": {
+            "top_score": 0.3333,
+            "chunks_used": 0,
+            "is_refused": true,
+            "total_sources": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "validation_error_case",
+      "description": "Short invalid query rejected by Pydantic schema validation.",
+      "request": {
+        "method": "POST",
+        "path": "/query",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "question": "hi"
+        }
+      },
+      "response": {
+        "status_code": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "string_too_short",
+              "loc": [
+                "body",
+                "question"
+              ],
+              "msg": "String should have at least 3 characters",
+              "input": "hi",
+              "ctx": {
+                "min_length": 3
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

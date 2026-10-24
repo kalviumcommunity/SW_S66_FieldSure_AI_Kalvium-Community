@@ -168,7 +168,14 @@
 - `src.rag_evaluation.summarize_evaluations(rows)`: Computes macro average scores across dimensions and isolates notable failures (`min score < 1.0`).
 - `src.rag_evaluation.format_evaluation_summary_md(summary, rows)`: Formats evaluation results, scores, and root-cause diagnoses into Markdown reports.
 - `src.rag_evaluation.run_rag_evaluation(...)`: End-to-end evaluation runner exporting JSON reports, test sets, and Markdown summaries.
-
+- `src.backend_api.create_app(pipeline_fn, config)`: FastAPI application factory exposing `POST /query`, `GET /health`, `GET /config`, `GET /`.
+- `src.backend_api.QueryRequest`: Pydantic input schema enforcing 3–1000 character length and non-whitespace validation.
+- `src.backend_api.Source`: Citation model with `source`, `chunk_id`, and retrieval `score`.
+- `src.backend_api.QueryResponse`: Structured response schema with `answer`, `sources`, `status`, and `metadata`.
+- `src.backend_api.load_environment_config(env_path, strict)`: Loads environment variables (`OPENAI_API_KEY`/`API_KEY`, `EMBEDDING_MODEL`, `VECTOR_DB_URL`, `COLLECTION_NAME`, `CHAT_MODEL`, `PORT`, `HOST`) with zero hardcoded credentials.
+- `src.backend_api.query_rag(request)`: Functional endpoint handler managing RAG execution, ValueError mapping (HTTP 400), and internal failure safety (HTTP 500).
+- `src.backend_api.run_demo(output_json, output_md)`: Test client execution runner generating sample request and response artifacts in `outputs/backend_api_sample.json` and `outputs/backend_api_sample.md`.
+- `src.api`: Alias module re-exporting `app`, `create_app`, `QueryRequest`, `QueryResponse`, `Source`, `load_environment_config`, and `query_rag`.
 
 ---
 
