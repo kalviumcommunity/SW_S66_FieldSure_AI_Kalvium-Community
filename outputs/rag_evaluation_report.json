@@ -1,0 +1,148 @@
+{
+  "summary": {
+    "questions": 7,
+    "avg_correctness": 0.8571,
+    "avg_grounding": 1.0,
+    "avg_citation_accuracy": 0.8571,
+    "overall_quality": 0.9047,
+    "passed_count": 6,
+    "failure_count": 1,
+    "failures": [
+      {
+        "question": "What is the recommended solar battery storage capacity for field shelters?",
+        "answer": "I don't have enough information in the provided context.",
+        "correctness": 0.0,
+        "grounding": 1.0,
+        "citation_accuracy": 0.0,
+        "citations": {},
+        "id": "eval_007_out_of_domain_retrieval_miss",
+        "category": "out_of_domain_failure",
+        "likely_cause": "weak_retrieval",
+        "failure_reason": "Retrieval failed to return chunks for the expected source document, leading to an empty citation map or a safe refusal admission.",
+        "recommendation": "Inspect retrieval query terms, tune embedding similarity thresholds, or increase top-k to capture the target documents."
+      }
+    ]
+  },
+  "rows": [
+    {
+      "question": "What evidence is required for project submission?",
+      "answer": "Based on verified protocol guidance:\nProject submission requires verifiable evidence including a PR link, sample output logs, and a video explanation walkthrough [1].\n\nNotice: FieldSure AI is an informational protocol assistant, not a clinical diagnostic system. Always refer patients with severe or worsening symptoms to the nearest primary health center (PHC).",
+      "correctness": 1.0,
+      "grounding": 1.0,
+      "citation_accuracy": 1.0,
+      "citations": {
+        "[1]": {
+          "source": "submission-rubric.md",
+          "chunk_id": "eval_submission_rubric_001",
+          "chunk_index": 0,
+          "section": "Submission Evidence Standards",
+          "text": "Project submission requires verifiable evidence including a PR link, sample output logs, and a video explanation walkthrough."
+        }
+      },
+      "id": "eval_001_project_submission",
+      "category": "grounded_rubric"
+    },
+    {
+      "question": "What should the system do when context is missing?",
+      "answer": "Based on verified protocol guidance:\nWhen context is missing, weak, or unrelated, the system must refuse and say not enough information or say not enough reliable context [1].\n\nNotice: FieldSure AI is an informational protocol assistant, not a clinical diagnostic system. Always refer patients with severe or worsening symptoms to the nearest primary health center (PHC).",
+      "correctness": 1.0,
+      "grounding": 1.0,
+      "citation_accuracy": 1.0,
+      "citations": {
+        "[1]": {
+          "source": "guardrails.md",
+          "chunk_id": "eval_guardrails_policy_001",
+          "chunk_index": 0,
+          "section": "Missing Context Fallback Policy",
+          "text": "When context is missing, weak, or unrelated, the system must refuse and say not enough information or say not enough reliable context."
+        }
+      },
+      "id": "eval_002_missing_context_refusal",
+      "category": "guardrails_policy"
+    },
+    {
+      "question": "Which warning signs require urgent referral for a dengue patient?",
+      "answer": "Based on verified protocol guidance:\nPersistent vomiting (> 3 episodes in 24 hours) [1]. Severe abdominal pain or tenderness [1]. Fluid accumulation (ascites, pleural effusion) [1]. Mucosal bleeding (epistaxis, gingival bleeding) [1]. Lethargy, restlessness, or altered sensorium [1]. Hepatomegaly (> 2 cm below costal margin) [1].\n\nNotice: FieldSure AI is an informational protocol assistant, not a clinical diagnostic system. Always refer patients with severe or worsening symptoms to the nearest primary health center (PHC).",
+      "correctness": 1.0,
+      "grounding": 1.0,
+      "citation_accuracy": 1.0,
+      "citations": {
+        "[1]": {
+          "source": "data/sample_advisories/who_dengue_clinical_guidance.md",
+          "chunk_id": "doc_who_dengue_guidance_2024_c0002",
+          "chunk_index": 2,
+          "section": "2. Red Flag Danger Signs Requiring Urgent Referral",
+          "text": "[Section: 2. Red Flag Danger Signs Requiring Urgent Referral]\nCommunity health workers must evaluate patients daily during the critical phase for warning signs:\n- Persistent vomiting (> 3 episodes in 24 hours).\n- Severe abdominal pain or tenderness.\n- Fluid accumulation (ascites, pleural effusion).\n- Mucosal bleeding (epistaxis, gingival bleeding).\n- Lethargy, restlessness, or altered sensorium.\n- Hepatomegaly (> 2 cm below costal margin).\n- Progressive hematocrit elevation with rapid platelet count drop."
+        }
+      },
+      "id": "eval_003_dengue_warning_signs",
+      "category": "clinical_triage"
+    },
+    {
+      "question": "What chlorine levels are required for drinking water in settlement camps?",
+      "answer": "Based on verified protocol guidance:\nWATER TREATMENT STANDARDS [1]. All drinking water distributed in settlement camps must be disinfected with sodium dichloroisocyanurate (NaDCC) or calcium hypochlorite [1]. Target Free Residual Chlorine (FRC) levels: [1]. At point of distribution: 0.5 to 1.0 mg/L (ppm) [1]. At household storage containers after 24 hours: Minimum 0.2 mg/L (ppm) [1]. Turbid water (NTU > 5) must undergo flocculation or filtration prior to chlorination [1].\n\nNotice: FieldSure AI is an informational protocol assistant, not a clinical diagnostic system. Always refer patients with severe or worsening symptoms to the nearest primary health center (PHC).",
+      "correctness": 1.0,
+      "grounding": 1.0,
+      "citation_accuracy": 1.0,
+      "citations": {
+        "[1]": {
+          "source": "data/sample_advisories/cdc_cholera_water_safety.txt",
+          "chunk_id": "doc_cdc_cholera_protocol_2024_c0001",
+          "chunk_index": 1,
+          "section": "2. WATER TREATMENT STANDARDS",
+          "text": "[Section: 2. WATER TREATMENT STANDARDS]\n2. WATER TREATMENT STANDARDS\n- All drinking water distributed in settlement camps must be disinfected with sodium dichloroisocyanurate (NaDCC) or calcium hypochlorite.\n- Target Free Residual Chlorine (FRC) levels:\n  * At point of distribution: 0.5 to 1.0 mg/L (ppm).\n  * At household storage containers after 24 hours: Minimum 0.2 mg/L (ppm).\n  * Turbid water (NTU > 5) must undergo flocculation or filtration prior to chlorination."
+        }
+      },
+      "id": "eval_004_cholera_water_treatment",
+      "category": "clinical_wash"
+    },
+    {
+      "question": "What are the steps for field testing with a malaria rapid diagnostic test?",
+      "answer": "Based on verified protocol guidance:\nVerify expiry date and desiccant packet integrity inside the foil pouch [1]. Clean patient fingertip with 70% alcohol swab; air dry completely [1]. Prick with single-use sterile lancet; collect 5 µL capillary blood using provided inverted cup applicator [1]. Add 4 drops of assay buffer immediately into well B [1]. Read results strictly between 15 and 20 minutes. Do not interpret after 30 minutes [1]. [Section: Step-by-Step RDT Field Testing Procedure] - Verify expiry date and desiccant packet integrity inside the foil pouch [1].\n\nNotice: FieldSure AI is an informational protocol assistant, not a clinical diagnostic system. Always refer patients with severe or worsening symptoms to the nearest primary health center (PHC).",
+      "correctness": 1.0,
+      "grounding": 1.0,
+      "citation_accuracy": 1.0,
+      "citations": {
+        "[1]": {
+          "source": "data/sample_advisories/moh_malaria_rapid_triage.html",
+          "chunk_id": "doc_moh_malaria_triage_2024_c0001",
+          "chunk_index": 1,
+          "section": "Step-by-Step RDT Field Testing Procedure",
+          "text": "[Section: Step-by-Step RDT Field Testing Procedure]\n- Verify expiry date and desiccant packet integrity inside the foil pouch.\n- Clean patient fingertip with 70% alcohol swab; air dry completely.\n- Prick with single-use sterile lancet; collect 5 µL capillary blood using provided inverted cup applicator.\n- Add 4 drops of assay buffer immediately into well B.\n- Read results strictly between 15 and 20 minutes. Do not interpret after 30 minutes."
+        },
+        "[2]": {
+          "source": "data/sample_advisories/moh_malaria_rapid_triage.html",
+          "chunk_id": "doc_moh_malaria_triage_2024_c0000",
+          "chunk_index": 0,
+          "section": "Clinical Triage & Risk Stratification",
+          "text": "[Section: Clinical Triage & Risk Stratification]\nNational Vector-Borne Disease Control Programme\nStandard Operating Procedure: Community Malaria Rapid Diagnostic Testing (RDT)\n\n1. Target Audience: Auxiliary Nurse Midwives (ANMs), Accredited Social Health Activists (ASHAs).\n2. Suspected Case Definition: Any individual presenting with acute intermittent fever with chills/rigors in an endemic block."
+        }
+      },
+      "id": "eval_005_malaria_rapid_test",
+      "category": "clinical_protocol"
+    },
+    {
+      "question": "What surgical intervention is recommended for acute dengue fever?",
+      "answer": "I don't have enough information in the provided context.",
+      "correctness": 1.0,
+      "grounding": 1.0,
+      "citation_accuracy": 1.0,
+      "citations": {},
+      "id": "eval_006_unsupported_medical_query",
+      "category": "safe_refusal"
+    },
+    {
+      "question": "What is the recommended solar battery storage capacity for field shelters?",
+      "answer": "I don't have enough information in the provided context.",
+      "correctness": 0.0,
+      "grounding": 1.0,
+      "citation_accuracy": 0.0,
+      "citations": {},
+      "id": "eval_007_out_of_domain_retrieval_miss",
+      "category": "out_of_domain_failure",
+      "likely_cause": "weak_retrieval",
+      "failure_reason": "Retrieval failed to return chunks for the expected source document, leading to an empty citation map or a safe refusal admission.",
+      "recommendation": "Inspect retrieval query terms, tune embedding similarity thresholds, or increase top-k to capture the target documents."
+    }
+  ]
+}

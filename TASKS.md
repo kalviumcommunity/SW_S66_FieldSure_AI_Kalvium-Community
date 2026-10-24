@@ -34,6 +34,8 @@
 | **#39** | Grounded Answer Generation | `Completed` | `src/grounded_generation.py`, `tests/test_grounded_generation.py`, `outputs/grounded_generation_sample.md` |
 | **#40** | Source Citation & Attribution | `Completed` | `src/source_citation.py`, `src/citation.py`, `tests/test_source_citation.py`, `outputs/source_citation_sample.md` |
 | **#41** | Hallucination Guardrails & Refusal Handling | `Completed` | `src/guardrails.py`, `src/hallucination_guardrails.py`, `tests/test_guardrails.py`, `outputs/guardrails_sample.md` |
+| **#42** | Conversational RAG & Follow-Up Context | `Completed` | `src/conversational_rag.py`, `src/conversation.py`, `tests/test_conversational_rag.py`, `outputs/conversational_rag_sample.md` |
+| **#43** | RAG Evaluation & Answer Quality Scoring | `Completed` | `src/rag_evaluation.py`, `src/evaluate_rag.py`, `tests/test_rag_evaluation.py`, `outputs/rag_evaluation_test_set.json`, `outputs/rag_evaluation_report.json`, `outputs/rag_evaluation_summary.md`, `outputs/rag_evaluation_sample.md` |
 
 ---
 
@@ -817,6 +819,42 @@
 - **Verification Evidence**:
   - 27 tests passing in `tests/test_conversational_rag.py`; 377 total test suite passing without regression.
   - Execution report and verified sample dialogues generated in `outputs/conversational_rag_sample.md`.
+
+---
+
+### Module #43: RAG Evaluation & Answer Quality Scoring
+- **Status**: `Completed`
+- **Objective**: Evaluate the end-to-end RAG system across correctness, grounding, and citation accuracy. Build a labeled test set containing questions, expected answer points, and expected sources; score answers for point coverage and retrieved context support; verify citation precision; summarize overall quality scores; diagnose notable failures with root-cause analysis (`weak_retrieval`, `missing_metadata`, `bad_citations`, `unsupported_claims`, `poor_prompt_instructions`); and commit evaluation scripts, test sets, scored reports, and summaries.
+- **Dependencies**: Module #42 (Conversational RAG & Follow-Up Context), Module #41 (Hallucination Guardrails & Refusal Handling), Module #40 (Source Citation & Attribution), Module #27 (Retrieval Evaluation & Recall Testing).
+- **Expected Files**:
+  - `src/rag_evaluation.py`
+  - `src/evaluate_rag.py`
+  - `tests/test_rag_evaluation.py`
+  - `outputs/rag_evaluation_test_set.json`
+  - `outputs/rag_evaluation_report.json`
+  - `outputs/rag_evaluation_summary.md`
+  - `outputs/rag_evaluation_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Task 1 — Prepare test set (`DEFAULT_TEST_SET`, `test_set`) containing queries, expected answer points, expected sources, and refusal expectations.
+  2. [x] Task 2 — Implement answer scoring dimensions: `judge_expected_points` for factual concept/refusal coverage and `judge_grounding` for claim support against retrieved context.
+  3. [x] Task 3 — Implement `check_citations` validating citation precision against expected source documents and detecting unwanted/fabricated citations.
+  4. [x] Task 4 — Implement `diagnose_failure` and `summarize_evaluations` computing average metrics across dimensions and classifying failure causes (`weak_retrieval`, `missing_metadata`, `bad_citations`, `unsupported_claims`, `poor_prompt_instructions`) with actionable recommendations.
+  5. [x] Task 5 — Implement end-to-end pipeline runner `score_answer`, `evaluate_test_set`, `run_rag_evaluation`, and CLI runner with `--self-test` option.
+  6. [x] Author comprehensive unit and integration test suite in `tests/test_rag_evaluation.py` (33 tests).
+  7. [x] Export and commit evaluation artifacts in `outputs/rag_evaluation_test_set.json`, `outputs/rag_evaluation_report.json`, `outputs/rag_evaluation_summary.md`, and `outputs/rag_evaluation_sample.md`.
+- **Acceptance Criteria**:
+  - Test set includes questions with expected answer points and expected source references.
+  - Scores answers across correctness, grounding, and citation accuracy.
+  - Checks citation accuracy against retrieved source documents.
+  - Summarizes overall quality and notable failures with automated root-cause diagnosis.
+  - Evaluation results, test set, scored results, citation checks, and summaries committed.
+  - Zero hardcoded secrets, zero credential leakage.
+- **Required Tests**:
+  - `tests/test_rag_evaluation.py`: 33 automated tests covering test set schema, correctness judging, grounding validation, citation accuracy, failure diagnostics, summary metrics, and end-to-end evaluation execution.
+- **Verification Evidence**:
+  - 33 tests passing in `tests/test_rag_evaluation.py`; 410 total test suite passing without regression.
+  - Execution reports generated in `outputs/rag_evaluation_report.json`, `outputs/rag_evaluation_summary.md`, and `outputs/rag_evaluation_sample.md`.
+
 
 
 

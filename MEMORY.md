@@ -1,14 +1,14 @@
 # FieldSure AI — Project Memory (MEMORY.md)
 
-> **Role**: Member 3 — RAG, Backend & Application (Module #42)  
+> **Role**: Member 3 — RAG, Backend & Application (Module #43)  
 > **Last Updated**: 2026-10-24
-> **Current Sprint Phase**: Conversational RAG & Follow-Up Context (Module #42)
+> **Current Sprint Phase**: RAG Evaluation & Answer Quality Scoring (Module #43)
 
 ---
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #42 (Conversational RAG & Follow-Up Context) completed.
+- **Current Active Task**: Module #43 (RAG Evaluation & Answer Quality Scoring) completed.
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
@@ -32,8 +32,9 @@
   - Module #40 (Source Citation & Attribution: `src/source_citation.py`, `src/citation.py`, `tests/test_source_citation.py`, `outputs/source_citation_sample.md`).
   - Module #41 (Hallucination Guardrails & Refusal Handling: `src/guardrails.py`, `src/hallucination_guardrails.py`, `tests/test_guardrails.py`, `outputs/guardrails_sample.md`).
   - Module #42 (Conversational RAG & Follow-Up Context: `src/conversational_rag.py`, `src/conversation.py`, `tests/test_conversational_rag.py`, `outputs/conversational_rag_sample.md`).
+  - Module #43 (RAG Evaluation & Answer Quality Scoring: `src/rag_evaluation.py`, `src/evaluate_rag.py`, `tests/test_rag_evaluation.py`, `outputs/rag_evaluation_test_set.json`, `outputs/rag_evaluation_report.json`, `outputs/rag_evaluation_summary.md`, `outputs/rag_evaluation_sample.md`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
-- **Next Planned Module**: Module #43 (RAG Evaluation & Answer Quality Scoring).
+- **Next Planned Module**: Module #44 / Backend API & UI Integration.
 
 ---
 
@@ -85,6 +86,11 @@
     - Rolling dialogue history management: tracks both user questions and assistant replies in `[{"role": role, "content": text}]` format, enforcing max turn (6) and token (600) budgets via `trim_history` without losing coreference context.
     - Guardrail integration: evaluates retrieval quality on the rewritten query; returns safe refusal (`"I don't have enough reliable context to answer that."`, `refused_weak_context`) on weak or out-of-corpus inquiries, preserving confident grounded answers (`answered`) when strong evidence exists.
     - Dual interface response: `ConversationalAnswer` dict subclass supporting dictionary subscripting (`res["rewritten_query"]`), attribute access (`res.rewritten_query`), and dict unpacking (`{**res}`).
+13. **RAG Evaluation & Multi-Dimensional Answer Quality Scoring**:
+    - Three-dimensional evaluation rubric: **Correctness** (point/concept coverage), **Grounding** (claim support in retrieved context), and **Citation Accuracy** (precision of cited source documents vs. expected references).
+    - Objective scoring: replaces subjective "vibes" with deterministic scoring (`judge_expected_points`, `judge_grounding`, `check_citations`).
+    - Grounding contract: safe refusals on missing or insufficient context are 100% grounded (score 1.0) because no unsupported factual claims are made.
+    - Automated failure root-cause taxonomy: automatically categorizes failures into `weak_retrieval`, `missing_metadata`, `bad_citations`, `unsupported_claims`, and `poor_prompt_instructions`, generating targeted remediation advice.
 
 ---
 
@@ -153,6 +159,15 @@
 - `src.conversational_rag.ConversationalAnswer`: Dict subclass response supporting dictionary subscripting, attribute access, and dict unpacking.
 - `src.conversational_rag.run_conversational_dialogue(questions, ...)`: Multi-turn sequential dialogue executor maintaining context across questions.
 - `src.conversational_rag.run_conversational_rag_demo(output_file)`: Execution verification runner generating sample multi-turn dialogues and reports.
+- `src.rag_evaluation.judge_expected_points(answer, expected_points)`: Measures factual coverage of expected concepts and refusal semantics.
+- `src.rag_evaluation.judge_grounding(answer, retrieved_sources)`: Evaluates sentence-level claim support in retrieved chunk context, treating safe refusals as fully grounded.
+- `src.rag_evaluation.check_citations(citations, expected_sources)`: Verifies citation accuracy against expected source document basenames, penalizing unwanted/fabricated citations.
+- `src.rag_evaluation.diagnose_failure(scored_result, example)`: Identifies likely cause (`weak_retrieval`, `missing_metadata`, `bad_citations`, `unsupported_claims`, `poor_prompt_instructions`) with actionable recommendations.
+- `src.rag_evaluation.score_answer(example, answer_fn, ...)`: Evaluates a single inquiry across all three dimensions, returning scores, citations, and failure diagnosis.
+- `src.rag_evaluation.evaluate_test_set(test_set, ...)`: Batches evaluation across the full test set.
+- `src.rag_evaluation.summarize_evaluations(rows)`: Computes macro average scores across dimensions and isolates notable failures (`min score < 1.0`).
+- `src.rag_evaluation.format_evaluation_summary_md(summary, rows)`: Formats evaluation results, scores, and root-cause diagnoses into Markdown reports.
+- `src.rag_evaluation.run_rag_evaluation(...)`: End-to-end evaluation runner exporting JSON reports, test sets, and Markdown summaries.
 
 
 ---

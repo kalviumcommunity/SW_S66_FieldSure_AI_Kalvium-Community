@@ -35,6 +35,8 @@ outputs/*.json
 !outputs/retrieval_tuning_report.json
 !outputs/retrieval_evaluation_queries.json
 !outputs/retrieval_evaluation_report.json
+!outputs/rag_evaluation_test_set.json
+!outputs/rag_evaluation_report.json
 !outputs/.gitkeep
 !outputs/chat_completion_sample.log
 !outputs/prompt_comparison_sample.log

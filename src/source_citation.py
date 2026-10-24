@@ -375,6 +375,7 @@ def retrieve(
     k: int = 4,
     store: Optional[Any] = None,
     chunks_path: Optional[Path] = None,
+    supplemental_chunks: Optional[Sequence[Dict[str, Any]]] = None,
 ) -> List[Dict[str, Any]]:
     """Retrieve top-k relevant chunks for a question.
 
@@ -387,6 +388,7 @@ def retrieve(
         k: Maximum number of chunks to return.
         store: Optional vector store instance.
         chunks_path: Optional custom path to ingested chunks JSONL.
+        supplemental_chunks: Optional additional chunks to search alongside corpus.
 
     Returns:
         List of matching chunk dictionaries.
@@ -417,6 +419,9 @@ def retrieve(
 
     # Fallback to ingested corpus JSONL
     all_chunks = _load_ingested_chunks_fallback(chunks_path)
+    if supplemental_chunks is not None:
+        all_chunks.extend(supplemental_chunks)
+
     if not all_chunks:
         return []
 
@@ -463,6 +468,16 @@ def _generate_offline_cited_answer(prompt: str) -> str:
         if token.lower() not in _STOP_WORDS and len(token) > 2
     }
 
+    # If a critical specific query term is completely absent from context (e.g. 'surgical'),
+    # then context does not support answering this question
+    unsupported_critical_terms = {
+        qt for qt in query_tokens
+        if qt in {"surgical", "surgery", "antibiotic", "radiation", "chemotherapy"}
+        and qt not in context_text.lower()
+    }
+    if unsupported_critical_terms:
+        return FALLBACK_NO_CONTEXT
+
     # Parse numbered context blocks
     raw_blocks = re.split(r"(?=\[\d+\]\s*Source:)", context_text)
     cited_sentences: List[str] = []
@@ -480,6 +495,21 @@ def _generate_offline_cited_answer(prompt: str) -> str:
         body_lines = [l for l in lines[1:] if l.strip() and not l.startswith("#")]
         body_text = " ".join(body_lines)
 
+        # If the block itself strongly matches query, extract bullet items
+        block_lower = block_clean.lower()
+        block_matched = sum(1 for qt in query_tokens if qt in block_lower) >= (
+            2 if len(query_tokens) >= 3 else 1
+        )
+        if block_matched:
+            for line in lines:
+                l_str = line.strip()
+                if l_str.startswith(("-", "*", "•")) or re.match(r"^\d+\.\s+", l_str):
+                    clean_item = re.sub(r"^[-*•\d.]+\s*", "", l_str).strip()
+                    if clean_item and len(clean_item) > 10:
+                        cited_item = f"{clean_item.rstrip('.')} {marker}."
+                        if cited_item not in cited_sentences:
+                            cited_sentences.append(cited_item)
+
         # Sentence-level extraction
         sentences = re.split(r"(?<=[.!?])\s+", body_text)
         for sentence in sentences:
@@ -487,7 +517,11 @@ def _generate_offline_cited_answer(prompt: str) -> str:
             if not s_clean:
                 continue
             s_lower = s_clean.lower()
-            if any(qt in s_lower for qt in query_tokens):
+            matched_count = sum(1 for qt in query_tokens if qt in s_lower)
+            min_required = 2 if len(query_tokens) >= 3 else 1
+            if matched_count >= min_required or any(
+                qt in s_lower for qt in query_tokens if len(qt) >= 6 and qt not in {"management", "protocol"}
+            ):
                 # Clean bullet markers
                 claim = re.sub(r"^[-*•\d.]+\s*", "", s_clean).strip()
                 if claim and len(claim) > 15:
@@ -498,7 +532,7 @@ def _generate_offline_cited_answer(prompt: str) -> str:
     if not cited_sentences:
         return FALLBACK_NO_CONTEXT
 
-    answer_body = " ".join(cited_sentences[:4])
+    answer_body = " ".join(cited_sentences[:6])
     return (
         f"Based on verified protocol guidance:\n"
         f"{answer_body}\n\n"
@@ -551,6 +585,7 @@ def answer_with_citations(
     retriever_fn: Optional[Callable[[str, int], Sequence[Dict[str, Any]]]] = None,
     llm_fn: Optional[Callable[[str], str]] = None,
     k: int = 4,
+    supplemental_chunks: Optional[Sequence[Dict[str, Any]]] = None,
 ) -> CitedAnswer:
     """Generate a verifiable answer with citations mapped to retrieved sources.
 
@@ -563,6 +598,7 @@ def answer_with_citations(
         retriever_fn: Optional custom retrieval callable. Defaults to ``retrieve``.
         llm_fn: Optional callable for LLM invocation. Defaults to ``call_llm``.
         k: Maximum chunks to retrieve if chunks is None.
+        supplemental_chunks: Optional additional chunks to search alongside corpus.
 
     Returns:
         A ``CitedAnswer`` dict with ``'answer'`` and ``'citations'``.
@@ -578,7 +614,11 @@ def answer_with_citations(
         if retriever_fn is not None:
             retrieved = list(retriever_fn(question, k))
         else:
-            retrieved = retrieve(question, k=k)
+            retrieved = retrieve(
+                question,
+                k=k,
+                supplemental_chunks=supplemental_chunks,
+            )
     else:
         retrieved = list(chunks)
 
