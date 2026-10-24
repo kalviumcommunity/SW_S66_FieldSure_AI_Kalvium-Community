@@ -1,14 +1,14 @@
 # FieldSure AI — Project Memory (MEMORY.md)
 
-> **Role**: Member 3 — RAG, Backend & Application (Module #41)  
+> **Role**: Member 3 — RAG, Backend & Application (Module #42)  
 > **Last Updated**: 2026-10-24
-> **Current Sprint Phase**: Hallucination Guardrails & Refusal Handling (Module #41)
+> **Current Sprint Phase**: Conversational RAG & Follow-Up Context (Module #42)
 
 ---
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #41 (Hallucination Guardrails & Refusal Handling) completed.
+- **Current Active Task**: Module #42 (Conversational RAG & Follow-Up Context) completed.
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
@@ -31,8 +31,9 @@
   - Module #39 (Grounded Answer Generation: `src/grounded_generation.py`, `tests/test_grounded_generation.py`, `outputs/grounded_generation_sample.md`).
   - Module #40 (Source Citation & Attribution: `src/source_citation.py`, `src/citation.py`, `tests/test_source_citation.py`, `outputs/source_citation_sample.md`).
   - Module #41 (Hallucination Guardrails & Refusal Handling: `src/guardrails.py`, `src/hallucination_guardrails.py`, `tests/test_guardrails.py`, `outputs/guardrails_sample.md`).
+  - Module #42 (Conversational RAG & Follow-Up Context: `src/conversational_rag.py`, `src/conversation.py`, `tests/test_conversational_rag.py`, `outputs/conversational_rag_sample.md`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
-- **Next Planned Module**: Module #42 (RAG Evaluation & Answer Quality Scoring).
+- **Next Planned Module**: Module #43 (RAG Evaluation & Answer Quality Scoring).
 
 ---
 
@@ -76,10 +77,14 @@
    - Verifiability: `verify_citation` and `verify_all_citations` confirm claim-level source chunk lexical support.
    - Anti-hallucination guardrail: `detect_fabricated_citations` flags illegitimate markers; zero-chunk queries yield clean fallback (`"I don't have enough information in the provided context."`) with zero citations.
 11. **Hallucination Guardrails & Refusal Protocol**:
-   - Pre-generation quality check: evaluate retrieval strength before calling generation models, preventing the LLM from inventing answers from poor evidence.
-   - Dual threshold enforcement: `MIN_TOP_SCORE = 0.72` and `MIN_SUPPORTING_CHUNKS = 1` derived from retrieval tuning and recall evaluations.
    - Safe refusal standard: returns `"I don't have enough reliable context to answer that."` with `status="refused_weak_context"` and `sources=[]`.
    - Dual interface response: `GuardedAnswer` dict subclass supporting subscripting (`result["status"]`), attribute access (`result.status`), and dict unpacking (`{**result}`).
+12. **Conversational RAG & Coreference Resolution**:
+    - Pre-retrieval query rewriting: transforms conversational follow-ups (e.g. "What about the video?", "Does it apply to Sprint 2?", "Can you explain that?") into self-contained standalone search queries using dialogue history before embedding and retrieval.
+    - Naive vs. rewritten disambiguation: prevents ambiguous or fragmentary queries from matching unrelated chunks (e.g., commercial camera setup) or missing relevant context.
+    - Rolling dialogue history management: tracks both user questions and assistant replies in `[{"role": role, "content": text}]` format, enforcing max turn (6) and token (600) budgets via `trim_history` without losing coreference context.
+    - Guardrail integration: evaluates retrieval quality on the rewritten query; returns safe refusal (`"I don't have enough reliable context to answer that."`, `refused_weak_context`) on weak or out-of-corpus inquiries, preserving confident grounded answers (`answered`) when strong evidence exists.
+    - Dual interface response: `ConversationalAnswer` dict subclass supporting dictionary subscripting (`res["rewritten_query"]`), attribute access (`res.rewritten_query`), and dict unpacking (`{**res}`).
 
 ---
 
@@ -139,6 +144,15 @@
 - `src.guardrails.guarded_answer(question, ...)`: Pipeline entry point refusing weak context (`"refused_weak_context"`) and returning confident grounded answers (`"answered"`).
 - `src.guardrails.GuardedAnswer`: Dict subclass response supporting dictionary subscripting, attribute access, and dict unpacking.
 - `src.guardrails.run_guardrails_demo(output_file)`: Execution verification runner generating sample refusal and answer reports.
+- `src.conversational_rag.format_history_text(history)`: Formats user and assistant message history for prompt injection and diagnostic logging.
+- `src.conversational_rag.trim_history(history, max_turns, max_tokens)`: In-place rolling history pruner preserving recent turns under token limits.
+- `src.conversational_rag.rewrite_followup(history, question, llm_fn)`: Rewrites dependent follow-ups into standalone queries resolving references.
+- `src.conversational_rag.retrieve(question, k, ...)`: Retrieves scored context chunks from ingested corpus and benchmark chunks.
+- `src.conversational_rag.compare_retrieval(history, question, ...)`: Compares naive vs rewritten query retrieval metrics demonstrating precision gain.
+- `src.conversational_rag.conversational_answer(history, user_question, ...)`: Multi-turn pipeline orchestrator rewriting queries, retrieving context, enforcing guardrails, and appending to history.
+- `src.conversational_rag.ConversationalAnswer`: Dict subclass response supporting dictionary subscripting, attribute access, and dict unpacking.
+- `src.conversational_rag.run_conversational_dialogue(questions, ...)`: Multi-turn sequential dialogue executor maintaining context across questions.
+- `src.conversational_rag.run_conversational_rag_demo(output_file)`: Execution verification runner generating sample multi-turn dialogues and reports.
 
 
 ---
