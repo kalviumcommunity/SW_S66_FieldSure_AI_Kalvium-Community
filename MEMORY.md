@@ -1,14 +1,14 @@
 # FieldSure AI — Project Memory (MEMORY.md)
 
-> **Role**: Member 3 — RAG, Backend & Application (Module #43)  
-> **Last Updated**: 2026-10-24
-> **Current Sprint Phase**: RAG Evaluation & Answer Quality Scoring (Module #43)
+> **Role**: Member 3 — RAG, Backend & Application (Module #46)  
+> **Last Updated**: 2026-10-26
+> **Current Sprint Phase**: Chat Interface & Query UI (Module #46)
 
 ---
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #43 (RAG Evaluation & Answer Quality Scoring) completed.
+- **Current Active Task**: Module #46 (Chat Interface & Query UI) completed.
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
@@ -33,8 +33,10 @@
   - Module #41 (Hallucination Guardrails & Refusal Handling: `src/guardrails.py`, `src/hallucination_guardrails.py`, `tests/test_guardrails.py`, `outputs/guardrails_sample.md`).
   - Module #42 (Conversational RAG & Follow-Up Context: `src/conversational_rag.py`, `src/conversation.py`, `tests/test_conversational_rag.py`, `outputs/conversational_rag_sample.md`).
   - Module #43 (RAG Evaluation & Answer Quality Scoring: `src/rag_evaluation.py`, `src/evaluate_rag.py`, `tests/test_rag_evaluation.py`, `outputs/rag_evaluation_test_set.json`, `outputs/rag_evaluation_report.json`, `outputs/rag_evaluation_summary.md`, `outputs/rag_evaluation_sample.md`).
+  - Module #44 (Backend API for the RAG Service: `src/backend_api.py`, `src/api.py`, `tests/test_backend_api.py`, `outputs/backend_api_sample.json`, `outputs/backend_api_sample.md`).
+  - Module #45 (Document Upload & Indexing Endpoint: `src/document_upload.py`, `src/backend_api.py`, `tests/test_document_upload.py`, `outputs/document_upload_sample.json`, `outputs/document_upload_sample.md`).
+  - Module #46 (Chat Interface & Query UI: `frontend/`, `src/query_ui_demo.py`, `tests/test_query_ui.py`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
-- **Next Planned Module**: Module #44 / Backend API & UI Integration.
 
 ---
 
@@ -187,6 +189,12 @@
 - `src.document_upload.upload_document(file, upload_dir, store)`: Functional async handler returning `UploadResponse` with indexing summary.
 - `src.document_upload.run_upload_demo(sample_file, output_json, output_md)`: Test runner demonstrating upload execution, runtime query searchability, and error handling.
 - `src.api`: Consolidated API entry point re-exporting backend API and document upload endpoints and models.
+- `frontend.src.lib.api.askQuestion(question, baseUrl)`: Async client dispatching query requests to `POST /query` and returning typed answers with citations and latency metadata.
+- `frontend.src.lib.api.checkHealth(baseUrl)`: Health check client pinging `GET /health` with latency measurement.
+- `frontend.src.lib.api.uploadDocument(file, baseUrl)`: Multi-format document upload client for runtime knowledge base ingestion via `POST /documents`.
+- `frontend.src.components.AnswerCard`: React component displaying grounded answers with confidence badges, disclaimers, and clipboard actions.
+- `frontend.src.components.SourcesList`: React component rendering retrieved document citations, chunk identifiers, and similarity score tags.
+- `src.query_ui_demo.run_sample_interactions(output_json, output_md)`: Test runner generating JSON and Markdown interaction evidence across 6 query and refusal scenarios.
 
 ---
 
