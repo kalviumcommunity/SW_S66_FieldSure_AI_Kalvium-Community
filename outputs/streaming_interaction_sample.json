@@ -1,0 +1,53 @@
+{
+  "service": "FieldSure AI Streaming Service",
+  "concept": "3.47 Streaming Responses & Citation Display",
+  "interactions": [
+    {
+      "scenario": "grounded_answer_streaming",
+      "question": "What evidence is required for project submission?",
+      "citations": [
+        {
+          "id": "source-1",
+          "label": "[1]",
+          "document": "FieldSure AI Project Submission Standards",
+          "source": "FieldSure AI Project Submission Standards",
+          "chunk_id": "proj_sub_std_2026_c0001",
+          "section": "Evidence Requirements",
+          "score": 0.75,
+          "text": "Project submission requires evidence such as git commits, automated test execution reports, and source citation traceability."
+        }
+      ],
+      "token_count": 50,
+      "accumulated_answer": "Based on verified protocol guidance :\nProject submission requires evidence such as git commits, automated test execution reports, and source citation traceability.\n\nNotice: FieldSure AI is an informational protocol assistant, not a clinical diagnostic system. Always refer patients with severe or worsening symptoms to the nearest primary health center (PHC).",
+      "has_done_event": true
+    },
+    {
+      "scenario": "safe_refusal_streaming",
+      "question": "What is the return policy for retail equipment?",
+      "citations": [],
+      "token_count": 9,
+      "status": "refused_weak_context",
+      "accumulated_answer": "I don't have enough reliable context to answer that."
+    },
+    {
+      "scenario": "stream_interruption_simulation",
+      "question": "What evidence is required for project submission?",
+      "interrupted_at_token": 25,
+      "total_tokens_available": 50,
+      "partial_text": "Based on verified protocol guidance :\nProject submission requires evidence such as git commits, automated test execution reports, and source citation traceability.\n\nNotice: FieldSure AI ",
+      "preserved_citations": [
+        {
+          "id": "source-1",
+          "label": "[1]",
+          "document": "FieldSure AI Project Submission Standards",
+          "source": "FieldSure AI Project Submission Standards",
+          "chunk_id": "proj_sub_std_2026_c0001",
+          "section": "Evidence Requirements",
+          "score": 0.75,
+          "text": "Project submission requires evidence such as git commits, automated test execution reports, and source citation traceability."
+        }
+      ],
+      "recovery_action": "Retry query with preserved evidence in UI"
+    }
+  ]
+}

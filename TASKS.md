@@ -37,8 +37,8 @@
 | **#42** | Conversational RAG & Follow-Up Context | `Completed` | `src/conversational_rag.py`, `src/conversation.py`, `tests/test_conversational_rag.py`, `outputs/conversational_rag_sample.md` |
 | **#43** | RAG Evaluation & Answer Quality Scoring | `Completed` | `src/rag_evaluation.py`, `src/evaluate_rag.py`, `tests/test_rag_evaluation.py`, `outputs/rag_evaluation_test_set.json`, `outputs/rag_evaluation_report.json`, `outputs/rag_evaluation_summary.md`, `outputs/rag_evaluation_sample.md` |
 | **#44** | Backend API for the RAG Service | `Completed` | `src/backend_api.py`, `src/api.py`, `tests/test_backend_api.py`, `outputs/backend_api_sample.json`, `outputs/backend_api_sample.md` |
-| **#45** | Document Upload & Indexing Endpoint | `Completed` | `src/document_upload.py`, `src/backend_api.py`, `tests/test_document_upload.py`, `outputs/document_upload_sample.json`, `outputs/document_upload_sample.md` |
 | **#46** | Chat Interface & Query UI | `Completed` | `frontend/`, `src/query_ui_demo.py`, `tests/test_query_ui.py` |
+| **#47** | Streaming Responses & Citation Display | `Completed` | `src/backend_api.py`, `src/streaming_demo.py`, `frontend/`, `tests/test_streaming.py`, `outputs/streaming_interaction_sample.json`, `outputs/streaming_interaction_sample.md` |
 
 ---
 
@@ -961,4 +961,45 @@
   - 12 tests passing in `tests/test_query_ui.py`; 470 total test suite passing without regression.
   - Next.js production build (`npm run build`) compiled successfully in 262ms with 0 errors.
   - Browser subagent verified live UI execution at `http://localhost:3000` against FastAPI backend at `http://localhost:8001`.
+
+---
+
+### Module #47: Streaming Responses & Citation Display
+- **Status**: `Completed`
+- **Objective**: Connect a streaming backend response (`POST /query/stream`) to a chat UI and display cited source evidence clearly. Stream answers progressively using Server-Sent Events (SSE) instead of waiting for full completions, display citations beside/below the answer with visible source markers `[1]`, document names, chunk IDs, and sections, allow users to expand and inspect full cited source text, handle interruptions and errors gracefully by preserving partial text and citations with retry action, and commit sample interaction code and artifacts.
+- **Dependencies**: Module #46 (Chat Interface & Query UI), Module #44 (Backend API for RAG Service), Module #41 (Hallucination Guardrails & Refusal Handling), Module #40 (Source Citation & Attribution).
+- **Expected Files**:
+  - `src/backend_api.py`
+  - `src/api.py`
+  - `src/streaming_demo.py`
+  - `frontend/src/types/rag.ts`
+  - `frontend/src/lib/api.ts`
+  - `frontend/src/components/SourcesList.tsx`
+  - `frontend/src/components/AnswerCard.tsx`
+  - `frontend/src/app/page.tsx`
+  - `frontend/src/app/globals.css`
+  - `tests/test_streaming.py`
+  - `outputs/streaming_interaction_sample.json`
+  - `outputs/streaming_interaction_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Task 1 — Stream answers progressively: Implemented `rag_pipeline_stream` and `POST /query/stream` emitting Server-Sent Events (`citations`, `token`, `done`, `error`) and connected to `streamAnswer` in frontend UI.
+  2. [x] Task 2 — Display citations clearly: Rendered visible citation markers (`[1]`), document names, chunk IDs, section details, and similarity score badges.
+  3. [x] Task 3 — Let users view cited sources: Built expandable `<details>` / `<summary>` cards with full source passage text inspection, copy excerpt action, and expand/collapse all toggle.
+  4. [x] Task 4 — Handle streaming errors: Maintained partial answers and received citations on interruptions or errors, provided inline retry action, enabled stop generation button, and avoided false success states.
+  5. [x] Task 5 — Commit sample interaction: Authored `src/streaming_demo.py` and exported verified interaction evidence in `outputs/streaming_interaction_sample.json` and `outputs/streaming_interaction_sample.md`.
+  6. [x] Author comprehensive automated unit and integration test suite in `tests/test_streaming.py` (12 tests).
+- **Acceptance Criteria**:
+  - Backend `POST /query/stream` emits Server-Sent Events with `text/event-stream` media type.
+  - Answers stream to the interface progressively token by token.
+  - Citations display visible markers `[1]`, document names, chunk IDs, and sections.
+  - Users can expand citations to inspect exact retrieved chunk text.
+  - Interruptions, cancellations, and errors are handled cleanly without losing partial output or citations.
+  - Full test suite passing with zero regressions.
+- **Required Tests**:
+  - `tests/test_streaming.py`: 12 automated tests covering SSE wire format, progressive token assembly, citation metadata completeness, source text verifiability, safe refusal streaming, validation errors, error events, and artifact generation.
+- **Verification Evidence**:
+  - 12 tests passing in `tests/test_streaming.py`; 482 total test suite passing without regression.
+  - Next.js production build (`npm run build`) compiled successfully with 0 errors.
+  - Live browser subagent verified progressive streaming, citation details expansion, source text inspection, and out-of-domain safe refusal streaming at `http://localhost:3000`.
+  - Artifacts exported to `outputs/streaming_interaction_sample.json` and `outputs/streaming_interaction_sample.md`.
 

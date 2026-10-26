@@ -10,7 +10,9 @@ from src.backend_api import (
     create_app,
     load_environment_config,
     query_rag,
+    rag_pipeline_stream,
     run_demo,
+    stream_query,
     upload_document,
 )
 from src.document_upload import (
@@ -43,6 +45,8 @@ __all__ = [
     "APIConfig",
     "load_environment_config",
     "query_rag",
+    "rag_pipeline_stream",
+    "stream_query",
     "run_demo",
     # Concept 3.45: Document Upload & Indexing
     "UploadResponse",

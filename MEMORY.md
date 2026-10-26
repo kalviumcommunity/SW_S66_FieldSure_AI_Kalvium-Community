@@ -1,14 +1,14 @@
 # FieldSure AI — Project Memory (MEMORY.md)
 
-> **Role**: Member 3 — RAG, Backend & Application (Module #46)  
+> **Role**: Member 3 — RAG, Backend & Application (Module #47)  
 > **Last Updated**: 2026-10-26
-> **Current Sprint Phase**: Chat Interface & Query UI (Module #46)
+> **Current Sprint Phase**: Streaming Responses & Citation Display (Module #47)
 
 ---
 
 ## 1. Module Progress
 
-- **Current Active Task**: Module #46 (Chat Interface & Query UI) completed.
+- **Current Active Task**: Module #47 (Streaming Responses & Citation Display) completed.
 - **Completed Modules**:
   - Module #1 (Development Environment & Project Workspace Setup: `pyproject.toml`, `.env.example`, `.gitignore`, directory scaffolding, `tests/test_workspace.py`).
   - Module #3 (LLM API Access & First Completion Call: `src/config.py`, `src/llm_client.py`, `src/chat_completion.py`, `outputs/chat_completion_sample.log`, `tests/test_llm_client.py`).
@@ -36,6 +36,7 @@
   - Module #44 (Backend API for the RAG Service: `src/backend_api.py`, `src/api.py`, `tests/test_backend_api.py`, `outputs/backend_api_sample.json`, `outputs/backend_api_sample.md`).
   - Module #45 (Document Upload & Indexing Endpoint: `src/document_upload.py`, `src/backend_api.py`, `tests/test_document_upload.py`, `outputs/document_upload_sample.json`, `outputs/document_upload_sample.md`).
   - Module #46 (Chat Interface & Query UI: `frontend/`, `src/query_ui_demo.py`, `tests/test_query_ui.py`).
+  - Module #47 (Streaming Responses & Citation Display: `src/backend_api.py`, `src/streaming_demo.py`, `frontend/`, `tests/test_streaming.py`, `outputs/streaming_interaction_sample.json`, `outputs/streaming_interaction_sample.md`).
 - **In-Progress Modules**: Module #2 (GitHub Repository & Team Workflow Setup: Git initialized, docs established, scaffolding complete).
 
 ---
@@ -195,6 +196,10 @@
 - `frontend.src.components.AnswerCard`: React component displaying grounded answers with confidence badges, disclaimers, and clipboard actions.
 - `frontend.src.components.SourcesList`: React component rendering retrieved document citations, chunk identifiers, and similarity score tags.
 - `src.query_ui_demo.run_sample_interactions(output_json, output_md)`: Test runner generating JSON and Markdown interaction evidence across 6 query and refusal scenarios.
+- `src.backend_api.rag_pipeline_stream(question, ...)`: Async generator streaming citations event followed by progressive answer token events and done/error.
+- `src.backend_api.stream_query(request)`: Standalone functional streaming handler returning Server-Sent Events `StreamingResponse`.
+- `frontend.src.lib.api.streamAnswer(question, callbacks, ...)`: Client-side SSE stream consumer with partial line buffering, abort controller support, and error recovery.
+- `src.streaming_demo.run_streaming_demo(output_json, output_md)`: Test runner generating JSON and Markdown interaction evidence for progressive answer streaming and citation inspection.
 
 ---
 

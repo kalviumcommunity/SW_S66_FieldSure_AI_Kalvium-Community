@@ -1,16 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Header } from "../components/Header";
 import { QueryInput } from "../components/QueryInput";
 import { AnswerCard } from "../components/AnswerCard";
 import { DocumentUploadWidget } from "../components/DocumentUploadWidget";
 import { SettingsModal } from "../components/SettingsModal";
-import { askQuestion, checkHealth, getApiBaseUrl } from "../lib/api";
+import { askQuestion, checkHealth, getApiBaseUrl, streamAnswer } from "../lib/api";
 import { HealthStatus, QueryResponse } from "../types/rag";
 
 export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
+  const [isStreaming, setIsStreaming] = useState<boolean>(false);
+  const [streamInterrupted, setStreamInterrupted] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [currentResult, setCurrentResult] = useState<QueryResponse | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState<string>("");
@@ -21,6 +23,8 @@ export default function Home() {
   const [history, setHistory] = useState<
     Array<{ question: string; result: QueryResponse; timestamp: string }>
   >([]);
+
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Periodically check backend health
   const refreshHealth = useCallback(async () => {
@@ -44,31 +48,128 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [refreshHealth]);
 
-  // Handle RAG question submission
+  // Clean up any in-flight stream on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
+  // Stop active stream upon user action
+  const handleStopStream = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsStreaming(false);
+    setLoading(false);
+    setStreamInterrupted(true);
+    setError("The answer stopped streaming because it was cancelled.");
+  };
+
+  // Handle progressive streaming question submission
   const handleAskQuestion = async (question: string) => {
+    // Abort any existing stream
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
     setLoading(true);
+    setIsStreaming(true);
+    setStreamInterrupted(false);
     setError(null);
     setCurrentQuestion(question);
 
+    // Initial placeholder response for immediate visual feedback
+    const initialResponse: QueryResponse = {
+      answer: "",
+      sources: [],
+      status: "streaming",
+      metadata: {},
+    };
+    setCurrentResult(initialResponse);
+
     try {
-      const result = await askQuestion(question);
-      setCurrentResult(result);
-      setHistory((prev) => [
+      await streamAnswer(
+        question,
         {
-          question,
-          result,
-          timestamp: new Date().toLocaleTimeString(),
+          onCitations: (sources) => {
+            setCurrentResult((prev) => ({
+              ...(prev || initialResponse),
+              sources,
+            }));
+            setLoading(false);
+          },
+          onToken: (token) => {
+            setCurrentResult((prev) => ({
+              ...(prev || initialResponse),
+              answer: (prev?.answer || "") + token,
+            }));
+            setLoading(false);
+          },
+          onStatus: (status) => {
+            setCurrentResult((prev) => ({
+              ...(prev || initialResponse),
+              status,
+            }));
+          },
+          onMetadata: (metadata) => {
+            setCurrentResult((prev) => ({
+              ...(prev || initialResponse),
+              metadata: {
+                ...(prev?.metadata || {}),
+                ...metadata,
+              },
+            }));
+          },
+          onError: (errMsg) => {
+            setError(errMsg);
+            setStreamInterrupted(true);
+            setIsStreaming(false);
+            setLoading(false);
+          },
+          onDone: () => {
+            setIsStreaming(false);
+            setLoading(false);
+            setCurrentResult((latest) => {
+              if (latest && latest.answer) {
+                // Record completed interaction in session history
+                setHistory((prev) => [
+                  {
+                    question,
+                    result: latest,
+                    timestamp: new Date().toLocaleTimeString(),
+                  },
+                  ...prev.slice(0, 9),
+                ]);
+              }
+              return latest;
+            });
+          },
         },
-        ...prev.slice(0, 9), // keep last 10
-      ]);
+        getApiBaseUrl(),
+        abortController.signal
+      );
     } catch (err: unknown) {
-      const msg =
-        err instanceof Error
-          ? err.message
-          : "Could not get an answer. Please check if the backend service is running and try again.";
-      setError(msg);
+      if (abortController.signal.aborted) {
+        setStreamInterrupted(true);
+        setError("The answer stopped streaming because it was cancelled.");
+      } else {
+        const msg =
+          err instanceof Error
+            ? err.message
+            : "The answer stopped streaming. Please try again.";
+        setError(msg);
+        setStreamInterrupted(true);
+      }
     } finally {
+      setIsStreaming(false);
       setLoading(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -85,28 +186,31 @@ export default function Home() {
       <div className="content-grid">
         {/* Left Column: Query Workspace */}
         <div className="workspace-card">
-          <QueryInput onAsk={handleAskQuestion} loading={loading} />
+          <QueryInput
+            onAsk={handleAskQuestion}
+            loading={loading || isStreaming}
+          />
 
-          {/* Loading Indicator */}
-          {loading && (
+          {/* Initial Loading Indicator (Before first stream event) */}
+          {loading && !currentResult?.answer && (!currentResult?.sources || currentResult.sources.length === 0) && (
             <div className="loading-box" role="status" aria-live="polite">
               <div className="spinner" />
               <div className="loading-text">
-                <strong>Retrieving evidence & generating grounded answer...</strong>
+                <strong>Retrieving evidence & preparing stream...</strong>
                 <span className="loading-subtext">
-                  Checking relevance guardrails, scanning indexed vector chunks, and assembling source citations.
+                  Scanning vector index, checking relevance thresholds, and preparing progressive tokens.
                 </span>
               </div>
             </div>
           )}
 
           {/* Error Banner */}
-          {error && !loading && (
+          {error && (
             <div className="error-banner" role="alert">
               <div className="error-content">
                 <span className="error-icon">⚠️</span>
                 <div>
-                  <div className="error-title">Query Request Failed</div>
+                  <div className="error-title">Streaming Interruption / Error</div>
                   <div className="error-message">{error}</div>
                 </div>
               </div>
@@ -121,8 +225,8 @@ export default function Home() {
             </div>
           )}
 
-          {/* Grounded Answer & Sources Display */}
-          {currentResult && !loading && (
+          {/* Progressive Grounded Answer & Citations Display */}
+          {currentResult && (currentResult.answer || (currentResult.sources && currentResult.sources.length > 0) || isStreaming) && (
             <div style={{ marginTop: 8 }}>
               <div
                 style={{
@@ -133,7 +237,13 @@ export default function Home() {
               >
                 Inquiry: <strong style={{ color: "var(--text-primary)" }}>&ldquo;{currentQuestion}&rdquo;</strong>
               </div>
-              <AnswerCard result={currentResult} />
+              <AnswerCard
+                result={currentResult}
+                isStreaming={isStreaming}
+                isInterrupted={streamInterrupted}
+                onRetry={() => currentQuestion && handleAskQuestion(currentQuestion)}
+                onStop={handleStopStream}
+              />
             </div>
           )}
         </div>
@@ -171,6 +281,8 @@ export default function Home() {
                       setCurrentQuestion(item.question);
                       setCurrentResult(item.result);
                       setError(null);
+                      setStreamInterrupted(false);
+                      setIsStreaming(false);
                     }}
                     style={{
                       background: "rgba(15, 23, 42, 0.4)",
@@ -224,6 +336,12 @@ export default function Home() {
             </h3>
             <div>
               <div className="telemetry-row">
+                <span>Streaming API</span>
+                <span className="telemetry-value" style={{ color: "#38bdf8" }}>
+                  POST /query/stream (SSE)
+                </span>
+              </div>
+              <div className="telemetry-row">
                 <span>API Endpoint</span>
                 <span className="telemetry-value">
                   {typeof window !== "undefined"
@@ -238,9 +356,9 @@ export default function Home() {
                 </span>
               </div>
               <div className="telemetry-row">
-                <span>Verification</span>
+                <span>Citation Verification</span>
                 <span className="telemetry-value" style={{ color: "#38bdf8" }}>
-                  Citation Cross-Check
+                  Direct Source Text Inspection
                 </span>
               </div>
               <div className="telemetry-row">
