@@ -36,6 +36,9 @@
 | **#41** | Hallucination Guardrails & Refusal Handling | `Completed` | `src/guardrails.py`, `src/hallucination_guardrails.py`, `tests/test_guardrails.py`, `outputs/guardrails_sample.md` |
 | **#42** | Conversational RAG & Follow-Up Context | `Completed` | `src/conversational_rag.py`, `src/conversation.py`, `tests/test_conversational_rag.py`, `outputs/conversational_rag_sample.md` |
 | **#43** | RAG Evaluation & Answer Quality Scoring | `Completed` | `src/rag_evaluation.py`, `src/evaluate_rag.py`, `tests/test_rag_evaluation.py`, `outputs/rag_evaluation_test_set.json`, `outputs/rag_evaluation_report.json`, `outputs/rag_evaluation_summary.md`, `outputs/rag_evaluation_sample.md` |
+| **#44** | Backend API for the RAG Service | `Completed` | `src/backend_api.py`, `src/api.py`, `tests/test_backend_api.py`, `outputs/backend_api_sample.json`, `outputs/backend_api_sample.md` |
+| **#45** | Document Upload & Indexing Endpoint | `Completed` | `src/document_upload.py`, `src/backend_api.py`, `tests/test_document_upload.py`, `outputs/document_upload_sample.json`, `outputs/document_upload_sample.md` |
+| **#46** | Chat Interface & Query UI | `Completed` | `frontend/`, `src/query_ui_demo.py`, `tests/test_query_ui.py` |
 
 ---
 
@@ -918,4 +921,44 @@
 - **Verification Evidence**:
   - 22 tests passing in `tests/test_document_upload.py`; 458 total test suite passing without regression.
   - Verification artifacts generated in `outputs/document_upload_sample.json` and `outputs/document_upload_sample.md`.
+
+---
+
+### Module #46: Chat Interface & Query UI
+- **Status**: `Completed`
+- **Objective**: Build a trustworthy, interactive user interface in Next.js/React where users type questions, receive grounded answers, and inspect source citations. Connect frontend to the backend RAG API (`POST /query`, `POST /documents`, `GET /health`), render answer and retrieved sources side-by-side, handle loading states and error states with user-friendly retry feedback, support runtime document ingestion directly from the UI, and verify interaction scenarios with automated tests, sample interaction logs, and live browser screenshots.
+- **Dependencies**: Module #45 (Document Upload & Indexing Endpoint), Module #44 (Backend API for RAG Service), Module #41 (Hallucination Guardrails & Refusal Handling).
+- **Expected Files**:
+  - `frontend/src/app/page.tsx`
+  - `frontend/src/app/layout.tsx`
+  - `frontend/src/app/globals.css`
+  - `frontend/src/components/Header.tsx`
+  - `frontend/src/components/QueryInput.tsx`
+  - `frontend/src/components/AnswerCard.tsx`
+  - `frontend/src/components/SourcesList.tsx`
+  - `frontend/src/components/DocumentUploadWidget.tsx`
+  - `frontend/src/components/SettingsModal.tsx`
+  - `frontend/src/lib/api.ts`
+  - `frontend/src/types/rag.ts`
+  - `src/query_ui_demo.py`
+  - `tests/test_query_ui.py`
+- **Implementation Subtasks**:
+  1. [x] Task 1 — Build question and answer UI: Input box with character counter, shortcuts, sample prompts, and structured answer cards.
+  2. [x] Task 2 — Call the backend RAG API: Connect UI to `POST /query` and `GET /health` with dynamic endpoint configuration.
+  3. [x] Task 3 — Display retrieved sources: Show source document titles, chunk IDs, and similarity score badges alongside answers.
+  4. [x] Task 4 — Handle loading and error states: Animated loading spinner, safe refusal badges (`refused_weak_context`), input validation feedback, and retry banners.
+  5. [x] Task 5 — Demonstrate and verify sample interactions: author verification tests simulating question, answer, sources, and error behavior.
+  6. [x] Author comprehensive automated unit and integration test suite in `tests/test_query_ui.py` (12 tests).
+- **Acceptance Criteria**:
+  - Question and answer UI with clear input, keyboard triggers, character validation, and grounded display area.
+  - POST /query and GET /health integration operational.
+  - Retrieved sources displayed with document names, chunk IDs, and score attributes.
+  - Loading, error, and safe refusal states handled clearly.
+  - Verification test suite passing.
+- **Required Tests**:
+  - `tests/test_query_ui.py`: 12 automated tests covering health checks, query contracts, source attributes, input validation, refusal handling, Next.js project structure, and artifact generation.
+- **Verification Evidence**:
+  - 12 tests passing in `tests/test_query_ui.py`; 470 total test suite passing without regression.
+  - Next.js production build (`npm run build`) compiled successfully in 262ms with 0 errors.
+  - Browser subagent verified live UI execution at `http://localhost:3000` against FastAPI backend at `http://localhost:8001`.
 
