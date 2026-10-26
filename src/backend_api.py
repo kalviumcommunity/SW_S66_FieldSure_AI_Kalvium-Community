@@ -15,17 +15,20 @@ Tasks:
 from __future__ import annotations
 
 import argparse
+import asyncio
 from dataclasses import asdict, dataclass
 import json
 import logging
 import os
 from pathlib import Path
+import re
 import sys
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, AsyncIterator, Callable, Dict, List, Optional, Sequence, Union
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, Request, Response, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, field_validator
 
 # Ensure repository root is on sys.path
@@ -51,13 +54,16 @@ from src.document_upload import (
     token_chunks,
     validate_upload,
 )
+from src.grounded_generation import generate_grounded_answer
 from src.guardrails import (
     DEFAULT_BENCHMARK_CHUNKS,
     DEFAULT_REFUSAL_MESSAGE,
     STATUS_ANSWERED,
     STATUS_REFUSED_WEAK_CONTEXT,
     GuardedAnswer,
+    get_chunk_score,
     guarded_answer,
+    retrieval_is_strong,
     retrieve,
 )
 
@@ -237,15 +243,137 @@ class HealthResponse(BaseModel):
 # Task 1, 2, 3: Endpoint Definition & FastAPI Application Factory
 # ---------------------------------------------------------------------------
 
+async def rag_pipeline_stream(
+    question: str,
+    retriever_fn: Optional[Callable[[str, int], Sequence[Dict[str, Any]]]] = None,
+    store: Optional[Any] = None,
+    supplemental_chunks: Optional[Sequence[Dict[str, Any]]] = None,
+    llm_fn: Optional[Callable[[str], str]] = None,
+    delay: float = 0.01,
+) -> AsyncIterator[Dict[str, Any]]:
+    """Stream RAG pipeline events (citations, progressive tokens, done, error).
+
+    Pipeline:
+        1. Retrieve candidate context chunks.
+        2. Evaluate retrieval strength with guardrails.
+        3. If weak or out-of-domain:
+           - Emit citations event with empty sources and refused status.
+           - Stream safe refusal tokens progressively.
+        4. If strong:
+           - Emit citations event with formatted source metadata and text.
+           - Synthesize grounded answer and stream tokens progressively.
+
+    Args:
+        question: User query string.
+        retriever_fn: Optional retrieval callable.
+        store: Optional vector store.
+        supplemental_chunks: Optional additional chunks to search.
+        llm_fn: Optional generator callable.
+        delay: Artificial inter-token delay in seconds (default: 0.01s).
+
+    Yields:
+        Event dictionaries containing citations or progressive tokens.
+    """
+    # 1. Retrieve candidate context
+    if retriever_fn is not None:
+        retrieved = list(retriever_fn(question, 4))
+    else:
+        retrieved = retrieve(
+            question,
+            k=4,
+            store=store,
+            supplemental_chunks=supplemental_chunks,
+        )
+
+    # 2. Check retrieval strength against relevance threshold
+    if not retrieval_is_strong(retrieved):
+        top_score = max((get_chunk_score(c) for c in retrieved), default=0.0)
+        yield {
+            "type": "citations",
+            "sources": [],
+            "status": STATUS_REFUSED_WEAK_CONTEXT,
+            "metadata": {
+                "is_refused": True,
+                "top_score": round(float(top_score), 4),
+                "chunks_used": 0,
+            },
+        }
+
+        # Stream refusal tokens progressively
+        tokens = re.findall(r"\S+\s*|\s+", DEFAULT_REFUSAL_MESSAGE)
+        for token in tokens:
+            yield {"type": "token", "text": token}
+            if delay > 0:
+                await asyncio.sleep(delay)
+        return
+
+    # 3. Strong context: Format detailed source citations
+    sources: List[Dict[str, Any]] = []
+    for idx, chunk in enumerate(retrieved):
+        metadata = chunk.get("metadata", {}) if isinstance(chunk, dict) else {}
+        doc_name = (
+            metadata.get("document_title")
+            or metadata.get("source_file")
+            or metadata.get("source")
+            or chunk.get("source")
+            or "Unknown Document"
+        )
+        chunk_id = chunk.get("chunk_id") or metadata.get("chunk_id")
+        section = metadata.get("section_heading") or metadata.get("section")
+        score = get_chunk_score(chunk)
+        text = chunk.get("text", "")
+
+        sources.append({
+            "id": f"source-{idx + 1}",
+            "label": f"[{idx + 1}]",
+            "document": str(doc_name),
+            "source": str(doc_name),
+            "chunk_id": str(chunk_id) if chunk_id else None,
+            "section": str(section) if section else None,
+            "score": round(float(score), 4) if score is not None else None,
+            "text": str(text),
+        })
+
+    top_score = max((get_chunk_score(c) for c in retrieved), default=0.0)
+
+    yield {
+        "type": "citations",
+        "sources": sources,
+        "status": STATUS_ANSWERED,
+        "metadata": {
+            "is_refused": False,
+            "top_score": round(float(top_score), 4),
+            "chunks_used": len(sources),
+        },
+    }
+
+    # 4. Generate grounded answer and stream tokens
+    grounded_res = generate_grounded_answer(question, retrieved, llm_fn=llm_fn)
+    if hasattr(grounded_res, "answer"):
+        answer_text = str(grounded_res.answer)
+    elif isinstance(grounded_res, dict) and "answer" in grounded_res:
+        answer_text = str(grounded_res["answer"])
+    else:
+        answer_text = str(grounded_res)
+
+    tokens = re.findall(r"\S+\s*|\s+", answer_text)
+    for token in tokens:
+        yield {"type": "token", "text": token}
+        if delay > 0:
+            await asyncio.sleep(delay)
+
+
 def create_app(
     pipeline_fn: Optional[Callable[[str], Any]] = None,
     config: Optional[APIConfig] = None,
+    stream_pipeline_fn: Optional[Callable[[str], Any]] = None,
 ) -> FastAPI:
     """Create and configure a production FastAPI application for the RAG service.
 
     Args:
-        pipeline_fn: Optional callable for RAG answering (defaults to guarded_answer).
+        pipeline_fn: Optional callable for synchronous RAG answering.
         config: Optional pre-loaded APIConfig.
+        stream_pipeline_fn: Optional callable for streaming RAG events.
 
     Returns:
         Configured FastAPI application instance.
@@ -283,6 +411,7 @@ def create_app(
     # Attach config, pipeline callable, and runtime index registry to app.state
     app.state.config = app_config
     app.state.pipeline_fn = rag_pipeline
+    app.state.stream_pipeline_fn = stream_pipeline_fn
     app.state.runtime_chunks = []
     app.state.upload_dir = UPLOAD_DIR
 
@@ -304,6 +433,7 @@ def create_app(
             "status": "online",
             "endpoints": {
                 "query": "POST /query",
+                "query_stream": "POST /query/stream",
                 "documents": "POST /documents",
                 "health": "GET /health",
                 "config": "GET /config",
@@ -445,6 +575,56 @@ def create_app(
                 detail="RAG service failed",
             )
 
+    @app.post(
+        "/query/stream",
+        tags=["RAG Query"],
+        summary="Stream RAG query response and citations progressively",
+        description="Streams Server-Sent Events (SSE) containing citations, progressive tokens, done, or error.",
+    )
+    async def query_rag_stream_endpoint(request: QueryRequest) -> StreamingResponse:
+        """Stream RAG response events as Server-Sent Events (SSE)."""
+        async def events():
+            try:
+                runtime_chunks = getattr(app.state, "runtime_chunks", [])
+                combined_chunks = list(DEFAULT_BENCHMARK_CHUNKS) + list(runtime_chunks)
+                store = getattr(app.state, "vector_store", None)
+
+                stream_fn = getattr(app.state, "stream_pipeline_fn", None)
+                if stream_fn is not None:
+                    stream_iter = stream_fn(request.question)
+                else:
+                    stream_iter = rag_pipeline_stream(
+                        request.question,
+                        retriever_fn=lambda q, k_val: retrieve(
+                            q,
+                            k=k_val,
+                            store=store,
+                            supplemental_chunks=combined_chunks,
+                        ),
+                    )
+
+                async for event in stream_iter:
+                    yield f"data: {json.dumps(event)}\n\n"
+
+                yield f"data: {json.dumps({'type': 'done'})}\n\n"
+            except Exception as error:
+                logger.error("The answer stopped streaming: %s", error, exc_info=True)
+                error_event = {
+                    "type": "error",
+                    "message": "The answer stopped streaming. Please retry.",
+                }
+                yield f"data: {json.dumps(error_event)}\n\n"
+
+        return StreamingResponse(
+            events(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            },
+        )
+
     return app
 
 
@@ -511,6 +691,33 @@ async def upload_document(file: UploadFile) -> UploadResponse:
         raise
     except Exception:
         raise HTTPException(status_code=500, detail="Document indexing failed")
+
+
+async def stream_query(request: QueryRequest, delay: float = 0.01) -> StreamingResponse:
+    """Standalone functional streaming query handler matching prompt specification."""
+    async def events():
+        try:
+            combined = list(DEFAULT_BENCHMARK_CHUNKS) + list(RUNTIME_UPLOADED_CHUNKS)
+            async for event in rag_pipeline_stream(
+                request.question,
+                retriever_fn=lambda q, k_val: retrieve(
+                    q,
+                    k=k_val,
+                    supplemental_chunks=combined,
+                ),
+                delay=delay,
+            ):
+                yield f"data: {json.dumps(event)}\n\n"
+
+            yield f"data: {json.dumps({'type': 'done'})}\n\n"
+        except Exception:
+            error_event = {
+                "type": "error",
+                "message": "The answer stopped streaming. Please retry.",
+            }
+            yield f"data: {json.dumps(error_event)}\n\n"
+
+    return StreamingResponse(events(), media_type="text/event-stream")
 
 
 # ---------------------------------------------------------------------------

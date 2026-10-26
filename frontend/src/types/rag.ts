@@ -9,7 +9,39 @@ export interface SourceCitation {
   source: string;
   chunk_id: string | null;
   score: number | null;
+  id?: string;
+  label?: string;
+  document?: string;
+  section?: string | null;
+  text?: string;
 }
+
+export interface StreamCitationsEvent {
+  type: "citations";
+  sources: SourceCitation[];
+  status?: string;
+  metadata?: QueryMetadata;
+}
+
+export interface StreamTokenEvent {
+  type: "token";
+  text: string;
+}
+
+export interface StreamDoneEvent {
+  type: "done";
+}
+
+export interface StreamErrorEvent {
+  type: "error";
+  message: string;
+}
+
+export type StreamEvent =
+  | StreamCitationsEvent
+  | StreamTokenEvent
+  | StreamDoneEvent
+  | StreamErrorEvent;
 
 export interface QueryMetadata {
   top_score?: number | null;
