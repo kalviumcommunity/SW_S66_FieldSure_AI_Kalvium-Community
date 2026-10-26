@@ -24,7 +24,7 @@ import sys
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request, Response, status
+from fastapi import FastAPI, File, HTTPException, Request, Response, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 
@@ -34,12 +34,31 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from src.config import mask_api_key
+from src.document_upload import (
+    MAX_UPLOAD_SIZE,
+    RUNTIME_UPLOADED_CHUNKS,
+    SUPPORTED_EXTENSIONS,
+    UPLOAD_DIR,
+    UploadResponse,
+    UploadSummary,
+    clean,
+    embed_chunks,
+    index_chunks,
+    load_text,
+    process_uploaded_document,
+    store_upload,
+    tag_chunks,
+    token_chunks,
+    validate_upload,
+)
 from src.guardrails import (
+    DEFAULT_BENCHMARK_CHUNKS,
     DEFAULT_REFUSAL_MESSAGE,
     STATUS_ANSWERED,
     STATUS_REFUSED_WEAK_CONTEXT,
     GuardedAnswer,
     guarded_answer,
+    retrieve,
 )
 
 logger = logging.getLogger("fieldsure.backend_api")
@@ -232,7 +251,22 @@ def create_app(
         Configured FastAPI application instance.
     """
     app_config = config or load_environment_config()
-    rag_pipeline = pipeline_fn or guarded_answer
+
+    def default_rag_pipeline(question: str) -> Any:
+        runtime_chunks = getattr(app.state, "runtime_chunks", [])
+        combined_chunks = list(DEFAULT_BENCHMARK_CHUNKS) + list(runtime_chunks)
+        store = getattr(app.state, "vector_store", None)
+        return guarded_answer(
+            question,
+            retriever_fn=lambda q, k_val: retrieve(
+                q,
+                k=k_val,
+                store=store,
+                supplemental_chunks=combined_chunks,
+            ),
+        )
+
+    rag_pipeline = pipeline_fn or default_rag_pipeline
 
     app = FastAPI(
         title="FieldSure AI — Backend API for RAG Service",
@@ -246,9 +280,11 @@ def create_app(
         redoc_url="/redoc",
     )
 
-    # Attach config and pipeline callable to app.state for testing & introspection
+    # Attach config, pipeline callable, and runtime index registry to app.state
     app.state.config = app_config
     app.state.pipeline_fn = rag_pipeline
+    app.state.runtime_chunks = []
+    app.state.upload_dir = UPLOAD_DIR
 
     # Enable CORS for frontend integration
     app.add_middleware(
@@ -268,6 +304,7 @@ def create_app(
             "status": "online",
             "endpoints": {
                 "query": "POST /query",
+                "documents": "POST /documents",
                 "health": "GET /health",
                 "config": "GET /config",
                 "docs": "GET /docs",
@@ -288,6 +325,50 @@ def create_app(
         """Return active service configuration with sensitive credentials masked."""
         cfg: APIConfig = getattr(app.state, "config", app_config)
         return cfg.to_safe_dict()
+
+    @app.post(
+        "/documents",
+        response_model=UploadResponse,
+        status_code=status.HTTP_200_OK,
+        tags=["Document Ingestion"],
+        summary="Upload and index a document at runtime",
+        description="Stores an uploaded file, extracts text, cleans, chunks, embeds, and indexes it into the knowledge base so it becomes immediately searchable via POST /query without restarting the app.",
+    )
+    async def upload_document_endpoint(file: UploadFile = File(...)) -> UploadResponse:
+        """Store and index a document at runtime, making it immediately searchable."""
+        try:
+            target_upload_dir = getattr(app.state, "upload_dir", UPLOAD_DIR)
+            path = await store_upload(file, upload_dir=target_upload_dir)
+            store = getattr(app.state, "vector_store", None)
+            summary = process_uploaded_document(path, store=store)
+
+            # Register chunks in app.state.runtime_chunks for instant query searchability
+            tagged = summary.get("tagged_chunks", [])
+            if hasattr(app.state, "runtime_chunks"):
+                for chunk in tagged:
+                    if not any(
+                        c.get("chunk_id") == chunk.get("chunk_id")
+                        for c in app.state.runtime_chunks
+                    ):
+                        app.state.runtime_chunks.append(chunk)
+
+            return UploadResponse(
+                status="indexed",
+                filename=file.filename or Path(path).name,
+                summary=UploadSummary(
+                    document=str(path),
+                    chunks=summary["chunks"],
+                    indexed=summary["indexed"],
+                ),
+            )
+        except HTTPException:
+            raise
+        except Exception as error:
+            logger.error("Document indexing failed: %s", error, exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Document indexing failed",
+            )
 
     @app.post(
         "/query",
@@ -374,7 +455,15 @@ app = create_app()
 def query_rag(request: QueryRequest) -> QueryResponse:
     """Standalone functional wrapper matching the prompt reference implementation."""
     try:
-        result = guarded_answer(request.question)
+        combined = list(DEFAULT_BENCHMARK_CHUNKS) + list(RUNTIME_UPLOADED_CHUNKS)
+        result = guarded_answer(
+            request.question,
+            retriever_fn=lambda q, k_val: retrieve(
+                q,
+                k=k_val,
+                supplemental_chunks=combined,
+            ),
+        )
         sources: List[Source] = []
         for source in result.get("sources", []):
             score = source.get("score")
@@ -402,6 +491,26 @@ def query_rag(request: QueryRequest) -> QueryResponse:
         raise HTTPException(status_code=400, detail=str(error))
     except Exception:
         raise HTTPException(status_code=500, detail="RAG service failed")
+
+
+async def upload_document(file: UploadFile) -> UploadResponse:
+    """Standalone functional upload handler matching prompt reference specification."""
+    try:
+        path = await store_upload(file)
+        summary = process_uploaded_document(path)
+        return UploadResponse(
+            status="indexed",
+            filename=file.filename or Path(path).name,
+            summary=UploadSummary(
+                document=str(path),
+                chunks=summary["chunks"],
+                indexed=summary["indexed"],
+            ),
+        )
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Document indexing failed")
 
 
 # ---------------------------------------------------------------------------
