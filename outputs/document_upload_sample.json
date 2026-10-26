@@ -1,0 +1,89 @@
+{
+  "metadata": {
+    "concept": "3.45 Document Upload & Indexing Endpoint",
+    "service": "FieldSure AI RAG Backend Service",
+    "timestamp": "2026-10-26T11:44:44.566474+00:00"
+  },
+  "sample_upload": {
+    "filename": "new-policy.md",
+    "char_count": 617,
+    "response": {
+      "status": "indexed",
+      "filename": "new-policy.md",
+      "summary": {
+        "document": "uploads/new-policy.md",
+        "chunks": 3,
+        "indexed": 3
+      }
+    }
+  },
+  "runtime_searchability_test": {
+    "question": "What temperature range must cold chain units maintain according to the remote protocol?",
+    "pre_upload": {
+      "status_code": 200,
+      "response": {
+        "answer": "I don't have enough reliable context to answer that.",
+        "sources": [],
+        "status": "refused_weak_context",
+        "metadata": {
+          "top_score": 0.2,
+          "chunks_used": 0,
+          "is_refused": true,
+          "total_sources": 0
+        }
+      }
+    },
+    "post_upload": {
+      "status_code": 200,
+      "response": {
+        "answer": "Based on verified protocol guidance :\n## Remote Field Work Protocol All field epidemiologists and community health staff deployed to remote surveillance zones must carry certified solar-powered cold chain monitoring units. Cold chain units must maintain the temperature range for vaccines and biological specimens strictly between 2\u00b0C and 8\u00b0C at all times according to remote protocol directives. WATER TREATMENT STANDARDS - All drinking water distributed in settlement camps must be disinfected with sodium dichloroisocyanurate (NaDCC) or calcium hypochlorite. * Turbid water (NTU > 5) must undergo flocculation or filtration prior to chlorination.\n\nNotice: FieldSure AI is an informational protocol assistant, not a clinical diagnostic system. Always refer patients with severe or worsening symptoms to the nearest primary health center (PHC).",
+        "sources": [
+          {
+            "source": "new-policy.md",
+            "chunk_id": null,
+            "score": 1.0
+          },
+          {
+            "source": "data/sample_advisories/cdc_cholera_water_safety.txt",
+            "chunk_id": "doc_cdc_cholera_protocol_2024_c0001",
+            "score": 1.0
+          },
+          {
+            "source": "data/sample_advisories/cdc_cholera_water_safety.txt",
+            "chunk_id": "doc_cdc_cholera_protocol_2024_c0003",
+            "score": 1.0
+          },
+          {
+            "source": "new-policy.md",
+            "chunk_id": null,
+            "score": 1.0
+          }
+        ],
+        "status": "answered",
+        "metadata": {
+          "top_score": 1.0,
+          "chunks_used": 4,
+          "is_refused": false,
+          "total_sources": 4
+        }
+      }
+    },
+    "runtime_searchability_confirmed": true
+  },
+  "error_handling_tests": {
+    "unsupported_media_type": {
+      "filename": "malicious.py",
+      "status_code": 415,
+      "response": {
+        "detail": "Unsupported file type: '.py'. Supported formats: ['.md', '.pdf', '.txt']"
+      }
+    },
+    "empty_file": {
+      "filename": "empty.txt",
+      "status_code": 400,
+      "response": {
+        "detail": "File is empty"
+      }
+    }
+  }
+}

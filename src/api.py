@@ -1,4 +1,4 @@
-"""API module entry point re-exporting backend API components (Concept 3.44)."""
+"""API module entry point re-exporting backend API & document upload components (Concepts 3.44 & 3.45)."""
 
 from src.backend_api import (
     APIConfig,
@@ -11,6 +11,26 @@ from src.backend_api import (
     load_environment_config,
     query_rag,
     run_demo,
+    upload_document,
+)
+from src.document_upload import (
+    MAX_UPLOAD_SIZE,
+    RUNTIME_UPLOADED_CHUNKS,
+    SUPPORTED_EXTENSIONS,
+    UPLOAD_DIR,
+    UploadResponse,
+    UploadSummary,
+    clean,
+    clear_runtime_uploaded_chunks,
+    embed_chunks,
+    index_chunks,
+    load_text,
+    process_uploaded_document,
+    run_upload_demo,
+    store_upload,
+    tag_chunks,
+    token_chunks,
+    validate_upload,
 )
 
 __all__ = [
@@ -24,4 +44,23 @@ __all__ = [
     "load_environment_config",
     "query_rag",
     "run_demo",
+    # Concept 3.45: Document Upload & Indexing
+    "UploadResponse",
+    "UploadSummary",
+    "UPLOAD_DIR",
+    "SUPPORTED_EXTENSIONS",
+    "MAX_UPLOAD_SIZE",
+    "RUNTIME_UPLOADED_CHUNKS",
+    "clear_runtime_uploaded_chunks",
+    "validate_upload",
+    "store_upload",
+    "load_text",
+    "clean",
+    "token_chunks",
+    "tag_chunks",
+    "embed_chunks",
+    "index_chunks",
+    "process_uploaded_document",
+    "upload_document",
+    "run_upload_demo",
 ]

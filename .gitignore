@@ -27,6 +27,8 @@ data/*
 !data/.gitkeep
 !data/README.md
 !data/sample_advisories/
+uploads/*
+!uploads/.gitkeep
 
 # Generated execution logs and artifacts (keep tracking sample outputs only)
 outputs/*.log
@@ -38,6 +40,7 @@ outputs/*.json
 !outputs/rag_evaluation_test_set.json
 !outputs/rag_evaluation_report.json
 !outputs/backend_api_sample.json
+!outputs/document_upload_sample.json
 !outputs/.gitkeep
 !outputs/chat_completion_sample.log
 !outputs/prompt_comparison_sample.log

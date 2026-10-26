@@ -886,3 +886,36 @@
 - **Verification Evidence**:
   - 26 tests passing in `tests/test_backend_api.py`; 436 total test suite passing without regression.
   - Verification artifacts generated in `outputs/backend_api_sample.json` and `outputs/backend_api_sample.md`.
+
+---
+
+### Module #45: Document Upload & Indexing Endpoint
+- **Status**: `Completed`
+- **Objective**: Expand the FieldSure AI RAG knowledge base at runtime without restarting the application. Expose a document upload endpoint (`POST /documents`) that accepts a document file (`.txt`, `.md`, `.pdf`), validates file formats, sanitizes file paths to prevent directory traversal, stores it safely, ingests and cleans the text, segments it into token-budgeted chunks with structural overlap, tags chunks with immutable citation metadata, embeds chunks into dense vectors, and indexes them into the vector database and runtime index. Immediately enable `POST /query` to retrieve and answer questions grounded in the newly uploaded document without application restart.
+- **Dependencies**: Module #44 (Backend API for RAG Service), Module #41 (Hallucination Guardrails & Refusal Handling), Module #40 (Source Citation & Attribution), Module #15 (Corpus Preparation & Ingestion Pipeline).
+- **Expected Files**:
+  - `src/document_upload.py`
+  - `src/backend_api.py`
+  - `src/api.py`
+  - `tests/test_document_upload.py`
+  - `outputs/document_upload_sample.json`
+  - `outputs/document_upload_sample.md`
+- **Implementation Subtasks**:
+  1. [x] Task 1 — Create upload endpoint: Implement `POST /documents` accepting document files (`.txt`, `.md`, `.pdf`) and storing them safely with path traversal protection.
+  2. [x] Task 2 — Ingest, embed, and index: Process uploaded document through loading, semantic text cleaning, token-aware structural chunking, metadata tagging, embedding, and vector database/runtime indexing.
+  3. [x] Task 3 — Confirm runtime searchability: Verify that newly uploaded content becomes immediately searchable through `POST /query` with full grounded citation attribution without restarting the server.
+  4. [x] Task 4 — Handle upload errors: Validate formats and file sizes gracefully, returning HTTP 415 for unsupported media types, HTTP 400 for empty or invalid files, HTTP 413 for oversized uploads, and HTTP 500 for pipeline failures without leaking tracebacks.
+  5. [x] Task 5 — Commit sample upload run: Export and verify sample upload request, indexing summary (`status: indexed`), and follow-up query verification in `outputs/document_upload_sample.json` and `outputs/document_upload_sample.md`.
+  6. [x] Author comprehensive automated unit and integration test suite in `tests/test_document_upload.py` (22 tests).
+- **Acceptance Criteria**:
+  - `POST /documents` endpoint operational, accepts `.txt`, `.md`, `.pdf` and returns structured summary `{status: 'indexed', filename: '...', summary: {document: '...', chunks: N, indexed: N}}`.
+  - Directory traversal attacks (`../../`) sanitized to safe basenames.
+  - Runtime searchability confirmed: pre-upload query refuses safely (`refused_weak_context`); post-upload query answers with verified citation (`answered`) without app restart.
+  - Unsupported file formats rejected with HTTP 415; empty files rejected with HTTP 400; oversized files rejected with HTTP 413.
+  - Zero hardcoded secrets, zero credential leakage.
+- **Required Tests**:
+  - `tests/test_document_upload.py`: 22 automated tests covering file format validation, traversal sanitization, size limits, text extraction, cleaning, chunking, metadata tagging, embedding, runtime searchability, error handling, and artifact generation.
+- **Verification Evidence**:
+  - 22 tests passing in `tests/test_document_upload.py`; 458 total test suite passing without regression.
+  - Verification artifacts generated in `outputs/document_upload_sample.json` and `outputs/document_upload_sample.md`.
+
