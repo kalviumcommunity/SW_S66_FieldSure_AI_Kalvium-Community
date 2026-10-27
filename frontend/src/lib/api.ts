@@ -180,6 +180,14 @@ export async function streamAnswer(
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
+    let doneEmitted = false;
+
+    const emitDone = () => {
+      if (!doneEmitted) {
+        doneEmitted = true;
+        callbacks.onDone?.();
+      }
+    };
 
     try {
       while (true) {
@@ -225,7 +233,7 @@ export async function streamAnswer(
             } else if (event.type === "error") {
               callbacks.onError?.(event.message || "The answer stopped streaming. Please retry.");
             } else if (event.type === "done") {
-              callbacks.onDone?.();
+              emitDone();
             }
           } catch (jsonErr) {
             console.warn("Failed to parse SSE event:", dataStr, jsonErr);
@@ -238,13 +246,13 @@ export async function streamAnswer(
         try {
           const event: StreamEvent = JSON.parse(buffer.trim().slice(6).trim());
           if (event.type === "token") callbacks.onToken?.(event.text);
-          else if (event.type === "done") callbacks.onDone?.();
+          else if (event.type === "done") emitDone();
         } catch {
           // ignore
         }
       }
 
-      callbacks.onDone?.();
+      emitDone();
     } finally {
       reader.releaseLock();
     }

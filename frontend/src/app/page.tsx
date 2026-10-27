@@ -25,6 +25,7 @@ export default function Home() {
   >([]);
 
   const abortControllerRef = useRef<AbortController | null>(null);
+  const currentResultRef = useRef<QueryResponse | null>(null);
 
   // Periodically check backend health
   const refreshHealth = useCallback(async () => {
@@ -91,6 +92,7 @@ export default function Home() {
       status: "streaming",
       metadata: {},
     };
+    currentResultRef.current = initialResponse;
     setCurrentResult(initialResponse);
 
     try {
@@ -98,33 +100,37 @@ export default function Home() {
         question,
         {
           onCitations: (sources) => {
-            setCurrentResult((prev) => ({
-              ...(prev || initialResponse),
+            currentResultRef.current = {
+              ...(currentResultRef.current || initialResponse),
               sources,
-            }));
+            };
+            setCurrentResult(currentResultRef.current);
             setLoading(false);
           },
           onToken: (token) => {
-            setCurrentResult((prev) => ({
-              ...(prev || initialResponse),
-              answer: (prev?.answer || "") + token,
-            }));
+            currentResultRef.current = {
+              ...(currentResultRef.current || initialResponse),
+              answer: (currentResultRef.current?.answer || "") + token,
+            };
+            setCurrentResult(currentResultRef.current);
             setLoading(false);
           },
           onStatus: (status) => {
-            setCurrentResult((prev) => ({
-              ...(prev || initialResponse),
+            currentResultRef.current = {
+              ...(currentResultRef.current || initialResponse),
               status,
-            }));
+            };
+            setCurrentResult(currentResultRef.current);
           },
           onMetadata: (metadata) => {
-            setCurrentResult((prev) => ({
-              ...(prev || initialResponse),
+            currentResultRef.current = {
+              ...(currentResultRef.current || initialResponse),
               metadata: {
-                ...(prev?.metadata || {}),
+                ...(currentResultRef.current?.metadata || {}),
                 ...metadata,
               },
-            }));
+            };
+            setCurrentResult(currentResultRef.current);
           },
           onError: (errMsg) => {
             setError(errMsg);
@@ -135,20 +141,23 @@ export default function Home() {
           onDone: () => {
             setIsStreaming(false);
             setLoading(false);
-            setCurrentResult((latest) => {
-              if (latest && latest.answer) {
-                // Record completed interaction in session history
-                setHistory((prev) => [
+            const latest = currentResultRef.current;
+            if (latest && (latest.answer || latest.status === "refused_weak_context")) {
+              setHistory((prev) => {
+                // Deduplicate: remove any previous entry with the identical question
+                const remaining = prev.filter(
+                  (item) => item.question.trim().toLowerCase() !== question.trim().toLowerCase()
+                );
+                return [
                   {
-                    question,
+                    question: question.trim(),
                     result: latest,
                     timestamp: new Date().toLocaleTimeString(),
                   },
-                  ...prev.slice(0, 9),
-                ]);
-              }
-              return latest;
-            });
+                  ...remaining.slice(0, 9),
+                ];
+              });
+            }
           },
         },
         getApiBaseUrl(),
@@ -260,17 +269,38 @@ export default function Home() {
           {/* Query Session History */}
           {history.length > 0 && (
             <div className="widget-card">
-              <h3>
-                <span>🕒 Recent Inquiries</span>
-                <span
-                  style={{
-                    fontSize: "0.72rem",
-                    color: "var(--text-muted)",
-                    fontWeight: "normal",
-                  }}
-                >
-                  ({history.length})
+              <h3 style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span>
+                  <span>🕒 Recent Inquiries</span>{" "}
+                  <span
+                    style={{
+                      fontSize: "0.72rem",
+                      color: "var(--text-muted)",
+                      fontWeight: "normal",
+                    }}
+                  >
+                    ({history.length})
+                  </span>
                 </span>
+                <button
+                  type="button"
+                  onClick={() => setHistory([])}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "var(--text-muted)",
+                    fontSize: "0.72rem",
+                    cursor: "pointer",
+                    padding: "2px 6px",
+                    borderRadius: "var(--radius-sm)",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "var(--danger-text, #f87171)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+                  title="Clear inquiry history"
+                >
+                  Clear
+                </button>
               </h3>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {history.map((item, idx) => (
